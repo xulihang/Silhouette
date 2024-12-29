@@ -17,11 +17,15 @@ Library1=b4jvlcj
 Library2=javaobject
 Library3=jcore
 Library4=jfx
-Library5=jxui
-Library6=jreflection
+Library5=jreflection
+Library6=jxui
+Library7=jshell
+Module1=ASR
+Module2=FFMpeg
+Module3=Utils
 NumberOfFiles=6
-NumberOfLibraries=6
-NumberOfModules=0
+NumberOfLibraries=7
+NumberOfModules=3
 Version=8.9
 @EndOfDesignText@
 #Region Project Attributes 
@@ -166,11 +170,36 @@ Private Sub MenuBar1_Action
 			OpenFile
 		Case "_Close"
 			Close
+		Case "_Recognize Speech"
+			RecognizeSpeech
 		Case "_Exit"
 			ExitApp
 		Case "_About"
 			fx.Msgbox(MainForm,"@xulihang, 2024","Silhouette")
 	End Select
+End Sub
+
+Private Sub RecognizeSpeech
+	If currentFile = "" Then
+		Return
+	End If
+	Dim parent As String = File.GetFileParent(currentFile)
+	Dim filename As String = File.GetName(currentFile)
+	Dim tmpFolder As String = File.Combine(parent,"tmp")
+	Dim dir As String = File.Combine(tmpFolder,filename)
+	File.MakeDir(tmpFolder,"")
+	File.MakeDir(dir,"")
+	If File.Exists(dir,"audio.wav") = False Then
+		Dim outpath As String = File.Combine(dir,"audio.wav")
+		Log("convert video to wav...")
+		Wait For (FFMpeg.Video2Wav(parent,filename,outpath)) Complete (done As Object)
+		Log("convert video to wav done")
+	End If
+	If File.Exists(dir,"segnemnt-00001.wav") = False Then
+		Log("split wav...")
+		Wait For (FFMpeg.SplitWav(30,dir,"audio.wav")) Complete (done As Object)
+		Log("split wav done")
+	End If
 End Sub
 
 Private Sub Close
