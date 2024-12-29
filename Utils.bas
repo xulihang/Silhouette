@@ -20,3 +20,13 @@ Public Sub DetectOS As String
 		Return "linux"
 	End If
 End Sub
+
+Sub GetFilenameWithoutExtension(filename As String) As String
+	Try
+		filename=filename.SubString2(0,filename.LastIndexOf("."))
+	Catch
+		Log(LastException)
+	End Try
+	Return filename
+End Sub
+

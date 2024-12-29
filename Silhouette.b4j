@@ -200,6 +200,24 @@ Private Sub RecognizeSpeech
 		Wait For (FFMpeg.SplitWav(30,dir,"audio.wav")) Complete (done As Object)
 		Log("split wav done")
 	End If
+	Dim files As List = File.ListFiles(dir)
+	Dim wavFiles As List
+	wavFiles.Initialize
+	For Each filename As String In files
+		If filename.StartsWith("segment") And filename.EndsWith(".wav") Then
+			wavFiles.Add(filename)
+		End If
+	Next
+	Dim index As Int = 1
+	For Each filename As String In wavFiles
+		Log(index & "/" & wavFiles.Size)
+		Dim purename As String = Utils.GetFilenameWithoutExtension(filename)
+		If File.Exists(dir,purename&".srt") = False Then
+			Dim wavpath As String = File.Combine(dir,filename)
+			Wait For (ASR.RecognizeWav(wavpath,"ja")) Complete (done As Object)
+		End If
+		index = index + 1
+	Next
 End Sub
 
 Private Sub Close
