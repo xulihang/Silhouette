@@ -1,0 +1,278 @@
+﻿AppType=JavaFX
+Build1=Default,b4j.example
+File1=Editor.bjl
+File2=LeftSplitPane.bjl
+File3=ListView.bjl
+File4=main.bjl
+File5=VideoPlayer.bjl
+File6=WaveForm.bjl
+FileGroup1=Default Group
+FileGroup2=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+FileGroup5=Default Group
+FileGroup6=Default Group
+Group=Default Group
+Library1=b4jvlcj
+Library2=javaobject
+Library3=jcore
+Library4=jfx
+Library5=jxui
+Library6=jreflection
+NumberOfFiles=6
+NumberOfLibraries=6
+NumberOfModules=0
+Version=8.9
+@EndOfDesignText@
+#Region Project Attributes 
+	#MainFormWidth: 600
+	#MainFormHeight: 600 
+#End Region
+
+Sub Process_Globals
+	Private fx As JFX
+	Private MainForm As Form
+	Private xui As XUI 
+	Private vlc As B4JVlcj
+	Private MenuBar1 As MenuBar
+	Private MainPane As Pane
+	Private EditorSplitPane As SplitPane
+	Private LeftSplitPane As SplitPane
+	Private EditorListView As ListView
+	Private VLCPane As Pane
+	Private PlayButton As Button
+	Private ProgressSlider As Slider
+	Private VolSlider As Slider
+	Private currentFile As String
+	Private ProgressLabel As Label
+	Private TotalTimeLabel As Label
+	Private ProgressTimer As Timer
+	Private ProgressContextMenu As ContextMenu
+End Sub
+
+Sub AppStart (Form1 As Form, Args() As String)
+	'** IMPORTANT - checking if VLC is installed on the computer should be the first thing to execute in your code
+	If vlc.IsVLCInstalled = False Then
+		'Implement your own code to tell user that VLC must be installed.
+		'Note: if VLC has been installed in a non-standard directory, VLC might not be found.
+		fx.Msgbox(MainForm,"VLC must be installed on the computer to run this program.","")
+		ExitApplication
+	End If
+	
+	'** OK, VLC was found. We can proceed.
+	vlc.Initialize("vlc")
+	MainForm = Form1
+	MainForm.RootPane.LoadLayout("main")
+	MainForm.WindowWidth = 800
+	MainForm.Show
+	MainPane.LoadLayout("Editor")
+	EditorSplitPane.LoadLayout("LeftSplitPane")
+	EditorSplitPane.LoadLayout("ListView")
+	LeftSplitPane.LoadLayout("VideoPlayer")
+	LeftSplitPane.LoadLayout("WaveForm")
+	LeftSplitPane.DividerPositions = Array As Double(0.8,0.2)
+	LeftSplitPane.Vertical = True
+	Dim jo As JavaObject = VLCPane
+	jo.RunMethodJo("getChildren", Null).RunMethod("add", Array(vlc.player))
+	ProgressTimer.Initialize("ProgressTimer",1000)
+	ProgressTimer.Enabled = False
+	'Dim Obj As Reflector
+	'Obj.Target = ProgressSlider
+	'Obj.AddChangeListener("ProgressSlider", "onMouseMovedProperty")
+	Dim jo As JavaObject = ProgressSlider
+	Dim e As Object = jo.CreateEventFromUI("javafx.event.EventHandler", "progress_mousemoved", Null)
+	jo.RunMethod("setOnMouseMoved", Array(e))
+	Dim e As Object = jo.CreateEventFromUI("javafx.event.EventHandler", "progress_mouseclicked", Null)
+	jo.RunMethod("setOnMouseClicked", Array(e))
+	ProgressSlider.tag = False
+	ProgressContextMenu.Initialize("ProgressContextMenu")
+End Sub
+
+Sub Progress_MouseClicked_Event (MethodName As String, Args() As Object) As ResumableSub
+	If vlc.IsPlayable = False Then
+		Return Null
+	End If
+	Dim e As MouseEvent = Args(0)
+	Dim percent As Double = e.X / ProgressSlider.Width
+	ProgressSlider.Enabled = False
+	ProgressSlider.Value = percent * 100
+	vlc.SetPosition(percent)
+	ProgressContextMenu.MenuItems.Clear
+	e.Consume
+	Sleep(0)
+	ProgressSlider.Enabled = True
+	Return Null
+End Sub
+
+Sub Progress_MouseMoved_Event (MethodName As String, Args() As Object) As Object
+	If vlc.IsPlayable = False Then
+		Return Null
+	End If
+	Dim e As MouseEvent = Args(0)
+	Dim percent As Double = e.X / ProgressSlider.Width
+	Dim time As Long = percent * vlc.GetLength / 1000
+	ProgressContextMenu.MenuItems.Clear
+	Dim mi As MenuItem
+	mi.Initialize(GetTimeLabelText(time),"")
+	ProgressContextMenu.MenuItems.Add(mi)
+	Dim map1 As Map
+	map1=GetScreenPosition(ProgressSlider)
+	Dim jo As JavaObject = ProgressContextMenu
+	jo.RunMethod("show", Array(ProgressSlider, map1.Get("x")+e.X, map1.Get("y")-40))
+	Return Null
+End Sub
+
+Private Sub GetTimeLabelText(totalSeconds As Long) As String
+	Dim minutes As Int =  Floor(totalSeconds / 60)
+	Dim seconds As Int = totalSeconds - minutes*60
+	Return NumberFormat(minutes,2,0) & ":" & NumberFormat(seconds,2,0)
+End Sub
+
+
+Sub GetScreenPosition(n As Node) As Map
+	Dim m As Map = CreateMap("x": 0, "y": 0)
+	Dim x = 0, y = 0 As Double
+	Dim joNode = n, joScene, joStage As JavaObject
+  
+	'Get the scene position:
+	joScene = joNode.RunMethod("getScene",Null)
+	If joScene.IsInitialized = False Then Return m
+	x = x + joScene.RunMethod("getX", Null)
+	y = y + joScene.RunMethod("getY", Null)
+
+	'Get the stage position:
+	joStage = joScene.RunMethod("getWindow", Null)
+	If joStage.IsInitialized = False Then Return m
+	x = x + joStage.RunMethod("getX", Null)
+	y = y + joStage.RunMethod("getY", Null)
+  
+	'Get the node position in the scene:
+	Do While True
+		y = y + joNode.RunMethod("getLayoutY", Null)
+		x = x + joNode.RunMethod("getLayoutX", Null)
+		joNode = joNode.RunMethod("getParent", Null)
+		If joNode.IsInitialized = False Then Exit
+	Loop
+
+	m.Put("x", x)
+	m.Put("y", y)
+	Return m
+End Sub
+
+Private Sub MenuBar1_Action
+	Dim mi As MenuItem = Sender
+	Select mi.Text
+		Case "_Open Media File"
+			OpenFile
+		Case "_Close"
+			Close
+		Case "_Exit"
+			ExitApp
+		Case "_About"
+			fx.Msgbox(MainForm,"@xulihang, 2024","Silhouette")
+	End Select
+End Sub
+
+Private Sub Close
+	StopPlaying
+	currentFile = ""
+End Sub
+
+Private Sub OpenFile
+	Dim fc As FileChooser
+	fc.Initialize
+	Dim path As String = fc.ShowOpen(MainForm)
+	If File.Exists(path,"") Then
+		currentFile = path
+		PlayFile(path)
+	End If
+End Sub
+
+Private Sub PlayFile(path As String)
+	If vlc.IsPlaying Then
+		vlc.Stop
+	End If
+	ProgressSlider.tag = False
+	ProgressSlider.Value = 0
+	vlc.Play(path)
+	Sleep(0)
+	ProgressSlider.tag = True
+	Do While vlc.IsPlaying == False
+		Sleep(100)
+	Loop
+	TogglePlayingStatus(True)
+	Dim time As Long = vlc.GetLength / 1000
+	Dim minutes As Int =  Floor(time / 60)
+	Dim seconds As Int = time - minutes*60
+	TotalTimeLabel.Text = NumberFormat(minutes,2,0) & ":" & NumberFormat(seconds,2,0)
+End Sub
+
+Private Sub VLCPane_Resize (Width As Double, Height As Double)
+	Dim n As Node = VLCPane.GetNode(0)
+	n.PrefWidth = Width
+	n.PrefHeight = Height
+End Sub
+
+Sub MainForm_CloseRequest (EventData As Event)
+	Log("We are closing the mainform")
+	vlc.stop
+	vlc.release
+End Sub
+
+Private Sub ExitApp
+	vlc.stop
+	vlc.release
+	ExitApplication
+End Sub
+
+Private Sub VolSlider_ValueChange (Value As Double)
+	vlc.SetVolume(Value)
+End Sub
+
+Private Sub StopButton_MouseClicked (EventData As MouseEvent)
+	StopPlaying
+End Sub
+
+Private Sub StopPlaying
+	vlc.Stop
+	TogglePlayingStatus(False)
+End Sub
+
+Private Sub PlayButton_MouseClicked (EventData As MouseEvent)
+	If vlc.IsPlaying Then
+		vlc.Pause
+		TogglePlayingStatus(False)
+	Else
+		GetMediaPlayer.RunMethod("play",Null)
+		TogglePlayingStatus(True)
+	End If
+End Sub
+
+private Sub GetMediaPlayer As JavaObject
+	Dim jo As JavaObject=vlc.player
+	Dim mp As JavaObject=jo.RunMethod("getMp",Null)
+	Return mp
+End Sub
+
+Private Sub TogglePlayingStatus(isPlaying As Boolean)
+	If isPlaying Then
+		PlayButton.Text = ""
+		ProgressTimer.Enabled = True
+	Else
+		PlayButton.Text = ""
+		ProgressTimer.Enabled = False
+	End If
+End Sub
+
+Private Sub ProgressTimer_Tick
+	If vlc.IsPlaying Then
+		ProgressSlider.Tag = False
+		Dim time As Long = vlc.GetTime / 1000
+		Dim minutes As Int = Floor(time / 60)
+		Dim seconds As Int = time - minutes*60
+		ProgressLabel.Text = NumberFormat(minutes,2,0) & ":" & NumberFormat(seconds,2,0)
+		ProgressSlider.Value = vlc.GetTime/vlc.GetLength * 100
+		Sleep(0)
+		ProgressSlider.Tag = True
+	End If
+End Sub
