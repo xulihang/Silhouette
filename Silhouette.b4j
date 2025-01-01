@@ -484,6 +484,10 @@ Sub Progress_MouseClicked_Event (MethodName As String, Args() As Object) As Resu
 	If vlc.IsPlayable = False Then
 		Return Null
 	End If
+	If vlc.IsSeekable = False Then
+		fx.Msgbox(MainForm,"Not seekable","")
+		Return Null
+	End If
 	Dim e As MouseEvent = Args(0)
 	Dim percent As Double = e.X / ProgressSlider.Width
 	ProgressSlider.Enabled = False
@@ -571,6 +575,7 @@ Private Sub ProgressTimer_Tick
 			expectedEndTime = -1
 			vlc.Pause
 			TogglePlayingStatus(False)
+			Return
 		End If
 		ProgressSlider.Tag = False
 		Dim time As Long = vlc.GetTime / 1000
@@ -621,6 +626,7 @@ Private Sub PlayTheSelectedLine
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
 	Log(line.Get("startTime"))
 	Log(startTime)
+	Log(vlc.GetLength)
 	GetMediaPlayer.RunMethod("play",Null)
 	Sleep(0)
 	vlc.SetPosition(startTime / vlc.GetLength)
