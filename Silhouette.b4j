@@ -263,6 +263,7 @@ Private Sub MenuBar1_Action
 			fc.Initialize
 			Dim path As String = fc.ShowOpen(MainForm)
 			ImportFromSRT(path)
+			LoadLinesToTable
 			fx.Msgbox(MainForm,"Done","")
 		Case "export to _srt"
 			Dim fc As FileChooser
