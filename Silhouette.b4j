@@ -1,8 +1,9 @@
 ﻿AppType=JavaFX
 Build1=Default,b4j.example
 File1=BottomSplitPane.bjl
-File10=VideoPlayer.bjl
-File11=WaveForm.bjl
+File10=TranslationMemory.bjl
+File11=VideoPlayer.bjl
+File12=WaveForm.bjl
 File2=Editor.bjl
 File3=LeftSplitPane.bjl
 File4=LineEditor.bjl
@@ -14,6 +15,7 @@ File9=TranslationAssist.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
+FileGroup12=Default Group
 FileGroup2=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
@@ -38,7 +40,7 @@ Module2=FFMpeg
 Module3=Project
 Module4=SrtParser
 Module5=Utils
-NumberOfFiles=11
+NumberOfFiles=12
 NumberOfLibraries=10
 NumberOfModules=5
 Version=10
@@ -82,7 +84,10 @@ Sub Process_Globals
 	Private EndColumn As B4XTableColumn
 	Private SourceColumn As B4XTableColumn
 	Private TargetColumn As B4XTableColumn
-	private focusedTimeTextField as TextField
+	Private focusedTimeTextField As TextField
+	Private AssistTabPane As TabPane
+	Private TMTableView As TableView
+	Private TMTextArea As TextArea
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -112,6 +117,11 @@ Sub AppStart (Form1 As Form, Args() As String)
 	TopRightSplitPane.Vertical = True
 	BottomSplitPane.LoadLayout("ListView")
 	BottomSplitPane.LoadLayout("TranslationAssist")
+	AssistTabPane.LoadLayout("TranslationMemory","Translation")
+	TMTableView.SetColumnWidth(0,50)
+	TMTableView.SetColumnWidth(1,50)
+	TMTableView.SetColumnWidth(2,200)
+	TMTableView.SetColumnWidth(3,100)
 	Dim jo As JavaObject = VLCPane
 	jo.RunMethodJo("getChildren", Null).RunMethod("add", Array(vlc.player))
 	ProgressTimer.Initialize("ProgressTimer",250)
