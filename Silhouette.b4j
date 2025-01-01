@@ -1,17 +1,27 @@
 ﻿AppType=JavaFX
 Build1=Default,b4j.example
-File1=Editor.bjl
-File2=LeftSplitPane.bjl
-File3=ListView.bjl
-File4=main.bjl
-File5=VideoPlayer.bjl
-File6=WaveForm.bjl
+File1=BottomSplitPane.bjl
+File10=VideoPlayer.bjl
+File11=WaveForm.bjl
+File2=Editor.bjl
+File3=LeftSplitPane.bjl
+File4=LineEditor.bjl
+File5=ListView.bjl
+File6=main.bjl
+File7=TopRightSplitPane.bjl
+File8=TopSplitPane.bjl
+File9=TranslationAssist.bjl
 FileGroup1=Default Group
+FileGroup10=Default Group
+FileGroup11=Default Group
 FileGroup2=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
+FileGroup7=Default Group
+FileGroup8=Default Group
+FileGroup9=Default Group
 Group=Default Group
 Library1=b4jvlcj
 Library2=javaobject
@@ -23,7 +33,7 @@ Library7=jshell
 Module1=ASR
 Module2=FFMpeg
 Module3=Utils
-NumberOfFiles=6
+NumberOfFiles=11
 NumberOfLibraries=7
 NumberOfModules=3
 Version=8.9
@@ -52,6 +62,11 @@ Sub Process_Globals
 	Private TotalTimeLabel As Label
 	Private ProgressTimer As Timer
 	Private ProgressContextMenu As ContextMenu
+	Private BottomSplitPane As SplitPane
+	Private TopSplitPane As SplitPane
+	Private TopRightSplitPane As SplitPane
+	Private SourceTextArea As TextArea
+	Private TargetTextArea As TextArea
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -70,12 +85,17 @@ Sub AppStart (Form1 As Form, Args() As String)
 	MainForm.WindowWidth = 800
 	MainForm.Show
 	MainPane.LoadLayout("Editor")
-	EditorSplitPane.LoadLayout("LeftSplitPane")
-	EditorSplitPane.LoadLayout("ListView")
-	LeftSplitPane.LoadLayout("VideoPlayer")
-	LeftSplitPane.LoadLayout("WaveForm")
-	LeftSplitPane.DividerPositions = Array As Double(0.8,0.2)
-	LeftSplitPane.Vertical = True
+	EditorSplitPane.LoadLayout("TopSplitPane")
+	EditorSplitPane.LoadLayout("BottomSplitPane")
+	EditorSplitPane.Vertical = True
+	TopSplitPane.LoadLayout("VideoPlayer")
+	TopSplitPane.LoadLayout("TopRightSplitPane")
+	TopSplitPane.DividerPositions = Array As Double(0.8,0.2)
+	TopRightSplitPane.LoadLayout("WaveForm")
+	TopRightSplitPane.LoadLayout("LineEditor")
+	TopRightSplitPane.Vertical = True
+	BottomSplitPane.LoadLayout("ListView")
+	BottomSplitPane.LoadLayout("TranslationAssist")
 	Dim jo As JavaObject = VLCPane
 	jo.RunMethodJo("getChildren", Null).RunMethod("add", Array(vlc.player))
 	ProgressTimer.Initialize("ProgressTimer",1000)
