@@ -32,10 +32,11 @@ Library6=jxui
 Library7=jshell
 Module1=ASR
 Module2=FFMpeg
-Module3=Utils
+Module3=SrtParser
+Module4=Utils
 NumberOfFiles=11
 NumberOfLibraries=7
-NumberOfModules=3
+NumberOfModules=4
 Version=8.9
 @EndOfDesignText@
 #Region Project Attributes 

@@ -30,3 +30,12 @@ Sub GetFilenameWithoutExtension(filename As String) As String
 	Return filename
 End Sub
 
+Public Sub GetMillisecondsFromTimeString(str As String) As Long
+	Dim totalMilliseconds As Long
+	Dim hours As Int = str.SubString2(0,2)
+	Dim minutes As Int = str.SubString2(3,5)
+	Dim seconds As Int = str.SubString2(6,8)
+	Dim milliseconds As Int = str.SubString2(9,12)
+	totalMilliseconds = hours*60*60*1000 + minutes*60*1000 + seconds*1000 + milliseconds
+	Return totalMilliseconds
+End Sub
