@@ -51,6 +51,10 @@ Public Sub AddLine(startTime As String,endTime As String,source As String,target
 	lines.Add(line)
 End Sub
 
+Public Sub GetLine(index As Int) As Map
+	Return lines.Get(index)
+End Sub
+
 Sub readProjectFile
 	Dim json As JSONParser
 	json.Initialize(File.ReadString(projectPath,""))

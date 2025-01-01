@@ -56,8 +56,6 @@ Sub Process_Globals
 	Private MenuBar1 As MenuBar
 	Private MainPane As Pane
 	Private EditorSplitPane As SplitPane
-	Private LeftSplitPane As SplitPane
-	Private EditorListView As ListView
 	Private VLCPane As Pane
 	Private PlayButton As Button
 	Private ProgressSlider As Slider
@@ -75,7 +73,8 @@ Sub Process_Globals
 	Private currentProject As Project
 	Private tableCM As ContextMenu
 	Private robot As JavaObject
-	private selectedRowID as Int
+	Private selectedRowID As Int
+	Private expectedEndTime As Int = -1
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -107,7 +106,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	BottomSplitPane.LoadLayout("TranslationAssist")
 	Dim jo As JavaObject = VLCPane
 	jo.RunMethodJo("getChildren", Null).RunMethod("add", Array(vlc.player))
-	ProgressTimer.Initialize("ProgressTimer",1000)
+	ProgressTimer.Initialize("ProgressTimer",250)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
 	For Each text As String In Array("Play this line","Delete this line")
@@ -407,6 +406,10 @@ End Sub
 
 Private Sub ProgressTimer_Tick
 	If vlc.IsPlaying Then
+		If vlc.GetPosition*vlc.GetLength > expectedEndTime and expectedEndTime<>-1 Then
+			expectedEndTime = -1
+			vlc.Pause
+		End If
 		ProgressSlider.Tag = False
 		Dim time As Long = vlc.GetTime / 1000
 		Dim minutes As Int = Floor(time / 60)
@@ -439,9 +442,18 @@ Private Sub tableMenuItem_Action
 	Dim mi As MenuItem = Sender
 	Select mi.Text
 	    Case "Play this line"
-			
+			PlayTheSelectedLine
 		Case "Delete this line"
 			currentProject.DeleteLine(selectedRowID - 1)
 			LoadLinesToTable
 	End Select
+End Sub
+
+Private Sub PlayTheSelectedLine
+	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+	Dim startTime As Int = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+	expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
+	GetMediaPlayer.RunMethod("play",Null)
+	vlc.SetPosition(startTime / vlc.GetLength)
+	TogglePlayingStatus(True)
 End Sub
