@@ -185,6 +185,14 @@ Sub AppStart (Form1 As Form, Args() As String)
 	loadPlugins
 End Sub
 
+
+'Return true to allow the default exceptions handler to handle the uncaught exception.
+Sub Application_Error (Error As Exception, StackTrace As String) As Boolean
+    fx.Msgbox(MainForm,Error.Message,"Error")
+	Return False
+End Sub
+
+
 Public Sub loadPlugins
 	Dim dir As String
 	dir=File.Combine(File.DirApp,"plugins")
