@@ -75,6 +75,7 @@ Sub Process_Globals
 	Private robot As JavaObject
 	Private selectedRowID As Int
 	Private expectedEndTime As Int = -1
+	Private segmentLength As Int = 30
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -85,7 +86,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 		fx.Msgbox(MainForm,"VLC must be installed on the computer to run this program.","")
 		ExitApplication
 	End If
-	
+
 	'** OK, VLC was found. We can proceed.
 	vlc.Initialize("vlc")
 	MainForm = Form1
@@ -189,7 +190,7 @@ Private Sub RecognizeSpeech
 	End If
 	If File.Exists(dir,"segnemnt-00001.wav") = False Then
 		Log("split wav...")
-		Wait For (FFMpeg.SplitWav(30,dir,"audio.wav")) Complete (done As Object)
+		Wait For (FFMpeg.SplitWav(segmentLength,dir,"audio.wav")) Complete (done As Object)
 		Log("split wav done")
 	End If
 	Dim files As List = File.ListFiles(dir)
@@ -220,14 +221,19 @@ Private Sub LoadSRTToProject
 	Dim dir As String = currentProject.GetTmpFolder
 	Dim files As List = File.ListFiles(dir)
 	currentProject.Clear
+	Dim index As Int = 0
 	For Each filename As String In files
+		Dim offsetMS As Int = index * segmentLength * 1000
 		If filename.EndsWith(".srt") Then
 			Dim content As String = File.ReadString(dir,filename)
 			content = Utils.RemoveBOM(content)
 			Dim lines As List = parser.Parse(content)
 			For Each line As SpeechLine In lines
-				currentProject.AddLine(line.startTime,line.endTime,line.text,"")
+				Dim startTime As String = Utils.ShiftTimeString(line.startTime,offsetMS)
+				Dim endTime As String = Utils.ShiftTimeString(line.endTime,offsetMS)
+				currentProject.AddLine(startTime,endTime,line.text,"")
 			Next
+			index = index + 1
 		End If
 	Next
 End Sub
