@@ -12,12 +12,13 @@ Sub Class_Globals
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
-Public Sub Initialize(mediaPath As String)
+Public Sub Initialize(mediaPath As String) As Boolean
 	Dim filename As String = File.GetName(mediaPath)
 	Dim dir As String = File.GetFileParent(mediaPath)
 	projectPath = File.Combine(dir,Utils.GetFilenameWithoutExtension(filename)&".sip")
 	If File.Exists(projectPath,"") Then
 		readProjectFile
+		Return False
 	Else
 		projectFile.Initialize
 		lines.Initialize
@@ -26,6 +27,7 @@ Public Sub Initialize(mediaPath As String)
 		projectFile.Put("lines",lines)
 		projectFile.Put("settings",settings)
 		CreateTempFolder
+		Return True
 	End If
 End Sub
 

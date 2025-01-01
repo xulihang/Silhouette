@@ -472,7 +472,14 @@ Private Sub OpenFile
 		If currentProject.IsInitialized Then
 			Dim currentProject As Project
 		End If
-		currentProject.Initialize(path)
+		Dim isNew As Boolean = currentProject.Initialize(path)
+		If isNew Then
+			Dim langSelector As LanguagePairSelector
+			langSelector.Initialize
+			Dim langpairMap As Map = langSelector.ShowAndWait
+			currentProject.SourceLang=langpairMap.Get("source")
+			currentProject.TargetLang=langpairMap.Get("target")
+		End If
 		PlayFile(path)
 		LoadLinesToTable
 	End If
