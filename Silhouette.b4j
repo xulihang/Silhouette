@@ -415,6 +415,7 @@ Private Sub ProgressTimer_Tick
 		If vlc.GetPosition*vlc.GetLength > expectedEndTime And expectedEndTime<>-1 Then
 			expectedEndTime = -1
 			vlc.Pause
+			TogglePlayingStatus(False)
 		End If
 		ProgressSlider.Tag = False
 		Dim time As Long = vlc.GetTime / 1000
