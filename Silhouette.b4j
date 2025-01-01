@@ -1,26 +1,27 @@
 ﻿AppType=JavaFX
 Build1=Default,b4j.example
 File1=apiparamfiller.bjl
-File10=ListView.bjl
-File11=main.bjl
-File12=MTSetting.bjl
-File13=pretranslate.bjl
-File14=progress.bjl
-File15=projectSetting.bjl
-File16=TopRightSplitPane.bjl
-File17=TopSplitPane.bjl
-File18=TranslationAssist.bjl
-File19=TranslationMemory.bjl
+File10=LineEditor.bjl
+File11=ListView.bjl
+File12=main.bjl
+File13=MTSetting.bjl
+File14=pretranslate.bjl
+File15=progress.bjl
+File16=projectSetting.bjl
+File17=TopRightSplitPane.bjl
+File18=TopSplitPane.bjl
+File19=TranslationAssist.bjl
 File2=APISetting.bjl
-File20=VideoPlayer.bjl
-File21=WaveForm.bjl
+File20=TranslationMemory.bjl
+File21=VideoPlayer.bjl
+File22=WaveForm.bjl
 File3=BottomSplitPane.bjl
 File4=Editor.bjl
-File5=inputbox.bjl
-File6=LangaugePairSelector.bjl
-File7=langcodes.txt
-File8=LeftSplitPane.bjl
-File9=LineEditor.bjl
+File5=generalSettings.bjl
+File6=inputbox.bjl
+File7=LangaugePairSelector.bjl
+File8=langcodes.txt
+File9=LeftSplitPane.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -35,6 +36,7 @@ FileGroup19=Default Group
 FileGroup2=Default Group
 FileGroup20=Default Group
 FileGroup21=Default Group
+FileGroup22=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
@@ -60,8 +62,9 @@ Library8=jfx
 Library9=jokhttputils2
 Module1=APIParamsFiller
 Module10=Project
-Module11=SrtParser
-Module12=Utils
+Module11=ProjectSettings
+Module12=SrtParser
+Module13=Utils
 Module2=ASR
 Module3=FFMpeg
 Module4=InputBox
@@ -70,9 +73,9 @@ Module6=MT
 Module7=Preferences
 Module8=preTranslateDialog
 Module9=progressDialog
-NumberOfFiles=21
+NumberOfFiles=22
 NumberOfLibraries=15
-NumberOfModules=12
+NumberOfModules=13
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -239,6 +242,10 @@ Private Sub MenuBar1_Action
 			dialog.Initialize
 			Dim options As Map = dialog.ShowAndWait
 			pretranslate(options)
+		Case "_Settings"
+			Dim ps As ProjectSettings
+			ps.Initialize(currentProject)
+			ps.show
 		Case "_Exit"
 			ExitApp
 		Case "_About"
