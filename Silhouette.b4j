@@ -447,6 +447,9 @@ Private Sub OpenFile
 	fc.Initialize
 	Dim path As String = fc.ShowOpen(MainForm)
 	If File.Exists(path,"") Then
+		If currentProject.IsInitialized Then
+			Dim currentProject As Project
+		End If
 		currentProject.Initialize(path)
 		PlayFile(path)
 		LoadLinesToTable
