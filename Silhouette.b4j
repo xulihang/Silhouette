@@ -137,6 +137,7 @@ private Sub SetTable
 	Dim TargetColumn As B4XTableColumn = LinesTable.AddColumn("Target", LinesTable.COLUMN_TYPE_TEXT)
 	TargetColumn.Sortable = False
 	LinesTable.SearchVisible = False
+	LinesTable.SelectionColor = xui.Color_Transparent
 End Sub
 
 Private Sub GetTimeLabelText(totalSeconds As Long) As String
@@ -238,6 +239,28 @@ Private Sub LoadLinesToTable
 		data.Add(row)
 	Next
 	LinesTable.SetData(data)
+End Sub
+
+Sub LinesTable_CellClicked (ColumnId As String, RowId As Long)
+	SetRowColor(RowId,xui.Color_RGB(119,198,255))
+End Sub
+
+Sub SetRowColor(targetRowId As Int, color As Int)    'rowid-1
+	For i = 0 To LinesTable.VisibleRowIds.Size - 1
+		Dim RowId As Long = LinesTable.VisibleRowIds.Get(i)
+		For Each c As B4XTableColumn In LinesTable.Columns
+			Dim pnl As B4XView = c.CellsLayouts.Get(i+1)
+			If RowId = targetRowId Then
+				pnl.Color=color
+			Else
+				If i Mod 2 = 0 Then
+					pnl.Color = LinesTable.EvenRowColor
+				Else
+					pnl.Color = LinesTable.OddRowColor
+				End If
+			End If
+		Next
+	Next
 End Sub
 
 Private Sub Save
