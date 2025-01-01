@@ -76,6 +76,12 @@ Sub Process_Globals
 	Private selectedRowID As Int
 	Private expectedEndTime As Int = -1
 	Private segmentLength As Int = 30
+	Private EndTimeTextField As TextField
+	Private StartTimeTextField As TextField
+	Private StartColumn As B4XTableColumn
+	Private EndColumn As B4XTableColumn
+	Private SourceColumn As B4XTableColumn
+	Private TargetColumn As B4XTableColumn
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -135,15 +141,15 @@ private Sub SetTable
 	Dim NumberColumn As B4XTableColumn = LinesTable.AddColumn("No.", LinesTable.COLUMN_TYPE_TEXT)
 	NumberColumn.Width = 80dip
 	NumberColumn.Sortable = False
-	Dim StartColumn As B4XTableColumn = LinesTable.AddColumn("Start", LinesTable.COLUMN_TYPE_TEXT)
+	StartColumn = LinesTable.AddColumn("Start", LinesTable.COLUMN_TYPE_TEXT)
 	StartColumn.Width = 105dip
 	StartColumn.Sortable = False
-	Dim EndColumn As B4XTableColumn = LinesTable.AddColumn("End", LinesTable.COLUMN_TYPE_TEXT)
+	EndColumn = LinesTable.AddColumn("End", LinesTable.COLUMN_TYPE_TEXT)
 	EndColumn.Width = 105dip
 	EndColumn.Sortable = False
-	Dim SourceColumn As B4XTableColumn = LinesTable.AddColumn("Source", LinesTable.COLUMN_TYPE_TEXT)
+	SourceColumn = LinesTable.AddColumn("Source", LinesTable.COLUMN_TYPE_TEXT)
 	SourceColumn.Sortable = False
-	Dim TargetColumn As B4XTableColumn = LinesTable.AddColumn("Target", LinesTable.COLUMN_TYPE_TEXT)
+	TargetColumn = LinesTable.AddColumn("Target", LinesTable.COLUMN_TYPE_TEXT)
 	TargetColumn.Sortable = False
 	LinesTable.SearchVisible = False
 	LinesTable.SelectionColor = xui.Color_Transparent
@@ -256,10 +262,21 @@ Private Sub LoadLinesToTable
 End Sub
 
 Sub LinesTable_CellClicked (ColumnId As String, RowId As Long)
-	SetRowColor(RowId,xui.Color_RGB(119,198,255))
+	SelectRow(RowId,xui.Color_RGB(119,198,255))
 End Sub
 
-Sub SetRowColor(targetRowId As Int, color As Int)    'rowid-1
+Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
+	SelectRow(RowId,xui.Color_RGB(119,198,255))
+	Dim col As B4XTableColumn = LinesTable.GetColumn(ColumnId)
+	Dim i As Int = LinesTable.VisibleRowIds.IndexOf(RowId)
+	Dim cell As B4XView = col.CellsLayouts.Get(i)
+	Dim jo As JavaObject = tableCM '<--------------------------- global ContextMenu object
+	Dim x As Double = robot.RunMethod("getMouseX",Null)' <----- global JavaObject object
+	Dim y As Double = robot.RunMethod("getMouseY",Null)
+	jo.RunMethod("show", Array(cell, x, y))
+End Sub
+
+Sub SelectRow(targetRowId As Int, color As Int)    'rowid-1
 	For i = 0 To LinesTable.VisibleRowIds.Size - 1
 		Dim RowId As Long = LinesTable.VisibleRowIds.Get(i)
 		For Each c As B4XTableColumn In LinesTable.Columns
@@ -276,6 +293,7 @@ Sub SetRowColor(targetRowId As Int, color As Int)    'rowid-1
 		Next
 	Next
 	selectedRowID = targetRowId
+	LoadLineToEditor
 End Sub
 
 Private Sub Save
@@ -434,17 +452,6 @@ Sub MainForm_CloseRequest (EventData As Event)
 	vlc.release
 End Sub
 
-Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
-	SetRowColor(RowId,xui.Color_RGB(119,198,255))
-	Dim col As B4XTableColumn = LinesTable.GetColumn(ColumnId)
-	Dim i As Int = LinesTable.VisibleRowIds.IndexOf(RowId)
-	Dim cell As B4XView = col.CellsLayouts.Get(i)
-	Dim jo As JavaObject = tableCM '<--------------------------- global ContextMenu object
-	Dim x As Double = robot.RunMethod("getMouseX",Null)' <----- global JavaObject object
-	Dim y As Double = robot.RunMethod("getMouseY",Null)
-	jo.RunMethod("show", Array(cell, x, y))
-End Sub
-
 Private Sub tableMenuItem_Action
 	Dim mi As MenuItem = Sender
 	Select mi.Text
@@ -477,4 +484,44 @@ Private Sub PlayTheSelectedLine
 	GetMediaPlayer.RunMethod("play",Null)
 	vlc.SetPosition(startTime / vlc.GetLength)
 	TogglePlayingStatus(True)
+End Sub
+
+Private Sub LoadLineToEditor
+	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+	SourceTextArea.Text = line.Get("source")
+	TargetTextArea.Text = line.Get("target")
+	StartTimeTextField.Text = line.Get("startTime")
+	EndTimeTextField.Text = line.Get("endTime")
+End Sub
+
+Private Sub UpdateText(isSource As Boolean,new As String)
+	If currentProject.IsInitialized = False Then
+		Return
+	End If
+	
+	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+	If isSource Then
+		line.Put("source",new)
+		LinesTable.sql1.ExecNonQuery2($"UPDATE data SET ${SourceColumn.SQLID} = ? WHERE rowid = ?"$, Array As String(new, selectedRowID))
+	Else
+		line.Put("target",new)
+		LinesTable.sql1.ExecNonQuery2($"UPDATE data SET ${TargetColumn.SQLID} = ? WHERE rowid = ?"$, Array As String(new, selectedRowID))
+	End If
+	LinesTable.Refresh
+End Sub
+
+Private Sub SourceTextArea_TextChanged (Old As String, New As String)
+	UpdateText(True,New)
+End Sub
+
+Private Sub TargetTextArea_TextChanged (Old As String, New As String)
+	UpdateText(False,New)
+End Sub
+
+Private Sub StartTimeTextField_TextChanged (Old As String, New As String)
+	
+End Sub
+
+Private Sub EndTimeTextField_TextChanged (Old As String, New As String)
+	
 End Sub
