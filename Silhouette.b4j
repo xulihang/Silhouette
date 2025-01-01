@@ -108,8 +108,15 @@ Sub AppStart (Form1 As Form, Args() As String)
 	jo.RunMethod("setOnMouseMoved", Array(e))
 	Dim e As Object = jo.CreateEventFromUI("javafx.event.EventHandler", "progress_mouseclicked", Null)
 	jo.RunMethod("setOnMouseClicked", Array(e))
+	Dim e As Object = jo.CreateEventFromUI("javafx.event.EventHandler", "progress_mouseexited", Null)
+	jo.RunMethod("setOnMouseExited", Array(e))
 	ProgressSlider.tag = False
 	ProgressContextMenu.Initialize("ProgressContextMenu")
+End Sub
+
+Sub Progress_MouseExited_Event (MethodName As String, Args() As Object) As Object
+	ProgressContextMenu.MenuItems.Clear
+	Return Null
 End Sub
 
 Sub Progress_MouseClicked_Event (MethodName As String, Args() As Object) As ResumableSub
