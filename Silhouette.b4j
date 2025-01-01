@@ -593,7 +593,7 @@ End Sub
 
 Private Sub ProgressTimer_Tick
 	If vlc.IsPlaying Then
-		If vlc.GetPosition*vlc.GetLength > expectedEndTime And expectedEndTime<>-1 Then
+		If vlc.GetTime > expectedEndTime And expectedEndTime<>-1 Then
 			expectedEndTime = -1
 			vlc.Pause
 			TogglePlayingStatus(False)
