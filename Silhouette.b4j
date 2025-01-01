@@ -3,14 +3,16 @@ Build1=Default,b4j.example
 File1=apiparamfiller.bjl
 File10=main.bjl
 File11=MTSetting.bjl
-File12=projectSetting.bjl
-File13=TopRightSplitPane.bjl
-File14=TopSplitPane.bjl
-File15=TranslationAssist.bjl
-File16=TranslationMemory.bjl
-File17=VideoPlayer.bjl
-File18=WaveForm.bjl
+File12=pretranslate.bjl
+File13=progress.bjl
+File14=projectSetting.bjl
+File15=TopRightSplitPane.bjl
+File16=TopSplitPane.bjl
+File17=TranslationAssist.bjl
+File18=TranslationMemory.bjl
+File19=VideoPlayer.bjl
 File2=APISetting.bjl
+File20=WaveForm.bjl
 File3=BottomSplitPane.bjl
 File4=Editor.bjl
 File5=inputbox.bjl
@@ -28,7 +30,9 @@ FileGroup15=Default Group
 FileGroup16=Default Group
 FileGroup17=Default Group
 FileGroup18=Default Group
+FileGroup19=Default Group
 FileGroup2=Default Group
+FileGroup20=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
@@ -53,17 +57,19 @@ Library7=jcore
 Library8=jfx
 Library9=jokhttputils2
 Module1=APIParamsFiller
+Module10=SrtParser
+Module11=Utils
 Module2=ASR
 Module3=FFMpeg
 Module4=InputBox
 Module5=MT
 Module6=Preferences
-Module7=Project
-Module8=SrtParser
-Module9=Utils
-NumberOfFiles=18
+Module7=preTranslateDialog
+Module8=progressDialog
+Module9=Project
+NumberOfFiles=20
 NumberOfLibraries=15
-NumberOfModules=9
+NumberOfModules=11
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -225,6 +231,11 @@ Private Sub MenuBar1_Action
 			pref.Show
 		Case "_Recognize Speech"
 			RecognizeSpeech
+		Case "_Pretranslate"
+			Dim dialog As preTranslateDialog
+			dialog.Initialize
+			Dim options As Map = dialog.ShowAndWait
+			pretranslate(options)
 		Case "_Exit"
 			ExitApp
 		Case "_About"
@@ -347,6 +358,40 @@ Sub SelectRow(targetRowId As Int, color As Int)    'rowid-1
 	Next
 	selectedRowID = targetRowId
 	LoadLineToEditor
+End Sub
+
+Sub pretranslate(options As Map) As ResumableSub
+	If options.Get("type")<>"" Then
+		If options.Get("type")="MT" Then
+			Dim sourceLang As String
+			Dim targetLang As String
+			Dim mtengine As String=options.Get("engine")
+			sourceLang=currentProject.SourceLang
+			targetLang=currentProject.TargetLang
+			Dim interval As Int=options.GetDefault("interval",0)
+			progressDialog.Show("translating...")
+			Dim index As Int = 0
+			For Each line As Map In currentProject.lines
+				index = index + 1
+				progressDialog.update(index,currentProject.lines.Size)
+				If progressDialog.isShowing = False Then
+					Exit
+				End If
+				Dim source As String = line.Get("source")
+				Dim target As String = line.Get("target")
+				If target = "" Then
+					wait for (MT.getMT(source,sourceLang,targetLang,mtengine)) complete (target As String)
+					line.Put("target",target)
+					Sleep(interval)
+				End If
+			Next
+			progressDialog.close
+		Else
+			fx.Msgbox(MainForm,"Not supported now","")
+		End If
+	End If
+	LoadLinesToTable
+	Return ""
 End Sub
 
 Private Sub Save
