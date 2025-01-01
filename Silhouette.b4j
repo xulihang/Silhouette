@@ -1,23 +1,33 @@
 ﻿AppType=JavaFX
 Build1=Default,b4j.example
-File1=BottomSplitPane.bjl
-File10=TranslationAssist.bjl
-File11=TranslationMemory.bjl
-File12=VideoPlayer.bjl
-File13=WaveForm.bjl
-File2=Editor.bjl
-File3=langcodes.txt
-File4=LeftSplitPane.bjl
-File5=LineEditor.bjl
-File6=ListView.bjl
-File7=main.bjl
-File8=TopRightSplitPane.bjl
-File9=TopSplitPane.bjl
+File1=apiparamfiller.bjl
+File10=main.bjl
+File11=MTSetting.bjl
+File12=projectSetting.bjl
+File13=TopRightSplitPane.bjl
+File14=TopSplitPane.bjl
+File15=TranslationAssist.bjl
+File16=TranslationMemory.bjl
+File17=VideoPlayer.bjl
+File18=WaveForm.bjl
+File2=APISetting.bjl
+File3=BottomSplitPane.bjl
+File4=Editor.bjl
+File5=inputbox.bjl
+File6=langcodes.txt
+File7=LeftSplitPane.bjl
+File8=LineEditor.bjl
+File9=ListView.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
 FileGroup12=Default Group
 FileGroup13=Default Group
+FileGroup14=Default Group
+FileGroup15=Default Group
+FileGroup16=Default Group
+FileGroup17=Default Group
+FileGroup18=Default Group
 FileGroup2=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
@@ -28,33 +38,38 @@ FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
 Library1=abplugin
-Library10=jshell
-Library11=json
-Library12=jxui
-Library13=xcustomlistview
-Library14=encryption
+Library10=jreflection
+Library11=jshell
+Library12=json
+Library13=jxui
+Library14=xcustomlistview
+Library15=b4xcollections
 Library2=b4jvlcj
 Library3=b4xtable
 Library4=byteconverter
-Library5=javaobject
-Library6=jcore
-Library7=jfx
-Library8=jokhttputils2
-Library9=jreflection
-Module1=ASR
-Module2=FFMpeg
-Module3=MT
-Module4=Project
-Module5=SrtParser
-Module6=Utils
-NumberOfFiles=13
-NumberOfLibraries=14
-NumberOfModules=6
+Library5=encryption
+Library6=javaobject
+Library7=jcore
+Library8=jfx
+Library9=jokhttputils2
+Module1=APIParamsFiller
+Module2=ASR
+Module3=FFMpeg
+Module4=InputBox
+Module5=MT
+Module6=Preferences
+Module7=Project
+Module8=SrtParser
+Module9=Utils
+NumberOfFiles=18
+NumberOfLibraries=15
+NumberOfModules=9
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
 	#MainFormHeight: 600 
+	#VirtualMachineArgs: --add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
 #End Region
 
 Sub Process_Globals
@@ -204,6 +219,10 @@ Private Sub MenuBar1_Action
 			Save
 		Case "_Close"
 			Close
+		Case "_Preferences"
+			Dim pref As Preferences
+			pref.Initialize(MenuBar1)
+			pref.Show
 		Case "_Recognize Speech"
 			RecognizeSpeech
 		Case "_Exit"
@@ -484,6 +503,7 @@ Sub MainForm_CloseRequest (EventData As Event)
 	Log("We are closing the mainform")
 	vlc.stop
 	vlc.release
+	ExitApplication
 End Sub
 
 Private Sub tableMenuItem_Action
@@ -526,6 +546,34 @@ Private Sub LoadLineToEditor
 	TargetTextArea.Text = line.Get("target")
 	StartTimeTextField.Text = line.Get("startTime")
 	EndTimeTextField.Text = line.Get("endTime")
+	ShowMT(SourceTextArea.Text,True)
+End Sub
+
+Private Sub ShowMT(sourceText As String,fromTextArea As Boolean)
+	Dim preferencesMap As Map = Utils.getPrefMap
+	If preferencesMap.ContainsKey("mt") Then
+		Dim mtPreferences As Map=preferencesMap.Get("mt")
+		For Each engine As String In MT.getMTList
+			If mtPreferences.GetDefault(engine&"_enabled",False)=True Then
+				appendSingleMTResult(sourceText,fromTextArea,engine)
+			End If
+		Next
+	End If
+End Sub
+
+Private Sub appendSingleMTResult(sourceText As String,fromTextArea As Boolean,engine As String)
+	wait for (MT.getMT(sourceText,currentProject.SourceLang,currentProject.TargetLang,engine)) Complete (target As String)
+	If fromTextArea And sourceText <> SourceTextArea.Text Then
+		Return
+	End If
+	Dim lbl As Label
+	lbl.Initialize("lbl")
+	lbl.Text=target
+	lbl.TooltipText=target
+	Dim row() As Object
+	row=Array("","",lbl,engine)
+	Log(target)
+	TMTableView.Items.Add(row)
 End Sub
 
 Private Sub UpdateTime(isStartTime As Boolean,new As String)

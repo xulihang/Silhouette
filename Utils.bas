@@ -6,7 +6,7 @@ Version=8.9
 @EndOfDesignText@
 'Static code module
 Sub Process_Globals
-
+	private mPref as Map
 End Sub
 
 Public Sub RemoveBOM(s As String) As String
@@ -102,3 +102,78 @@ Public Sub GetScreenPosition(n As Node) As Map
 	m.Put("y", y)
 	Return m
 End Sub
+
+Public Sub resetPref
+	Dim mPref As Map
+End Sub
+
+Sub getPrefMap As Map
+	Dim map1 As Map
+	If mPref.IsInitialized Then
+		map1 = mPref
+	Else
+		Dim preferencesMap As Map
+		If File.Exists(File.DirApp,"preferences.conf") Then
+			preferencesMap = readJsonAsMap(File.ReadString(File.DirApp,"preferences.conf"))
+		Else
+			preferencesMap.Initialize
+		End If
+		mPref = preferencesMap
+		map1 = preferencesMap
+	End If
+	Return map1
+End Sub
+
+Sub readJsonAsMap(s As String) As Map
+	Dim json As JSONParser
+	json.Initialize(s)
+	Return json.NextObject
+End Sub
+
+Sub getMap(key As String,parentmap As Map) As Map
+	Dim emptymap As Map
+	emptymap.Initialize
+	Return parentmap.GetDefault(key,emptymap)
+End Sub
+
+Sub readLanguageCode(codesfilePath As String) As Map
+	Dim linesList As List
+	linesList=File.ReadList(File.DirAssets,"langcodes.txt")
+	If codesfilePath<>"" Then
+		If File.Exists(codesfilePath,"") Then
+			linesList=File.ReadList(codesfilePath,"")
+		End If
+	End If
+	
+	Dim headsList As List
+	headsList.Initialize
+	headsList.AddAll(Regex.Split("	",linesList.Get(0)))
+	'Log(headsList)
+	
+	Dim langcodes As Map
+	langcodes.Initialize
+	Dim lineNum As Int=1
+	For Each line As String In linesList
+		If lineNum=1 Then
+			lineNum=lineNum+1
+			Continue
+		End If
+		Dim colIndex As Int=0
+		Dim code As String=Regex.Split("	",line)(0)
+		Dim codesMap As Map
+		codesMap.Initialize
+		For Each value As String In Regex.Split("	",line)
+			If colIndex=0 Then
+				colIndex=colIndex+1
+				Continue
+			End If
+			If value<>"" Then
+				codesMap.Put(headsList.Get(colIndex),value)
+			End If
+			colIndex=colIndex+1
+		Next
+		langcodes.Put(code,codesMap)
+	Next
+	Return langcodes
+End Sub
+

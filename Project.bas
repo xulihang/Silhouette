@@ -115,3 +115,19 @@ Public Sub GetTmpFolder As String
 	Dim dir As String = File.Combine(tmpFolder,filename)
 	Return dir
 End Sub
+
+Public Sub setSourceLang(lang As String)
+	settings.Put("sourceLang",lang)
+End Sub
+
+Public Sub getSourceLang As String
+	Return settings.GetDefault("sourceLang","ja")
+End Sub
+
+Public Sub setTargetLang(lang As String)
+	settings.Put("targetLang",lang)
+End Sub
+
+Public Sub getTargetLang As String
+	Return settings.GetDefault("targetLang","zh")
+End Sub

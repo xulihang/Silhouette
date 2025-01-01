@@ -164,8 +164,8 @@ Sub BaiduMT(sourceList As List,sourceLang As String,targetLang As String) As Res
 	Dim salt As Int
 	salt=Rnd(1,1000)
 	Dim appid,sign,key As String
-	appid=Utils.getMap("baiduMT",Utils.getMap("api",Utils.getPrefMap)).Get("appid")
-	key=Utils.getMap("baiduMT",Utils.getMap("api",Utils.getPrefMap)).Get("key")
+	appid=Utils.getMap("baidu",Utils.getMap("api",Utils.getPrefMap)).Get("appid")
+	key=Utils.getMap("baidu",Utils.getMap("api",Utils.getPrefMap)).Get("key")
 	If appid="" Then
 		Return ""
 	End If
