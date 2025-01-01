@@ -24,20 +24,22 @@ FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
 Library1=b4jvlcj
-Library2=javaobject
-Library3=jcore
-Library4=jfx
-Library5=jreflection
-Library6=jxui
+Library2=b4xtable
+Library3=javaobject
+Library4=jcore
+Library5=jfx
+Library6=jreflection
 Library7=jshell
+Library8=jxui
+Library9=xcustomlistview
 Module1=ASR
 Module2=FFMpeg
 Module3=SrtParser
 Module4=Utils
 NumberOfFiles=11
-NumberOfLibraries=7
+NumberOfLibraries=9
 NumberOfModules=4
-Version=8.9
+Version=10
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
@@ -68,6 +70,7 @@ Sub Process_Globals
 	Private TopRightSplitPane As SplitPane
 	Private SourceTextArea As TextArea
 	Private TargetTextArea As TextArea
+	Private LinesTable As B4XTable
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -101,9 +104,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	jo.RunMethodJo("getChildren", Null).RunMethod("add", Array(vlc.player))
 	ProgressTimer.Initialize("ProgressTimer",1000)
 	ProgressTimer.Enabled = False
-	'Dim Obj As Reflector
-	'Obj.Target = ProgressSlider
-	'Obj.AddChangeListener("ProgressSlider", "onMouseMovedProperty")
+
 	Dim jo As JavaObject = ProgressSlider
 	Dim e As Object = jo.CreateEventFromUI("javafx.event.EventHandler", "progress_mousemoved", Null)
 	jo.RunMethod("setOnMouseMoved", Array(e))
@@ -113,82 +114,32 @@ Sub AppStart (Form1 As Form, Args() As String)
 	jo.RunMethod("setOnMouseExited", Array(e))
 	ProgressSlider.tag = False
 	ProgressContextMenu.Initialize("ProgressContextMenu")
+	SetTable
 End Sub
 
-Sub Progress_MouseExited_Event (MethodName As String, Args() As Object) As Object
-	ProgressContextMenu.MenuItems.Clear
-	Return Null
-End Sub
-
-Sub Progress_MouseClicked_Event (MethodName As String, Args() As Object) As ResumableSub
-	If vlc.IsPlayable = False Then
-		Return Null
-	End If
-	Dim e As MouseEvent = Args(0)
-	Dim percent As Double = e.X / ProgressSlider.Width
-	ProgressSlider.Enabled = False
-	ProgressSlider.Value = percent * 100
-	vlc.SetPosition(percent)
-	ProgressContextMenu.MenuItems.Clear
-	e.Consume
-	Sleep(0)
-	ProgressSlider.Enabled = True
-	Return Null
-End Sub
-
-Sub Progress_MouseMoved_Event (MethodName As String, Args() As Object) As Object
-	If vlc.IsPlayable = False Then
-		Return Null
-	End If
-	Dim e As MouseEvent = Args(0)
-	Dim percent As Double = e.X / ProgressSlider.Width
-	Dim time As Long = percent * vlc.GetLength / 1000
-	ProgressContextMenu.MenuItems.Clear
-	Dim mi As MenuItem
-	mi.Initialize(GetTimeLabelText(time),"")
-	ProgressContextMenu.MenuItems.Add(mi)
-	Dim map1 As Map
-	map1=GetScreenPosition(ProgressSlider)
-	Dim jo As JavaObject = ProgressContextMenu
-	jo.RunMethod("show", Array(ProgressSlider, map1.Get("x")+e.X, map1.Get("y")-40))
-	Return Null
+private Sub SetTable
+	LinesTable.HeaderFont = xui.CreateFont(fx.DefaultFont(15),15)
+	LinesTable.HeadersHeight = 30dip
+	LinesTable.RowHeight = 30dip
+	Dim NumberColumn As B4XTableColumn = LinesTable.AddColumn("No.", LinesTable.COLUMN_TYPE_TEXT)
+	NumberColumn.Width = 80dip
+	NumberColumn.Sortable = False
+	Dim StartColumn As B4XTableColumn = LinesTable.AddColumn("Start", LinesTable.COLUMN_TYPE_TEXT)
+	StartColumn.Width = 80dip
+	StartColumn.Sortable = False
+	Dim EndColumn As B4XTableColumn = LinesTable.AddColumn("End", LinesTable.COLUMN_TYPE_TEXT)
+	EndColumn.Width = 80dip
+	EndColumn.Sortable = False
+	Dim SourceColumn As B4XTableColumn = LinesTable.AddColumn("Source", LinesTable.COLUMN_TYPE_TEXT)
+	SourceColumn.Sortable = False
+	Dim TargetColumn As B4XTableColumn = LinesTable.AddColumn("Target", LinesTable.COLUMN_TYPE_TEXT)
+	TargetColumn.Sortable = False
 End Sub
 
 Private Sub GetTimeLabelText(totalSeconds As Long) As String
 	Dim minutes As Int =  Floor(totalSeconds / 60)
 	Dim seconds As Int = totalSeconds - minutes*60
 	Return NumberFormat(minutes,2,0) & ":" & NumberFormat(seconds,2,0)
-End Sub
-
-
-Sub GetScreenPosition(n As Node) As Map
-	Dim m As Map = CreateMap("x": 0, "y": 0)
-	Dim x = 0, y = 0 As Double
-	Dim joNode = n, joScene, joStage As JavaObject
-  
-	'Get the scene position:
-	joScene = joNode.RunMethod("getScene",Null)
-	If joScene.IsInitialized = False Then Return m
-	x = x + joScene.RunMethod("getX", Null)
-	y = y + joScene.RunMethod("getY", Null)
-
-	'Get the stage position:
-	joStage = joScene.RunMethod("getWindow", Null)
-	If joStage.IsInitialized = False Then Return m
-	x = x + joStage.RunMethod("getX", Null)
-	y = y + joStage.RunMethod("getY", Null)
-  
-	'Get the node position in the scene:
-	Do While True
-		y = y + joNode.RunMethod("getLayoutY", Null)
-		x = x + joNode.RunMethod("getLayoutX", Null)
-		joNode = joNode.RunMethod("getParent", Null)
-		If joNode.IsInitialized = False Then Exit
-	Loop
-
-	m.Put("x", x)
-	m.Put("y", y)
-	Return m
 End Sub
 
 Private Sub MenuBar1_Action
@@ -282,16 +233,49 @@ Private Sub PlayFile(path As String)
 	TotalTimeLabel.Text = NumberFormat(minutes,2,0) & ":" & NumberFormat(seconds,2,0)
 End Sub
 
+Sub Progress_MouseExited_Event (MethodName As String, Args() As Object) As Object
+	ProgressContextMenu.MenuItems.Clear
+	Return Null
+End Sub
+
+Sub Progress_MouseClicked_Event (MethodName As String, Args() As Object) As ResumableSub
+	If vlc.IsPlayable = False Then
+		Return Null
+	End If
+	Dim e As MouseEvent = Args(0)
+	Dim percent As Double = e.X / ProgressSlider.Width
+	ProgressSlider.Enabled = False
+	ProgressSlider.Value = percent * 100
+	vlc.SetPosition(percent)
+	ProgressContextMenu.MenuItems.Clear
+	e.Consume
+	Sleep(0)
+	ProgressSlider.Enabled = True
+	Return Null
+End Sub
+
+Sub Progress_MouseMoved_Event (MethodName As String, Args() As Object) As Object
+	If vlc.IsPlayable = False Then
+		Return Null
+	End If
+	Dim e As MouseEvent = Args(0)
+	Dim percent As Double = e.X / ProgressSlider.Width
+	Dim time As Long = percent * vlc.GetLength / 1000
+	ProgressContextMenu.MenuItems.Clear
+	Dim mi As MenuItem
+	mi.Initialize(GetTimeLabelText(time),"")
+	ProgressContextMenu.MenuItems.Add(mi)
+	Dim map1 As Map
+	map1=Utils.GetScreenPosition(ProgressSlider)
+	Dim jo As JavaObject = ProgressContextMenu
+	jo.RunMethod("show", Array(ProgressSlider, map1.Get("x")+e.X, map1.Get("y")-40))
+	Return Null
+End Sub
+
 Private Sub VLCPane_Resize (Width As Double, Height As Double)
 	Dim n As Node = VLCPane.GetNode(0)
 	n.PrefWidth = Width
 	n.PrefHeight = Height
-End Sub
-
-Sub MainForm_CloseRequest (EventData As Event)
-	Log("We are closing the mainform")
-	vlc.stop
-	vlc.release
 End Sub
 
 Private Sub ExitApp
@@ -350,4 +334,10 @@ Private Sub ProgressTimer_Tick
 		Sleep(0)
 		ProgressSlider.Tag = True
 	End If
+End Sub
+
+Sub MainForm_CloseRequest (EventData As Event)
+	Log("We are closing the mainform")
+	vlc.stop
+	vlc.release
 End Sub
