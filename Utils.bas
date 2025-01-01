@@ -9,6 +9,13 @@ Sub Process_Globals
 
 End Sub
 
+Public Sub RemoveBOM(s As String) As String
+	If s.StartsWith(Chr(0xFEFF)) Then
+		s = s.SubString(1)
+	End If
+	return s
+End Sub
+
 'windows, mac or linux
 Public Sub DetectOS As String
 	Dim os As String = GetSystemProperty("os.name", "").ToLowerCase

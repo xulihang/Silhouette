@@ -24,6 +24,7 @@ FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
 Library1=b4jvlcj
+Library10=json
 Library2=b4xtable
 Library3=javaobject
 Library4=jcore
@@ -34,11 +35,12 @@ Library8=jxui
 Library9=xcustomlistview
 Module1=ASR
 Module2=FFMpeg
-Module3=SrtParser
-Module4=Utils
+Module3=Project
+Module4=SrtParser
+Module5=Utils
 NumberOfFiles=11
-NumberOfLibraries=9
-NumberOfModules=4
+NumberOfLibraries=10
+NumberOfModules=5
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -60,7 +62,6 @@ Sub Process_Globals
 	Private PlayButton As Button
 	Private ProgressSlider As Slider
 	Private VolSlider As Slider
-	Private currentFile As String
 	Private ProgressLabel As Label
 	Private TotalTimeLabel As Label
 	Private ProgressTimer As Timer
@@ -71,6 +72,7 @@ Sub Process_Globals
 	Private SourceTextArea As TextArea
 	Private TargetTextArea As TextArea
 	Private LinesTable As B4XTable
+	Private currentProject As Project
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -134,6 +136,7 @@ private Sub SetTable
 	SourceColumn.Sortable = False
 	Dim TargetColumn As B4XTableColumn = LinesTable.AddColumn("Target", LinesTable.COLUMN_TYPE_TEXT)
 	TargetColumn.Sortable = False
+	LinesTable.SearchVisible = False
 End Sub
 
 Private Sub GetTimeLabelText(totalSeconds As Long) As String
@@ -147,6 +150,8 @@ Private Sub MenuBar1_Action
 	Select mi.Text
 		Case "_Open Media File"
 			OpenFile
+		Case "_Save"
+			Save
 		Case "_Close"
 			Close
 		Case "_Recognize Speech"
@@ -159,15 +164,14 @@ Private Sub MenuBar1_Action
 End Sub
 
 Private Sub RecognizeSpeech
-	If currentFile = "" Then
+	If currentProject.IsInitialized=False Then
 		Return
 	End If
-	Dim parent As String = File.GetFileParent(currentFile)
-	Dim filename As String = File.GetName(currentFile)
-	Dim tmpFolder As String = File.Combine(parent,"tmp")
-	Dim dir As String = File.Combine(tmpFolder,filename)
-	File.MakeDir(tmpFolder,"")
-	File.MakeDir(dir,"")
+	
+	Dim parent As String = currentProject.GetMediaFolder
+	Dim filename As String = currentProject.GetMediaFilename
+	Dim dir As String = currentProject.GetTmpFolder
+
 	If File.Exists(dir,"audio.wav") = False Then
 		Dim outpath As String = File.Combine(dir,"audio.wav")
 		Log("convert video to wav...")
@@ -197,11 +201,55 @@ Private Sub RecognizeSpeech
 		End If
 		index = index + 1
 	Next
+	LoadSRTToProject
+	LoadLinesToTable
+End Sub
+
+Private Sub LoadSRTToProject
+	Dim parser As SrtParser
+	parser.Initialize
+	Dim dir As String = currentProject.GetTmpFolder
+	Dim files As List = File.ListFiles(dir)
+	currentProject.Clear
+	For Each filename As String In files
+		If filename.EndsWith(".srt") Then
+			Dim content As String = File.ReadString(dir,filename)
+			content = Utils.RemoveBOM(content)
+			Dim lines As List = parser.Parse(content)
+			For Each line As SpeechLine In lines
+				currentProject.AddLine(line.startTime,line.endTime,line.text,"")
+			Next
+		End If
+	Next
+End Sub
+
+Private Sub LoadLinesToTable
+	Dim data As List
+	data.Initialize
+	Dim index As Int = 0
+	For Each line As Map In currentProject.lines
+		index = index + 1
+		Dim row(5) As String
+		row(0) = index.As(String)
+		row(1) = line.Get("startTime")
+		row(2) = line.Get("endTime")
+		row(3) = line.Get("source")
+		row(4) = line.Get("target")
+		data.Add(row)
+	Next
+	LinesTable.SetData(data)
+End Sub
+
+Private Sub Save
+	If currentProject.IsInitialized Then
+		currentProject.save
+	End If
 End Sub
 
 Private Sub Close
 	StopPlaying
-	currentFile = ""
+	LinesTable.SetData(Array())
+	currentProject = Null
 End Sub
 
 Private Sub OpenFile
@@ -209,8 +257,9 @@ Private Sub OpenFile
 	fc.Initialize
 	Dim path As String = fc.ShowOpen(MainForm)
 	If File.Exists(path,"") Then
-		currentFile = path
+		currentProject.Initialize(path)
 		PlayFile(path)
+		LoadLinesToTable
 	End If
 End Sub
 
