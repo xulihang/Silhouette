@@ -362,11 +362,11 @@ Private Sub LoadLinesToTable
 End Sub
 
 Sub LinesTable_CellClicked (ColumnId As String, RowId As Long)
-	SelectRow(RowId,xui.Color_RGB(119,198,255))
+	SelectRow(RowId,xui.Color_RGB(119,198,255),False)
 End Sub
 
 Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
-	SelectRow(RowId,xui.Color_RGB(119,198,255))
+	SelectRow(RowId,xui.Color_RGB(119,198,255),True)
 	Dim col As B4XTableColumn = LinesTable.GetColumn(ColumnId)
 	Dim i As Int = LinesTable.VisibleRowIds.IndexOf(RowId)
 	Dim cell As B4XView = col.CellsLayouts.Get(i)
@@ -376,7 +376,7 @@ Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
 	jo.RunMethod("show", Array(cell, x, y))
 End Sub
 
-Sub SelectRow(targetRowId As Int, color As Int)    'rowid-1
+Sub SelectRow(targetRowId As Int, color As Int,fromLongClick As Boolean)    'rowid-1
 	For i = 0 To LinesTable.VisibleRowIds.Size - 1
 		Dim RowId As Long = LinesTable.VisibleRowIds.Get(i)
 		For Each c As B4XTableColumn In LinesTable.Columns
@@ -393,7 +393,7 @@ Sub SelectRow(targetRowId As Int, color As Int)    'rowid-1
 		Next
 	Next
 	selectedRowID = targetRowId
-	LoadLineToEditor
+	LoadLineToEditor(fromLongClick)
 End Sub
 
 Sub pretranslate(options As Map) As ResumableSub
@@ -616,19 +616,24 @@ Private Sub PlayTheSelectedLine
 	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
 	Dim startTime As Int = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
+	Log(line.Get("startTime"))
+	Log(startTime)
 	GetMediaPlayer.RunMethod("play",Null)
+	Sleep(0)
 	vlc.SetPosition(startTime / vlc.GetLength)
 	TogglePlayingStatus(True)
 End Sub
 
-Private Sub LoadLineToEditor
+Private Sub LoadLineToEditor(fromLongClick As Boolean)
 	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
 	SourceTextArea.Text = line.Get("source")
 	TargetTextArea.Text = line.Get("target")
 	StartTimeTextField.Text = line.Get("startTime")
 	EndTimeTextField.Text = line.Get("endTime")
-	clearTMandMT
-	ShowMT(SourceTextArea.Text,True)
+	If fromLongClick = False Then
+		clearTMandMT
+		ShowMT(SourceTextArea.Text,True)
+	End If
 End Sub
 
 Private Sub clearTMandMT
