@@ -51,6 +51,28 @@ Public Sub AddLine(startTime As String,endTime As String,source As String,target
 	lines.Add(line)
 End Sub
 
+Private Sub DefaultLine As Map
+	Dim line As Map
+	line.Initialize
+	line.Put("startTime","00:00:00,000")
+	line.Put("endTime","00:00:00,000")
+	line.Put("source","")
+	line.Put("target","")
+	Return line
+End Sub
+
+Public Sub AppendLine(index As Int) As Map
+	Dim line As Map = DefaultLine
+	lines.InsertAt(index+1,line)
+	Return line
+End Sub
+
+Public Sub PrependLine(index As Int) As Map
+	Dim line As Map = DefaultLine
+	lines.InsertAt(index,line)
+	Return line
+End Sub
+
 Public Sub GetLine(index As Int) As Map
 	Return lines.Get(index)
 End Sub

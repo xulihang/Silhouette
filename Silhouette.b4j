@@ -109,7 +109,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressTimer.Initialize("ProgressTimer",250)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
-	For Each text As String In Array("Play this line","Delete this line")
+	For Each text As String In Array("Play this line","Delete this line","Prepend a line","Append a line")
 		Dim mi As MenuItem
 		mi.Initialize(text,"tableMenuItem")
 		tableCM.MenuItems.Add(mi)
@@ -406,7 +406,7 @@ End Sub
 
 Private Sub ProgressTimer_Tick
 	If vlc.IsPlaying Then
-		If vlc.GetPosition*vlc.GetLength > expectedEndTime and expectedEndTime<>-1 Then
+		If vlc.GetPosition*vlc.GetLength > expectedEndTime And expectedEndTime<>-1 Then
 			expectedEndTime = -1
 			vlc.Pause
 		End If
@@ -443,10 +443,24 @@ Private Sub tableMenuItem_Action
 	Select mi.Text
 	    Case "Play this line"
 			PlayTheSelectedLine
+		Case "Prepend a line"
+			PrependLine
+		Case "Append a line"
+			AppendLine
 		Case "Delete this line"
 			currentProject.DeleteLine(selectedRowID - 1)
 			LoadLinesToTable
 	End Select
+End Sub
+
+Private Sub PrependLine
+	currentProject.PrependLine(selectedRowID - 1)
+	LoadLinesToTable
+End Sub
+
+Private Sub AppendLine
+	currentProject.AppendLine(selectedRowID - 1)
+	LoadLinesToTable
 End Sub
 
 Private Sub PlayTheSelectedLine
