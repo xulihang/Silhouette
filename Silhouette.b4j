@@ -576,6 +576,22 @@ Private Sub appendSingleMTResult(sourceText As String,fromTextArea As Boolean,en
 	TMTableView.Items.Add(row)
 End Sub
 
+
+Sub tmTableView_MouseClicked (EventData As MouseEvent)
+	If TMTableView.SelectedRow=-1 Then
+		Return
+	End If
+	If TMTableView.SelectedRowValues=Null Then
+		Return
+	End If
+	Dim lbl As Label=TMTableView.SelectedRowValues(2)
+	If EventData.ClickCount=2 Then
+		TargetTextArea.Text=lbl.Text
+	Else if EventData.ClickCount=1 Then
+		TMTextArea.Text=lbl.Text
+	End If
+End Sub
+
 Private Sub UpdateTime(isStartTime As Boolean,new As String)
 	If currentProject <> Null And currentProject.IsInitialized = False Then
 		Return
