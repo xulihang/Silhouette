@@ -651,12 +651,12 @@ Private Sub PlayTheSelectedLine
 End Sub
 
 Private Sub LoadLineToEditor(fromLongClick As Boolean)
-	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
-	SourceTextArea.Text = line.Get("source")
-	TargetTextArea.Text = line.Get("target")
-	StartTimeTextField.Text = line.Get("startTime")
-	EndTimeTextField.Text = line.Get("endTime")
 	If fromLongClick = False Then
+		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+		SourceTextArea.Text = line.Get("source")
+		TargetTextArea.Text = line.Get("target")
+		StartTimeTextField.Text = line.Get("startTime")
+		EndTimeTextField.Text = line.Get("endTime")
 		clearTMandMT
 		ShowMT(SourceTextArea.Text,True)
 	End If
