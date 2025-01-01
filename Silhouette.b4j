@@ -1,27 +1,28 @@
 ﻿AppType=JavaFX
 Build1=Default,b4j.example
 File1=apiparamfiller.bjl
-File10=LineEditor.bjl
-File11=ListView.bjl
-File12=main.bjl
-File13=MTSetting.bjl
-File14=pretranslate.bjl
-File15=progress.bjl
-File16=projectSetting.bjl
-File17=TopRightSplitPane.bjl
-File18=TopSplitPane.bjl
-File19=TranslationAssist.bjl
+File10=LeftSplitPane.bjl
+File11=LineEditor.bjl
+File12=ListView.bjl
+File13=main.bjl
+File14=MTSetting.bjl
+File15=pretranslate.bjl
+File16=progress.bjl
+File17=projectSetting.bjl
+File18=TopRightSplitPane.bjl
+File19=TopSplitPane.bjl
 File2=APISetting.bjl
-File20=TranslationMemory.bjl
-File21=VideoPlayer.bjl
-File22=WaveForm.bjl
+File20=TranslationAssist.bjl
+File21=TranslationMemory.bjl
+File22=VideoPlayer.bjl
+File23=WaveForm.bjl
 File3=BottomSplitPane.bjl
 File4=Editor.bjl
-File5=generalSettings.bjl
-File6=inputbox.bjl
-File7=LangaugePairSelector.bjl
-File8=langcodes.txt
-File9=LeftSplitPane.bjl
+File5=ExportOptions.bjl
+File6=generalSettings.bjl
+File7=inputbox.bjl
+File8=LangaugePairSelector.bjl
+File9=langcodes.txt
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -37,6 +38,7 @@ FileGroup2=Default Group
 FileGroup20=Default Group
 FileGroup21=Default Group
 FileGroup22=Default Group
+FileGroup23=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
@@ -61,21 +63,23 @@ Library7=jcore
 Library8=jfx
 Library9=jokhttputils2
 Module1=APIParamsFiller
-Module10=Project
-Module11=ProjectSettings
-Module12=SrtParser
-Module13=Utils
+Module10=preTranslateDialog
+Module11=progressDialog
+Module12=Project
+Module13=ProjectSettings
+Module14=SrtParser
+Module15=Utils
 Module2=ASR
-Module3=FFMpeg
-Module4=InputBox
-Module5=LanguagePairSelector
-Module6=MT
-Module7=Preferences
-Module8=preTranslateDialog
-Module9=progressDialog
-NumberOfFiles=22
+Module3=Exporter
+Module4=ExportOptions
+Module5=FFMpeg
+Module6=InputBox
+Module7=LanguagePairSelector
+Module8=MT
+Module9=Preferences
+NumberOfFiles=23
 NumberOfLibraries=15
-NumberOfModules=13
+NumberOfModules=15
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -246,6 +250,12 @@ Private Sub MenuBar1_Action
 			Dim ps As ProjectSettings
 			ps.Initialize(currentProject)
 			ps.show
+		Case "_srt"
+			Dim fc As FileChooser
+			fc.Initialize
+			Dim path As String = fc.ShowSave(MainForm)
+			Exporter.ExportToSRT(currentProject.lines,path)
+			fx.Msgbox(MainForm,"Done","")
 		Case "_Exit"
 			ExitApp
 		Case "_About"
