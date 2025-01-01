@@ -27,5 +27,9 @@ Public Sub GetWhisperPath As String
 End Sub
 
 Public Sub GetModelPath As String
-	Return File.Combine(File.Combine(File.DirApp,"models"),"ggml-medium.bin")
+	Dim modelName As String = "ggml-medium.bin"
+	If File.Exists(File.Combine(File.DirApp,"models"),"model") Then
+		modelName = File.ReadString(File.Combine(File.DirApp,"models"),"model").Trim
+	End If
+	Return File.Combine(File.Combine(File.DirApp,"models"),modelName)
 End Sub
