@@ -273,15 +273,20 @@ Private Sub RecognizeSpeech
 	Dim dir As String = currentProject.GetTmpFolder
 
 	If File.Exists(dir,"audio.wav") = False Then
+		progressDialog.Show("Converting to audio...")
+		progressDialog.update2("Processing...")
 		Dim outpath As String = File.Combine(dir,"audio.wav")
 		Log("convert video to wav...")
 		Wait For (FFMpeg.Video2Wav(parent,filename,outpath)) Complete (done As Object)
 		Log("convert video to wav done")
+		progressDialog.close
 	End If
 	If File.Exists(dir,"segnemnt-00001.wav") = False Then
+		progressDialog.Show("Splitting audio...")
 		Log("split wav...")
 		Wait For (FFMpeg.SplitWav(segmentLength,dir,"audio.wav")) Complete (done As Object)
 		Log("split wav done")
+		progressDialog.close
 	End If
 	Dim files As List = File.ListFiles(dir)
 	Dim wavFiles As List
@@ -291,16 +296,19 @@ Private Sub RecognizeSpeech
 			wavFiles.Add(filename)
 		End If
 	Next
+	progressDialog.Show("Recognizing audio...")
 	Dim index As Int = 1
 	For Each filename As String In wavFiles
 		Log(index & "/" & wavFiles.Size)
 		Dim purename As String = Utils.GetFilenameWithoutExtension(filename)
 		If File.Exists(dir,purename&".srt") = False Then
+			progressDialog.update(index,wavFiles.Size)
 			Dim wavpath As String = File.Combine(dir,filename)
 			Wait For (ASR.RecognizeWav(wavpath,"ja")) Complete (done As Object)
 		End If
 		index = index + 1
 	Next
+	progressDialog.close
 	LoadSRTToProject
 	LoadLinesToTable
 End Sub
