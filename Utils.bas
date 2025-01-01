@@ -13,7 +13,7 @@ Public Sub RemoveBOM(s As String) As String
 	If s.StartsWith(Chr(0xFEFF)) Then
 		s = s.SubString(1)
 	End If
-	return s
+	Return s
 End Sub
 
 'windows, mac or linux

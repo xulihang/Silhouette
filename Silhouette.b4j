@@ -73,6 +73,9 @@ Sub Process_Globals
 	Private TargetTextArea As TextArea
 	Private LinesTable As B4XTable
 	Private currentProject As Project
+	Private tableCM As ContextMenu
+	Private robot As JavaObject
+	private selectedRowID as Int
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -106,7 +109,13 @@ Sub AppStart (Form1 As Form, Args() As String)
 	jo.RunMethodJo("getChildren", Null).RunMethod("add", Array(vlc.player))
 	ProgressTimer.Initialize("ProgressTimer",1000)
 	ProgressTimer.Enabled = False
-
+	tableCM.Initialize("tableCM")
+	For Each text As String In Array("Play this line","Delete this line")
+		Dim mi As MenuItem
+		mi.Initialize(text,"tableMenuItem")
+		tableCM.MenuItems.Add(mi)
+	Next
+	robot = robot.InitializeStatic("com.sun.glass.ui.Application").RunMethodJO("GetApplication",Null).RunMethodJO("createRobot",Null)
 	Dim jo As JavaObject = ProgressSlider
 	Dim e As Object = jo.CreateEventFromUI("javafx.event.EventHandler", "progress_mousemoved", Null)
 	jo.RunMethod("setOnMouseMoved", Array(e))
@@ -261,6 +270,7 @@ Sub SetRowColor(targetRowId As Int, color As Int)    'rowid-1
 			End If
 		Next
 	Next
+	selectedRowID = targetRowId
 End Sub
 
 Private Sub Save
@@ -412,4 +422,26 @@ Sub MainForm_CloseRequest (EventData As Event)
 	Log("We are closing the mainform")
 	vlc.stop
 	vlc.release
+End Sub
+
+Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
+	SetRowColor(RowId,xui.Color_RGB(119,198,255))
+	Dim col As B4XTableColumn = LinesTable.GetColumn(ColumnId)
+	Dim i As Int = LinesTable.VisibleRowIds.IndexOf(RowId)
+	Dim cell As B4XView = col.CellsLayouts.Get(i)
+	Dim jo As JavaObject = tableCM '<--------------------------- global ContextMenu object
+	Dim x As Double = robot.RunMethod("getMouseX",Null)' <----- global JavaObject object
+	Dim y As Double = robot.RunMethod("getMouseY",Null)
+	jo.RunMethod("show", Array(cell, x, y))
+End Sub
+
+Private Sub tableMenuItem_Action
+	Dim mi As MenuItem = Sender
+	Select mi.Text
+	    Case "Play this line"
+			
+		Case "Delete this line"
+			currentProject.DeleteLine(selectedRowID - 1)
+			LoadLinesToTable
+	End Select
 End Sub

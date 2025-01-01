@@ -37,6 +37,10 @@ Public Sub Clear
 	lines.Clear
 End Sub
 
+Public Sub DeleteLine(index As Int)
+	lines.RemoveAt(index)
+End Sub
+
 Public Sub AddLine(startTime As String,endTime As String,source As String,target As String)
 	Dim line As Map
 	line.Initialize
