@@ -619,7 +619,13 @@ Private Sub LoadLineToEditor
 	TargetTextArea.Text = line.Get("target")
 	StartTimeTextField.Text = line.Get("startTime")
 	EndTimeTextField.Text = line.Get("endTime")
+	clearTMandMT
 	ShowMT(SourceTextArea.Text,True)
+End Sub
+
+Private Sub clearTMandMT
+	TMTableView.Items.Clear
+	TMTextArea.Text=""
 End Sub
 
 Private Sub ShowMT(sourceText As String,fromTextArea As Boolean)
