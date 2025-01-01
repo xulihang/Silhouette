@@ -320,7 +320,7 @@ Private Sub RecognizeSpeech
 		If File.Exists(dir,purename&".srt") = False Then
 			progressDialog.update(index,wavFiles.Size)
 			Dim wavpath As String = File.Combine(dir,filename)
-			Wait For (ASR.RecognizeWav(wavpath,"ja")) Complete (done As Object)
+			Wait For (ASR.RecognizeWav(wavpath,currentProject.SourceLang)) Complete (done As Object)
 		End If
 		index = index + 1
 	Next
