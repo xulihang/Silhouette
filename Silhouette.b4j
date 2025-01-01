@@ -1,21 +1,23 @@
 ﻿AppType=JavaFX
 Build1=Default,b4j.example
 File1=BottomSplitPane.bjl
-File10=TranslationMemory.bjl
-File11=VideoPlayer.bjl
-File12=WaveForm.bjl
+File10=TranslationAssist.bjl
+File11=TranslationMemory.bjl
+File12=VideoPlayer.bjl
+File13=WaveForm.bjl
 File2=Editor.bjl
-File3=LeftSplitPane.bjl
-File4=LineEditor.bjl
-File5=ListView.bjl
-File6=main.bjl
-File7=TopRightSplitPane.bjl
-File8=TopSplitPane.bjl
-File9=TranslationAssist.bjl
+File3=langcodes.txt
+File4=LeftSplitPane.bjl
+File5=LineEditor.bjl
+File6=ListView.bjl
+File7=main.bjl
+File8=TopRightSplitPane.bjl
+File9=TopSplitPane.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
 FileGroup12=Default Group
+FileGroup13=Default Group
 FileGroup2=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
@@ -25,24 +27,29 @@ FileGroup7=Default Group
 FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
-Library1=b4jvlcj
-Library10=json
-Library2=b4xtable
-Library3=javaobject
-Library4=jcore
-Library5=jfx
-Library6=jreflection
-Library7=jshell
-Library8=jxui
-Library9=xcustomlistview
+Library1=abplugin
+Library10=jshell
+Library11=json
+Library12=jxui
+Library13=xcustomlistview
+Library14=encryption
+Library2=b4jvlcj
+Library3=b4xtable
+Library4=byteconverter
+Library5=javaobject
+Library6=jcore
+Library7=jfx
+Library8=jokhttputils2
+Library9=jreflection
 Module1=ASR
 Module2=FFMpeg
-Module3=Project
-Module4=SrtParser
-Module5=Utils
-NumberOfFiles=12
-NumberOfLibraries=10
-NumberOfModules=5
+Module3=MT
+Module4=Project
+Module5=SrtParser
+Module6=Utils
+NumberOfFiles=13
+NumberOfLibraries=14
+NumberOfModules=6
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -88,6 +95,7 @@ Sub Process_Globals
 	Private AssistTabPane As TabPane
 	Private TMTableView As TableView
 	Private TMTextArea As TextArea
+	Public plugin As ABPlugin
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -117,7 +125,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	TopRightSplitPane.Vertical = True
 	BottomSplitPane.LoadLayout("ListView")
 	BottomSplitPane.LoadLayout("TranslationAssist")
-	AssistTabPane.LoadLayout("TranslationMemory","Translation")
+	AssistTabPane.LoadLayout("TranslationMemory","TM")
 	TMTableView.SetColumnWidth(0,50)
 	TMTableView.SetColumnWidth(1,50)
 	TMTableView.SetColumnWidth(2,200)
@@ -143,6 +151,21 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressSlider.tag = False
 	ProgressContextMenu.Initialize("ProgressContextMenu")
 	SetTable
+	loadPlugins
+End Sub
+
+Public Sub loadPlugins
+	Dim dir As String
+	dir=File.Combine(File.DirApp,"plugins")
+	plugin.Initialize("plugin",dir, "MyKey")
+	plugin.Start(1)
+	Log(plugin.GetAvailablePlugins)
+End Sub
+
+Sub plugin_PluginsChanged()
+	Log("plugins have changed!")
+	Log(plugin.GetAvailablePlugins)
+	plugin.Stop
 End Sub
 
 private Sub SetTable
