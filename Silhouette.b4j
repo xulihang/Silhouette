@@ -459,7 +459,7 @@ End Sub
 Private Sub Close
 	StopPlaying
 	LinesTable.SetData(Array())
-	currentProject = Null
+	Dim currentProject As Project
 End Sub
 
 Private Sub OpenFile
