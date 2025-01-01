@@ -258,7 +258,13 @@ Private Sub MenuBar1_Action
 			Dim ps As ProjectSettings
 			ps.Initialize(currentProject)
 			ps.show
-		Case "_srt"
+		Case "import from _srt"
+			Dim fc As FileChooser
+			fc.Initialize
+			Dim path As String = fc.ShowOpen(MainForm)
+			ImportFromSRT(path)
+			fx.Msgbox(MainForm,"Done","")
+		Case "export to _srt"
 			Dim fc As FileChooser
 			fc.Initialize
 			Dim path As String = fc.ShowSave(MainForm)
@@ -341,6 +347,20 @@ Private Sub LoadSRTToProject
 			Next
 			index = index + 1
 		End If
+	Next
+End Sub
+
+Private Sub ImportFromSRT(path As String)
+	Dim parser As SrtParser
+	parser.Initialize
+	currentProject.Clear
+	Dim content As String = File.ReadString(path,"")
+	content = Utils.RemoveBOM(content)
+	Dim lines As List = parser.Parse(content)
+	For Each line As SpeechLine In lines
+		Dim startTime As String = line.startTime
+		Dim endTime As String = line.endTime
+		currentProject.AddLine(startTime,endTime,line.text,"")
 	Next
 End Sub
 
