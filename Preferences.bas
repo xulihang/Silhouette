@@ -19,6 +19,7 @@ End Sub
 Public Sub Initialize(mb As MenuBar)
 	frm.Initialize("frm",650,700)
 	frm.RootPane.LoadLayout("projectSetting")
+	frm.Title = "Preferences"
 	TabPane1.LoadLayout("APISetting", "API")
 	TabPane1.LoadLayout("MTSetting", "Machine Translation")
 	APITableView.SetColumns(Array("API Name","value"))
