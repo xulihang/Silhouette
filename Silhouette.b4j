@@ -163,7 +163,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	TMTableView.SetColumnWidth(3,100)
 	Dim jo As JavaObject = VLCPane
 	jo.RunMethodJo("getChildren", Null).RunMethod("add", Array(vlc.player))
-	ProgressTimer.Initialize("ProgressTimer",250)
+	ProgressTimer.Initialize("ProgressTimer",100)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
 	For Each text As String In Array("Play this line","Delete this line","Prepend a line","Append a line")
@@ -645,12 +645,8 @@ Private Sub PlayTheSelectedLine
 	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
 	Dim startTime As Int = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
-	Log(line.Get("startTime"))
-	Log(startTime)
-	Log(vlc.GetLength)
 	GetMediaPlayer.RunMethod("play",Null)
-	Sleep(0)
-	vlc.SetPosition(startTime / vlc.GetLength)
+	vlc.SetTime(startTime)
 	TogglePlayingStatus(True)
 End Sub
 
