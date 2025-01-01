@@ -82,6 +82,7 @@ Sub Process_Globals
 	Private EndColumn As B4XTableColumn
 	Private SourceColumn As B4XTableColumn
 	Private TargetColumn As B4XTableColumn
+	private focusedTimeTextField as TextField
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -540,4 +541,22 @@ End Sub
 
 Private Sub EndTimeTextField_TextChanged (Old As String, New As String)
 	UpdateTime(False,New)
+End Sub
+
+Private Sub UseCurrentTimeButton_MouseClicked (EventData As MouseEvent)
+	If focusedTimeTextField.IsInitialized Then
+		focusedTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(vlc.GetTime)
+	End If
+End Sub
+
+Private Sub StartTimeTextField_FocusChanged (HasFocus As Boolean)
+	If HasFocus Then
+		focusedTimeTextField = StartTimeTextField
+	End If
+End Sub
+
+Private Sub EndTimeTextField_FocusChanged (HasFocus As Boolean)
+	If HasFocus Then
+		focusedTimeTextField = EndTimeTextField
+	End If
 End Sub
