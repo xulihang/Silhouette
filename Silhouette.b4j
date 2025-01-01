@@ -136,10 +136,10 @@ private Sub SetTable
 	NumberColumn.Width = 80dip
 	NumberColumn.Sortable = False
 	Dim StartColumn As B4XTableColumn = LinesTable.AddColumn("Start", LinesTable.COLUMN_TYPE_TEXT)
-	StartColumn.Width = 80dip
+	StartColumn.Width = 105dip
 	StartColumn.Sortable = False
 	Dim EndColumn As B4XTableColumn = LinesTable.AddColumn("End", LinesTable.COLUMN_TYPE_TEXT)
-	EndColumn.Width = 80dip
+	EndColumn.Width = 105dip
 	EndColumn.Sortable = False
 	Dim SourceColumn As B4XTableColumn = LinesTable.AddColumn("Source", LinesTable.COLUMN_TYPE_TEXT)
 	SourceColumn.Sortable = False
