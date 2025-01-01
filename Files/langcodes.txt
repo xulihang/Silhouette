@@ -1,26 +1,23 @@
-basiccat	language name	yandex	google	mymemory	bing	youdao	tencent	niutrans	sogouDeepI	sogou	baidu
-en	英语										
-ja	日语										jp
-ko	韩语						kr				kor
-zh	中文				zh-Hans	zh-CHS			zh-CHS	zh-CHS	
-zh-CN	简体中文	zh	zh-CN	zh	zh-Hans	zh-CHS	zh	zh	zh-CHS	zh-CHS	zh
-zh-TW	繁体中文	zh	zh-TW	zh	zh-Hant	zh-CHS	zh	cht	zh-CHT	zh-CHT	cht
-ar	阿拉伯语										ara
-de	德语										
-fi	芬兰语										fin
-el	希腊语										
-da	丹麦语										dan
-cs	捷克语										
-ca	加泰罗尼亚语										
-fr	法语										fra
-it	意大利语										
-sv	瑞典语										swe
-pt	葡萄牙语										
-nl	荷兰语										
-pl	波兰语										
-es	西班牙语										spa
-id	印度尼西亚语										
-hi	印地语										
-vi	越南语										vie
-zh_wyw	古汉语										wyw
-ru	俄语										
+basiccat	language name	yandex	google	mymemory	bing	youdao	tencent	niutrans	sogouDeepI	sogou	baidu	ali	cloudtranslation	ali-ecommerce
+ar	Arabic													
+de	Germany													
+fi	Finnish										fin			
+el	Greek													
+da	Danish										dan			
+cs	Czech													
+ca	Catalan													
+fr	French										fra			
+it	Italian													
+sv	Swedish										swe			
+pt	Portuguese													
+nl	Dutch													
+en	English													
+pl	Polish													
+es	Spanish										spa			
+ja	Japanese										jp			
+ko	Korean						kr				kor			
+zh_wyw	Ancient Chinese										wyw			
+ru	Russian													
+zh	default Chinese				zh-Hans	zh-CHS			zh-CHS	zh-CHS				
+zh-CN	Simplified Chinese	zh	zh-CN	zh	zh-Hans	zh-CHS	zh	zh	zh-CHS	zh-CHS	zh	zh	zh-cn	zh
+zh-TW	Traditional Chinese	zh	zh-TW	zh	zh-Hant	zh-CHS	zh	cht	zh-CHT	zh-CHT	cht	zh	zh-tw	zh
