@@ -494,8 +494,24 @@ Private Sub LoadLineToEditor
 	EndTimeTextField.Text = line.Get("endTime")
 End Sub
 
+Private Sub UpdateTime(isStartTime As Boolean,new As String)
+	If currentProject <> Null And currentProject.IsInitialized = False Then
+		Return
+	End If
+	
+	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+	If isStartTime Then
+		line.Put("startTime",new)
+		LinesTable.sql1.ExecNonQuery2($"UPDATE data SET ${StartColumn.SQLID} = ? WHERE rowid = ?"$, Array As String(new, selectedRowID))
+	Else
+		line.Put("endTime",new)
+		LinesTable.sql1.ExecNonQuery2($"UPDATE data SET ${EndColumn.SQLID} = ? WHERE rowid = ?"$, Array As String(new, selectedRowID))
+	End If
+	LinesTable.Refresh
+End Sub
+
 Private Sub UpdateText(isSource As Boolean,new As String)
-	If currentProject.IsInitialized = False Then
+	If currentProject <> Null And currentProject.IsInitialized = False Then
 		Return
 	End If
 	
@@ -519,9 +535,9 @@ Private Sub TargetTextArea_TextChanged (Old As String, New As String)
 End Sub
 
 Private Sub StartTimeTextField_TextChanged (Old As String, New As String)
-	
+	UpdateTime(True,New)
 End Sub
 
 Private Sub EndTimeTextField_TextChanged (Old As String, New As String)
-	
+	UpdateTime(False,New)
 End Sub
