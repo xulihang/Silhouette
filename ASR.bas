@@ -23,7 +23,12 @@ Public Sub RecognizeWav(filepath As String,lang As String) As ResumableSub
 End Sub
 
 Public Sub GetWhisperPath As String
-	Return File.Combine(File.Combine(File.DirApp,"whisper"),"main.exe")
+	If Utils.DetectOS <> "win" Then
+		Return File.Combine(File.Combine(File.DirApp,"whisper"),"whisper")
+	Else
+		Return File.Combine(File.Combine(File.DirApp,"whisper"),"main.exe")
+	End If
+	
 End Sub
 
 Public Sub GetModelPath As String
