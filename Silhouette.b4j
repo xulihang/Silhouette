@@ -504,12 +504,10 @@ Private Sub PlayFile(path As String)
 	ProgressSlider.tag = False
 	ProgressSlider.Value = 0
 	vlc.Play(path)
-	Sleep(0)
 	ProgressSlider.tag = True
 	Do While vlc.IsPlaying == False
 		Sleep(100)
 	Loop
-	ResizeVLCImageView(VLCPane.Width,VLCPane.Height)
 	TogglePlayingStatus(True)
 	Dim time As Long = vlc.GetLength / 1000
 	Dim minutes As Int =  Floor(time / 60)
@@ -617,6 +615,8 @@ End Sub
 Private Sub TogglePlayingStatus(isPlaying As Boolean)
 	If isPlaying Then
 		vlc.SetVolume(VolSlider.Value)
+		VLCPane.PrefWidth  = VLCPane.Width + 1
+		VLCPane.PrefWidth  = VLCPane.Width - 1
 		PlayButton.Text = ""
 		ProgressTimer.Enabled = True
 	Else
