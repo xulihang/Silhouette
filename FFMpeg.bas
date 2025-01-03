@@ -11,7 +11,7 @@ End Sub
 
 Public Sub GetFFMpegPath As String
 	Dim ffmpegPath As String
-	If Utils.DetectOS <> "win" Then
+	If Utils.DetectOS = "win" Then
 		ffmpegPath = File.Combine(File.Combine(File.DirApp,"ffmpeg"),"ffmpeg.exe")
 	Else
 		ffmpegPath = File.Combine(File.Combine(File.DirApp,"ffmpeg"),"ffmpeg")
