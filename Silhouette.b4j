@@ -606,6 +606,9 @@ Private Sub PlayButton_MouseClicked (EventData As MouseEvent)
 		TogglePlayingStatus(False)
 	Else
 		vlc.Resume
+		Do While vlc.IsPlaying = False
+			Sleep(100)
+		Loop
 		TogglePlayingStatus(True)
 	End If
 End Sub
@@ -613,6 +616,7 @@ End Sub
 
 Private Sub TogglePlayingStatus(isPlaying As Boolean)
 	If isPlaying Then
+		vlc.SetVolume(VolSlider.Value)
 		PlayButton.Text = ""
 		ProgressTimer.Enabled = True
 	Else
