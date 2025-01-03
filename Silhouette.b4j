@@ -640,6 +640,8 @@ Private Sub ProgressTimer_Tick
 		ProgressSlider.Value = vlc.GetTime/vlc.GetLength * 100
 		Sleep(0)
 		ProgressSlider.Tag = True
+	Else
+		TogglePlayingStatus(False)
 	End If
 End Sub
 
