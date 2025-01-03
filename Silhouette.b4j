@@ -509,6 +509,7 @@ Private Sub PlayFile(path As String)
 	Do While vlc.IsPlaying == False
 		Sleep(100)
 	Loop
+	ResizeVLCImageView(VLCPane.Width,VLCPane.Height)
 	TogglePlayingStatus(True)
 	Dim time As Long = vlc.GetLength / 1000
 	Dim minutes As Int =  Floor(time / 60)
@@ -560,6 +561,10 @@ Sub Progress_MouseMoved_Event (MethodName As String, Args() As Object) As Object
 End Sub
 
 Private Sub VLCPane_Resize (Width As Double, Height As Double)
+	ResizeVLCImageView(Width,Height)
+End Sub
+
+Private Sub ResizeVLCImageView(Width As Double, Height As Double)
 	Dim img As Image = VLCImageView.GetImage
 	If img.IsInitialized Then
 		Dim radio As Double = img.Width/img.Height
