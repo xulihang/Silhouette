@@ -48,40 +48,40 @@ FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
 Library1=abplugin
-Library10=jokhttputils2
-Library11=jreflection
-Library12=jshell
-Library13=json
-Library14=jxui
-Library15=xcustomlistview
-Library16=xui views
-Library2=b4jvlcj
-Library3=b4xcollections
-Library4=b4xtable
-Library5=byteconverter
-Library6=encryption
-Library7=javaobject
-Library8=jcore
-Library9=jfx
+Library10=jreflection
+Library11=jshell
+Library12=json
+Library13=jxui
+Library14=xcustomlistview
+Library15=xui views
+Library2=b4xcollections
+Library3=b4xtable
+Library4=byteconverter
+Library5=encryption
+Library6=javaobject
+Library7=jcore
+Library8=jfx
+Library9=jokhttputils2
 Module1=APIParamsFiller
-Module10=preTranslateDialog
-Module11=progressDialog
-Module12=Project
-Module13=ProjectSettings
-Module14=SrtParser
-Module15=Utils
+Module10=Preferences
+Module11=preTranslateDialog
+Module12=progressDialog
+Module13=Project
+Module14=ProjectSettings
+Module15=SrtParser
+Module16=Utils
 Module2=ASR
 Module3=Exporter
 Module4=ExportOptions
 Module5=FFMpeg
 Module6=InputBox
-Module7=LanguagePairSelector
-Module8=MT
-Module9=Preferences
+Module7=jVLC
+Module8=LanguagePairSelector
+Module9=MT
 NumberOfFiles=23
-NumberOfLibraries=16
-NumberOfModules=15
-Version=9.8
+NumberOfLibraries=15
+NumberOfModules=16
+Version=10
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
@@ -92,15 +92,16 @@ Version=9.8
 #AdditionalJar: jna-5.16.0
 #AdditionalJar: slf4j-api-1.7.10
 #AdditionalJar: jna-platform-5.16.0
-#AdditionalJar: vlcj-3.12.1
+#AdditionalJar: vlcj-4.8.3
+#AdditionalJar: vlcj-javafx-1.2.0
+#AdditionalJar: vlcj-natives-4.8.3
 #AdditionalJar: sqlite-jdbc-3.43.0.0
-
 
 Sub Process_Globals
 	Private fx As JFX
 	Private MainForm As Form
 	Private xui As XUI 
-	Private vlc As B4JVlcj
+	Private vlc As jVLC
 	Private MenuBar1 As MenuBar
 	Private MainPane As Pane
 	Private EditorSplitPane As SplitPane
@@ -136,19 +137,20 @@ Sub Process_Globals
 	Private TMTextArea As TextArea
 	Public plugin As ABPlugin
 	Private isLongClick As Boolean = False
+	Private VLCImageView As ImageView
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
 	'** IMPORTANT - checking if VLC is installed on the computer should be the first thing to execute in your code
-	If vlc.IsVLCInstalled = False Then
+	'If vlc.IsVLCInstalled = False Then
 		'Implement your own code to tell user that VLC must be installed.
 		'Note: if VLC has been installed in a non-standard directory, VLC might not be found.
-		fx.Msgbox(MainForm,"VLC must be installed on the computer to run this program.","")
-		ExitApplication
-	End If
+	'	fx.Msgbox(MainForm,"VLC must be installed on the computer to run this program.","")
+	'	ExitApplication
+	'End If
 
 	'** OK, VLC was found. We can proceed.
-	vlc.Initialize("vlc")
+
 	MainForm = Form1
 	MainForm.RootPane.LoadLayout("main")
 	MainForm.WindowWidth = 800
@@ -170,8 +172,10 @@ Sub AppStart (Form1 As Form, Args() As String)
 	TMTableView.SetColumnWidth(1,50)
 	TMTableView.SetColumnWidth(2,200)
 	TMTableView.SetColumnWidth(3,100)
-	Dim jo As JavaObject = VLCPane
-	jo.RunMethodJo("getChildren", Null).RunMethod("add", Array(vlc.player))
+	
+	vlc.Initialize(VLCImageView)
+	VLCImageView.PreserveRatio = True
+	
 	ProgressTimer.Initialize("ProgressTimer",100)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
@@ -556,9 +560,19 @@ Sub Progress_MouseMoved_Event (MethodName As String, Args() As Object) As Object
 End Sub
 
 Private Sub VLCPane_Resize (Width As Double, Height As Double)
-	Dim n As Node = VLCPane.GetNode(0)
-	n.PrefWidth = Width
-	n.PrefHeight = Height
+	Dim img As Image = VLCImageView.GetImage
+	If img.IsInitialized Then
+		Dim radio As Double = img.Width/img.Height
+		VLCImageView.Height = Height
+		VLCImageView.Width = Width
+		If img.Width/img.Height < Width/Height Then '16:9 4:3
+			Dim desiredWidth As Double = VLCImageView.Height * radio
+			VLCImageView.Left = (Width - desiredWidth) / 2
+		Else
+			Dim desiredHeight As Double = VLCImageView.Width / radio
+			VLCImageView.Top = (Height - desiredHeight) / 2
+		End If
+	End If
 End Sub
 
 Private Sub ExitApp
@@ -568,6 +582,7 @@ Private Sub ExitApp
 End Sub
 
 Private Sub VolSlider_ValueChange (Value As Double)
+	Log(Value)
 	vlc.SetVolume(Value)
 End Sub
 
@@ -585,16 +600,11 @@ Private Sub PlayButton_MouseClicked (EventData As MouseEvent)
 		vlc.Pause
 		TogglePlayingStatus(False)
 	Else
-		GetMediaPlayer.RunMethod("play",Null)
+		vlc.Resume
 		TogglePlayingStatus(True)
 	End If
 End Sub
 
-private Sub GetMediaPlayer As JavaObject
-	Dim jo As JavaObject=vlc.player
-	Dim mp As JavaObject=jo.RunMethod("getMp",Null)
-	Return mp
-End Sub
 
 Private Sub TogglePlayingStatus(isPlaying As Boolean)
 	If isPlaying Then
@@ -661,7 +671,7 @@ Private Sub PlayTheSelectedLine
 	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
 	Dim startTime As Int = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
-	GetMediaPlayer.RunMethod("play",Null)
+	vlc.Resume
 	vlc.SetTime(startTime)
 	TogglePlayingStatus(True)
 End Sub
