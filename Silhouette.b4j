@@ -48,20 +48,21 @@ FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
 Library1=abplugin
-Library10=jreflection
-Library11=jshell
-Library12=json
-Library13=jxui
-Library14=xcustomlistview
-Library15=b4xcollections
+Library10=jokhttputils2
+Library11=jreflection
+Library12=jshell
+Library13=json
+Library14=jxui
+Library15=xcustomlistview
+Library16=xui views
 Library2=b4jvlcj
-Library3=b4xtable
-Library4=byteconverter
-Library5=encryption
-Library6=javaobject
-Library7=jcore
-Library8=jfx
-Library9=jokhttputils2
+Library3=b4xcollections
+Library4=b4xtable
+Library5=byteconverter
+Library6=encryption
+Library7=javaobject
+Library8=jcore
+Library9=jfx
 Module1=APIParamsFiller
 Module10=preTranslateDialog
 Module11=progressDialog
@@ -78,15 +79,22 @@ Module7=LanguagePairSelector
 Module8=MT
 Module9=Preferences
 NumberOfFiles=23
-NumberOfLibraries=15
+NumberOfLibraries=16
 NumberOfModules=15
-Version=10
+Version=9.8
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
 	#MainFormHeight: 600 
 	#VirtualMachineArgs: --add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
 #End Region
+
+#AdditionalJar: jna-5.16.0
+#AdditionalJar: slf4j-api-1.7.10
+#AdditionalJar: jna-platform-5.16.0
+#AdditionalJar: vlcj-3.12.1
+#AdditionalJar: sqlite-jdbc-3.43.0.0
+
 
 Sub Process_Globals
 	Private fx As JFX
@@ -127,7 +135,7 @@ Sub Process_Globals
 	Private TMTableView As TableView
 	Private TMTextArea As TextArea
 	Public plugin As ABPlugin
-	private isLongClick as Boolean = False
+	Private isLongClick As Boolean = False
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
