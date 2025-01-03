@@ -649,6 +649,7 @@ Sub MainForm_CloseRequest (EventData As Event)
 	Log("We are closing the mainform")
 	vlc.stop
 	vlc.release
+	Sleep(0)
 	ExitApplication
 End Sub
 
