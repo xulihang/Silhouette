@@ -23,7 +23,7 @@ Public Sub RecognizeWav(filepath As String,lang As String) As ResumableSub
 End Sub
 
 Public Sub GetWhisperPath As String
-	If Utils.DetectOS <> "win" Then
+	If Utils.DetectOS <> "windows" Then
 		Return File.Combine(File.Combine(File.DirApp,"whisper"),"whisper")
 	Else
 		Return File.Combine(File.Combine(File.DirApp,"whisper"),"main.exe")
@@ -32,9 +32,18 @@ Public Sub GetWhisperPath As String
 End Sub
 
 Public Sub GetModelPath As String
+	Dim modelDir As String = File.Combine(File.DirApp,"models")
 	Dim modelName As String = "ggml-medium.bin"
-	If File.Exists(File.Combine(File.DirApp,"models"),"model") Then
-		modelName = File.ReadString(File.Combine(File.DirApp,"models"),"model").Trim
+	If File.Exists(modelDir,"model") Then
+		modelName = File.ReadString(modelDir,"model").Trim
 	End If
-	Return File.Combine(File.Combine(File.DirApp,"models"),modelName)
+	If File.Exists(modelDir,modelName) = False Then
+	    For Each filename As String In File.ListFiles(modelDir)
+			If filename.EndsWith(".bin") Then
+				modelName = filename
+				Exit
+			End If
+	    Next
+	End If
+	Return File.Combine(modelDir,modelName)
 End Sub
