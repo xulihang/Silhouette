@@ -18,6 +18,7 @@ Public Sub Initialize(mediaPath As String) As Boolean
 	projectPath = File.Combine(dir,Utils.GetFilenameWithoutExtension(filename)&".sip")
 	If File.Exists(projectPath,"") Then
 		readProjectFile
+		CreateTempFolder
 		Return False
 	Else
 		projectFile.Initialize
