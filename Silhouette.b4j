@@ -54,6 +54,7 @@ Library12=json
 Library13=jxui
 Library14=xcustomlistview
 Library15=xui views
+Library16=jrandomaccessfile
 Library2=b4xcollections
 Library3=b4xtable
 Library4=byteconverter
@@ -63,24 +64,27 @@ Library7=jcore
 Library8=jfx
 Library9=jokhttputils2
 Module1=APIParamsFiller
-Module10=Preferences
-Module11=preTranslateDialog
-Module12=progressDialog
-Module13=Project
-Module14=ProjectSettings
-Module15=SrtParser
-Module16=Utils
+Module10=MT
+Module11=Preferences
+Module12=preTranslateDialog
+Module13=progressDialog
+Module14=Project
+Module15=ProjectSettings
+Module16=SrtParser
+Module17=Utils
+Module18=WaveFormBitmapCreator
+Module19=WavRandomAccessFile
 Module2=ASR
-Module3=Exporter
-Module4=ExportOptions
-Module5=FFMpeg
-Module6=InputBox
-Module7=jVLC
-Module8=LanguagePairSelector
-Module9=MT
+Module3=DraggableRange
+Module4=Exporter
+Module5=ExportOptions
+Module6=FFMpeg
+Module7=InputBox
+Module8=jVLC
+Module9=LanguagePairSelector
 NumberOfFiles=23
-NumberOfLibraries=15
-NumberOfModules=16
+NumberOfLibraries=16
+NumberOfModules=19
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -138,6 +142,11 @@ Sub Process_Globals
 	Public plugin As ABPlugin
 	Private isLongClick As Boolean = False
 	Private VLCImageView As ImageView
+	Private OverviewWaveFormImageView As ImageView
+	Private WaveFormImageView As ImageView
+	Private waveFormCreator As WaveFormBitmapCreator
+	Private overviewRange As DraggableRange
+	Private duration As Long
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -428,6 +437,39 @@ Sub SelectRow(targetRowId As Int, color As Int,fromLongClick As Boolean)    'row
 	Next
 	selectedRowID = targetRowId
 	LoadLineToEditor(fromLongClick)
+	DrawWaveForm
+End Sub
+
+Private Sub DrawWaveForm
+	Dim wavRaf As WavRandomAccessFile
+	wavRaf.Initialize(File.DirApp,"segment-00006.wav")
+	duration = wavRaf.Duration_ms
+	waveFormCreator.Initialize(wavRaf.DataShorts)
+	OverviewWaveFormImageView.SetImage(waveFormCreator.Draw)
+	Dim timestampRange As DraggableRange
+	Dim overviewPane As Pane = overviewRange.Initialize(Me,"overviewRange")
+	Dim timestampRangePane As Pane = timestampRange.Initialize(Me,"timestampRange")
+	Dim parent As Pane = OverviewWaveFormImageView.Parent
+	parent.AddNode(overviewPane,OverviewWaveFormImageView.Left,OverviewWaveFormImageView.Top,OverviewWaveFormImageView.Width,OverviewWaveFormImageView.Height)
+	parent.AddNode(timestampRangePane,WaveFormImageView.Left,WaveFormImageView.top,WaveFormImageView.width,WaveFormImageView.Height)
+End Sub
+
+Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Double)
+	waveFormCreator.StartIndex = startProgress*waveFormCreator.SampleLength
+	waveFormCreator.EndIndex = endProgress*waveFormCreator.SampleLength
+	WaveFormImageView.SetImage(waveFormCreator.Draw)
+End Sub
+
+Private Sub timestampRange_RangeChanged(startProgress As Double,endProgress As Double)
+	Log(startProgress)
+	Log(endProgress)
+	Dim startTime As Long  = overviewRange.StartProgress * duration
+	Dim endTime As Long = overviewRange.EndProgress * duration
+	Dim clipTime As Long = endTime -startTime
+	Dim clipStartTime As Long = clipTime * startProgress + startTime
+	Dim clipEndTime As Long = clipTime * endProgress + startTime
+	StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipStartTime)
+	EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipEndTime)
 End Sub
 
 Sub pretranslate(options As Map) As ResumableSub

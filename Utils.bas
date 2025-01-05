@@ -6,7 +6,7 @@ Version=8.9
 @EndOfDesignText@
 'Static code module
 Sub Process_Globals
-	private mPref as Map
+	Private mPref As Map
 End Sub
 
 Public Sub RemoveBOM(s As String) As String
