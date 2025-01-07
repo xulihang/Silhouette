@@ -416,6 +416,11 @@ Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
 	Dim jo As JavaObject = tableCM '<--------------------------- global ContextMenu object
 	Dim x As Double = robot.RunMethod("getMouseX",Null)' <----- global JavaObject object
 	Dim y As Double = robot.RunMethod("getMouseY",Null)
+	If Utils.DetectOS = "mac" Then
+		Dim m As Map = Utils.GetScreenPosition(cell)
+		x = m.Get("x") + cell.Width/2
+		y = m.Get("y") + cell.Height/2
+	End If
 	jo.RunMethod("show", Array(cell, x, y))
 End Sub
 
