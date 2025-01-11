@@ -868,7 +868,6 @@ End Sub
 
 Private Sub playHereMI_Action
 	Dim time As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
-	Log(time)
 	vlc.SetTime(time)
 	If vlc.IsPlaying = False Then
 		vlc.Resume
@@ -877,7 +876,11 @@ Private Sub playHereMI_Action
 End Sub
 
 Private Sub playSelectionMI_Action
-	
+	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(StartTimeTextField.Text)
+	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
+	vlc.Resume
+	vlc.SetTime(startTime)
+	TogglePlayingStatus(True)
 End Sub
 
 
@@ -916,7 +919,7 @@ End Sub
 
 Private Sub PlayTheSelectedLine
 	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
-	Dim startTime As Int = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
 	vlc.Resume
 	vlc.SetTime(startTime)
