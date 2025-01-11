@@ -867,11 +867,17 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 End Sub
 
 Private Sub playHereMI_Action
-	Log(Sender)
+	Dim time As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
+	Log(time)
+	vlc.SetTime(time)
+	If vlc.IsPlaying = False Then
+		vlc.Resume
+		TogglePlayingStatus(True)
+	End If
 End Sub
 
 Private Sub playSelectionMI_Action
-	Log(Sender)
+	
 End Sub
 
 
