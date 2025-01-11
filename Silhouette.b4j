@@ -325,7 +325,7 @@ Private Sub ConvertToWav(parent As String,filename As String, tmpDir As String) 
 		Log("convert video to wav done")
 		progressDialog.close
 	End If
-	If File.Exists(tmpDir,"segnemnt-00001.wav") = False Then
+	If File.Exists(tmpDir,"segment-00000.wav") = False Then
 		progressDialog.Show("Splitting audio...")
 		Log("split wav...")
 		Wait For (FFMpeg.SplitWav(segmentLength,tmpDir,"audio.wav")) Complete (done As Object)
