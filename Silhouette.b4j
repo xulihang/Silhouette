@@ -581,8 +581,8 @@ Private Sub timestampRange_RangeChanged(startProgress As Double,endProgress As D
 		Dim startTime As Long  = overviewRange.StartProgress * cutDurationMs
 		Dim endTime As Long = overviewRange.EndProgress * cutDurationMs
 		Dim clipTime As Long = endTime -startTime
-		Dim clipStartTime As Long = clipTime * startProgress + startTime
-		Dim clipEndTime As Long = clipTime * endProgress + startTime
+		Dim clipStartTime As Long = clipTime * startProgress + startTime + cutStartTimeMs
+		Dim clipEndTime As Long = clipTime * endProgress + startTime + cutStartTimeMs
 		StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipStartTime)
 		EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipEndTime)
 	End If
