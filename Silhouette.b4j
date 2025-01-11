@@ -126,7 +126,7 @@ Sub Process_Globals
 	Private currentProject As Project
 	Private tableCM As ContextMenu
 	Private robot As JavaObject
-	Private selectedRowID As Int
+	Private selectedRowID As Int = -1
 	Private expectedEndTime As Int = -1
 	Private segmentLength As Int = 30
 	Private EndTimeTextField As TextField
@@ -147,6 +147,7 @@ Sub Process_Globals
 	Private waveFormCreator As WaveFormBitmapCreator
 	Private overviewRange As DraggableRange
 	Private duration As Long
+	Private timestampRange As DraggableRange
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -205,6 +206,15 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressContextMenu.Initialize("ProgressContextMenu")
 	SetTable
 	loadPlugins
+	AddWaveFormControls
+End Sub
+
+Private Sub AddWaveFormControls
+	Dim overviewPane As Pane = overviewRange.Initialize(Me,"overviewRange")
+	Dim timestampRangePane As Pane = timestampRange.Initialize(Me,"timestampRange")
+	Dim parent As Pane = OverviewWaveFormImageView.Parent
+	parent.AddNode(overviewPane,OverviewWaveFormImageView.Left,OverviewWaveFormImageView.Top,OverviewWaveFormImageView.Width,OverviewWaveFormImageView.Height)
+	parent.AddNode(timestampRangePane,WaveFormImageView.Left,WaveFormImageView.top,WaveFormImageView.width,WaveFormImageView.Height)
 End Sub
 
 
@@ -445,24 +455,91 @@ Sub SelectRow(targetRowId As Int, color As Int,fromLongClick As Boolean)    'row
 	DrawWaveForm
 End Sub
 
+Private Sub WaveFormPane_Resize (Width As Double, Height As Double)
+	timestampRange.Pane.SetSize(Width,Height/4*3)
+	overviewRange.Pane.Top = Height/4*3
+	overviewRange.Pane.SetSize(Width,Height/4)
+	If currentProject.IsInitialized And selectedRowID <> - 1 Then
+		DrawWaveForm
+	End If
+End Sub
+
+Private Sub GetWaveFilesToDraw As List
+	Dim waveFilesToDraw As List
+	waveFilesToDraw.Initialize
+	Dim files As List = File.ListFiles(currentProject.GetTmpFolder)
+	Dim wavFiles As List
+	wavFiles.Initialize
+	For Each filename As String In files
+		If filename.StartsWith("segment") And filename.EndsWith(".wav") Then
+			wavFiles.Add(filename)
+		End If
+	Next
+	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+	Dim startTime As String = line.get("startTime")
+	Dim ms As Long = Utils.GetMillisecondsFromTimeString(startTime)
+	Dim wavIndex As Int = ms/1000/30
+	If wavFiles.Size>0 Then
+		If wavIndex - 1 >=0 Then
+			waveFilesToDraw.Add(wavFiles.Get(wavIndex - 1))
+		End If
+		If wavIndex < wavFiles.Size Then
+			waveFilesToDraw.Add(wavFiles.Get(wavIndex))
+		End If
+		If wavIndex + 1 <= wavFiles.Size - 1 Then
+			waveFilesToDraw.Add(wavFiles.Get(wavIndex + 1))
+		End If
+	End If
+	Return waveFilesToDraw
+End Sub
+
 Private Sub DrawWaveForm
-	Dim wavRaf As WavRandomAccessFile
-	wavRaf.Initialize(File.DirApp,"segment-00006.wav")
-	duration = wavRaf.Duration_ms
-	waveFormCreator.Initialize(wavRaf.DataShorts)
-	OverviewWaveFormImageView.SetImage(waveFormCreator.Draw)
-	Dim timestampRange As DraggableRange
-	Dim overviewPane As Pane = overviewRange.Initialize(Me,"overviewRange")
-	Dim timestampRangePane As Pane = timestampRange.Initialize(Me,"timestampRange")
-	Dim parent As Pane = OverviewWaveFormImageView.Parent
-	parent.AddNode(overviewPane,OverviewWaveFormImageView.Left,OverviewWaveFormImageView.Top,OverviewWaveFormImageView.Width,OverviewWaveFormImageView.Height)
-	parent.AddNode(timestampRangePane,WaveFormImageView.Left,WaveFormImageView.top,WaveFormImageView.width,WaveFormImageView.Height)
+	InitializeWaveFormCreatorIfNeeded
+	OverviewWaveFormImageView.SetImage(waveFormCreator.Draw(OverviewWaveFormImageView.Width,OverviewWaveFormImageView.Height))
+End Sub
+
+Private Sub InitializeWaveFormCreatorIfNeeded
+	Dim waveFiles As List = GetWaveFilesToDraw
+	If waveFormCreator.IsInitialized Then
+		Dim needReload As Boolean = False
+		 If waveFormCreator.Tag Is List Then
+			Dim prevousList As List = waveFormCreator.Tag
+			If prevousList.Get(0) <> waveFiles.Get(0) Then
+				needReload = True
+			End If
+		End If
+		If needReload Then
+			Log("reinit waveform creator")
+			waveFormCreator.Initialize(LoadDataFromWaveFiles(waveFiles))
+			waveFormCreator.Tag = waveFiles
+		End If
+	Else
+		waveFormCreator.Initialize(LoadDataFromWaveFiles(waveFiles))
+		waveFormCreator.Tag = waveFiles
+	End If
+End Sub
+
+Private Sub LoadDataFromWaveFiles(waveFiles As List) As Short()
+	Dim totalDuration As Int = 0
+	Dim bytesArray As List
+	bytesArray.Initialize
+	For Each filename As String In waveFiles
+		Log(filename)
+		Dim wavRaf As WavRandomAccessFile
+		wavRaf.Initialize(currentProject.GetTmpFolder,filename)
+		totalDuration = totalDuration + wavRaf.Duration_ms
+		bytesArray.Add(wavRaf.DataBytes)
+	Next
+	Dim jointBytes() As Byte = Utils.JoinBytes(bytesArray)
+	Dim jointShorts() As Short = Utils.getDataShortsFromBytes(jointBytes)
+	duration = totalDuration
+	Return jointShorts
 End Sub
 
 Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Double)
 	waveFormCreator.StartIndex = startProgress*waveFormCreator.SampleLength
 	waveFormCreator.EndIndex = endProgress*waveFormCreator.SampleLength
-	WaveFormImageView.SetImage(waveFormCreator.Draw)
+	WaveFormImageView.SetImage(waveFormCreator.Draw(WaveFormImageView.Width,WaveFormImageView.Height))
 End Sub
 
 Private Sub timestampRange_RangeChanged(startProgress As Double,endProgress As Double)

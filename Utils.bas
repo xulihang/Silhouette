@@ -9,6 +9,27 @@ Sub Process_Globals
 	Private mPref As Map
 End Sub
 
+Public Sub getDataShortsFromBytes(Bytes() As Byte) As Short()
+	Dim BC As ByteConverter
+	BC.LittleEndian = True
+	Return BC.ShortsFromBytes(Bytes)
+End Sub
+
+Sub JoinBytes(ListOfArraysOfBytes As List) As Byte()
+	Dim size As Int
+	For Each b() As Byte In ListOfArraysOfBytes
+		size = size + b.Length
+	Next
+	Dim result(size) As Byte
+	Dim index As Int
+	Dim bc As ByteConverter 'ByteConverter library
+	For Each b() As Byte In ListOfArraysOfBytes
+		bc.ArrayCopy(b, 0, result, index, b.Length)
+		index = index + b.Length
+	Next
+	Return result
+End Sub
+
 Public Sub RemoveBOM(s As String) As String
 	If s.StartsWith(Chr(0xFEFF)) Then
 		s = s.SubString(1)

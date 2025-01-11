@@ -11,6 +11,7 @@ Sub Class_Globals
 	Private mAmplitude As Int = 1
 	Private mStartIndex As Int = -1
 	Private mEndIndex As Int = -1
+	Public Tag As Object
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -46,20 +47,23 @@ Public Sub getEndIndex As Int
 	Return mEndIndex
 End Sub
 
-Public Sub Draw() As B4XBitmap
+Public Sub Draw(width As Int,height As Int) As B4XBitmap
+	Dim ratio As Double = width/height
 	Dim data() As Short
 	data = Cut(mData)
-	data = Compress(data)
+	data = Compress(data,3000)
 	Dim normalized() As Float= Normalize(data)
 	Dim bc As BitmapCreator
-	bc.Initialize(3000,500)
-	Dim height As Int = 500 - 200
+	Dim imageHeight As Int = 3000/ratio
+	bc.Initialize(3000,imageHeight)
+	Dim height As Int = imageHeight * 0.5
+	Log("bitmap size: 3000x"&imageHeight)
 	Dim NbSamples As Int = normalized.Length
 	For i = 0 To NbSamples - 1
 		If i = NbSamples - 1 Then
 			Exit
 		End If
-		Dim centerY As Double = 250
+		Dim centerY As Double = imageHeight/2
 		Dim x1 As Int = i
 		Dim y1 As Double = centerY + normalized(i)*height*mAmplitude
 		Dim x2 As Int = i+1
@@ -82,14 +86,14 @@ Private Sub Cut(data() As Short) As Short()
 	End If
 End Sub
 
-Private Sub Compress(data() As Short) As Short()
+Private Sub Compress(data() As Short,targetSize As Int) As Short()
 	Dim times As Int 
-	If data.Length > 3000 Then
-		times = data.Length / 3000
+	If data.Length > targetSize Then
+		times = data.Length / targetSize
 	Else
 		Return data
 	End If
-	Dim compressed(3000) As Short
+	Dim compressed(targetSize) As Short
 	For i = 0 To compressed.Length - 1
 		compressed(i) = data(i*times)
 	Next

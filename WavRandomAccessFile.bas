@@ -19,9 +19,7 @@ Sub Class_Globals
 	Private mChannelConfig As Int
 	Private mDirPath As String
 	Private mFileName As String
-	
 	Private mWavHeaderChunkMap As Map
-	
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.

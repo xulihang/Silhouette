@@ -13,6 +13,7 @@ Sub Class_Globals
 	Private mEndProgress As Double = 1
 	Private mCallBack As Object 'ignore
 	Private mEventName As String 'ignore
+	Public Tag As Object
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -23,6 +24,10 @@ Public Sub Initialize(Callback As Object, EventName As String) As Pane
 	mBase.AddNode(iv,0,0,0,0)
 	mCallBack = Callback
 	mEventName = EventName
+	Return mBase
+End Sub
+
+Public Sub getPane As Pane
 	Return mBase
 End Sub
 
