@@ -463,18 +463,8 @@ Private Sub SetTheRangeForTheSelectedRow
 	Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
 	Dim endTime As String = line.get("endTime")
 	Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(endTime)
-	Log("startTimeMs")
-	Log(startTimeMs)
-	Log("cutStartTimeMs")
-	Log(cutStartTimeMs)
-	Log("cutDurationMs")
-	Log(cutDurationMs)
 	Dim cutStartTimePercent As Double = (startTimeMs - cutStartTimeMs) / cutDurationMs
 	Dim cutEndTimePercent As Double = (endTimeMs - cutStartTimeMs) / cutDurationMs
-	Log("cutStartTimePercent")
-	Log(cutStartTimePercent)
-	Log("cutEndTimePercent")
-	Log(cutEndTimePercent)
 	overviewRange.setProgress(cutStartTimePercent,cutEndTimePercent)
 	overviewRange.TriggerRangeChanged
 End Sub

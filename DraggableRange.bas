@@ -13,6 +13,8 @@ Sub Class_Globals
 	Private mEndProgress As Double = 1
 	Private mCallBack As Object 'ignore
 	Private mEventName As String 'ignore
+	Private mCurrentProgress As Double = -1
+	Private mMouseOverProgress As Double = -1
 	Public Tag As Object
 End Sub
 
@@ -21,6 +23,7 @@ Public Sub Initialize(Callback As Object, EventName As String) As Pane
 	mBase.Initialize("Pane")
 	iv.Initialize("iv")
 	iv.PreserveRatio = True
+	iv.PickOnBounds = True
 	mBase.AddNode(iv,0,0,0,0)
 	mCallBack = Callback
 	mEventName = EventName
@@ -34,6 +37,11 @@ End Sub
 Public Sub setProgress(startProgress As Double,endProgress As Double)
 	mStartProgress = startProgress
 	mEndProgress = endProgress
+	Redraw(mBase.Width,mBase.Height)
+End Sub
+
+Public Sub setTime(progress As Double)
+	mCurrentProgress = progress
 	Redraw(mBase.Width,mBase.Height)
 End Sub
 
@@ -52,6 +60,7 @@ Public Sub getEndProgress As Double
 End Sub
 
 Sub iv_MouseDragged (EventData As MouseEvent)
+	mCurrentProgress = -1
 	Dim event As JavaObject = EventData
 	Dim view As ImageView = Sender
 	Dim pd As PositionData = view.Tag
@@ -89,6 +98,13 @@ End Sub
 
 Private Sub iv_MouseMoved (EventData As MouseEvent)
 	iv.MouseCursor = fx.Cursors.MOVE
+	mMouseOverProgress = EventData.X / iv.Width
+	Draw(iv.Width,iv.Height)
+End Sub
+
+Private Sub iv_MouseExited (EventData As MouseEvent)
+	mMouseOverProgress = -1
+	Draw(iv.Width,iv.Height)
 End Sub
 
 Public Sub Redraw(width As Double,height As Double)
@@ -116,6 +132,14 @@ Private Sub Draw(width As Int,height As Int)
 	
 	bc.DrawLine(endIndex,0,endIndex - 5,0,xui.Color_Green,5)
 	bc.DrawLine(endIndex,height-1,endIndex - 5,height-1,xui.Color_Green,5)
+	
+	If mCurrentProgress <> -1 Then
+		bc.DrawLine(width * mCurrentProgress,0,width * mCurrentProgress,height,xui.Color_Blue,1)
+	End If
+	
+	If mMouseOverProgress <> -1 Then
+		bc.DrawLine(width * mMouseOverProgress,0,width * mMouseOverProgress,height,xui.Color_Black,1)
+	End If
 	
 	iv.SetImage(bc.Bitmap)
 End Sub
