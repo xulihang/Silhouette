@@ -117,6 +117,8 @@ Sub Process_Globals
 	Private TotalTimeLabel As Label
 	Private ProgressTimer As Timer
 	Private ProgressContextMenu As ContextMenu
+	Private WaveFormContextMenu As ContextMenu
+	Private RightClickTarget As Node
 	Private BottomSplitPane As SplitPane
 	Private TopSplitPane As SplitPane
 	Private TopRightSplitPane As SplitPane
@@ -185,7 +187,6 @@ Sub AppStart (Form1 As Form, Args() As String)
 	TMTableView.SetColumnWidth(1,50)
 	TMTableView.SetColumnWidth(2,200)
 	TMTableView.SetColumnWidth(3,100)
-	
 	vlc.Initialize(VLCImageView)
 	VLCImageView.PreserveRatio = True
 	
@@ -207,6 +208,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	jo.RunMethod("setOnMouseExited", Array(e))
 	ProgressSlider.tag = False
 	ProgressContextMenu.Initialize("ProgressContextMenu")
+	WaveFormContextMenu.Initialize("WaveFormContextMenu")
 	SetTable
 	loadPlugins
 	AddWaveFormControls
@@ -833,6 +835,45 @@ Private Sub DrawPositionLineInWaveForm(time As Long)
 		End If
 	End If
 End Sub
+
+Private Sub WaveFormPane_MouseClicked (EventData As MouseEvent)
+	Dim view As Node = Sender
+	Dim jo As JavaObject = EventData
+	If EventData.SecondaryButtonPressed Then
+		RightClickTarget = jo.RunMethod("getTarget",Null)
+		Dim isTimestampRange As Boolean = False
+		If RightClickTarget Is ImageView Then
+			Dim iv As ImageView = RightClickTarget
+			isTimestampRange = (iv == timestampRange.ImageView)
+		End If
+		SetWaveFormContextMenuItems(isTimestampRange)
+		Dim map1 As Map
+		map1=Utils.GetScreenPosition(view)
+		Dim jo As JavaObject = WaveFormContextMenu
+		jo.RunMethod("show", Array(view, map1.Get("x")+EventData.X, map1.Get("y")+EventData.Y))
+	End If
+End Sub
+
+Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
+	WaveFormContextMenu.MenuItems.Clear
+	If isTimestampRange Then
+		Dim playMi As MenuItem
+		playMi.Initialize("Play the selection","playSelectionMI")
+		WaveFormContextMenu.MenuItems.Add(playMi)
+	End If
+	Dim playHereMi As MenuItem
+	playHereMi.Initialize("Play from here","playHereMI")
+	WaveFormContextMenu.MenuItems.Add(playHereMi)
+End Sub
+
+Private Sub playHereMI_Action
+	Log(Sender)
+End Sub
+
+Private Sub playSelectionMI_Action
+	Log(Sender)
+End Sub
+
 
 Sub MainForm_CloseRequest (EventData As Event)
 	Log("We are closing the mainform")

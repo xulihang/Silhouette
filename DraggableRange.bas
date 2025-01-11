@@ -34,6 +34,10 @@ Public Sub getPane As Pane
 	Return mBase
 End Sub
 
+Public Sub getImageView As ImageView
+	Return iv
+End Sub
+
 Public Sub setProgress(startProgress As Double,endProgress As Double)
 	mStartProgress = startProgress
 	mEndProgress = endProgress
