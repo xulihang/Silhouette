@@ -40,7 +40,7 @@ Public Sub setProgress(startProgress As Double,endProgress As Double)
 	Redraw(mBase.Width,mBase.Height)
 End Sub
 
-Public Sub setTime(progress As Double)
+Public Sub setPlayTimeProgress(progress As Double)
 	mCurrentProgress = progress
 	Redraw(mBase.Width,mBase.Height)
 End Sub

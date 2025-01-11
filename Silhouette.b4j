@@ -806,6 +806,7 @@ Private Sub ProgressTimer_Tick
 			TogglePlayingStatus(False)
 		End If
 		ProgressSlider.Tag = False
+		DrawPositionLineInWaveForm(vlc.GetTime)
 		Dim time As Long = vlc.GetTime / 1000
 		Dim minutes As Int = Floor(time / 60)
 		Dim seconds As Int = time - minutes*60
@@ -815,6 +816,21 @@ Private Sub ProgressTimer_Tick
 		ProgressSlider.Tag = True
 	Else
 		TogglePlayingStatus(False)
+	End If
+End Sub
+
+Private Sub DrawPositionLineInWaveForm(time As Long)
+	If currentProject.IsInitialized And selectedRowID <> -1 Then
+		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+		Dim startTime As String = line.Get("startTime")
+		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
+		If startTimeMs >= cutStartTimeMs And startTimeMs <= cutStartTimeMs + cutDurationMs Then
+			overviewRange.PlayTimeProgress = (time - cutStartTimeMs) / cutDurationMs
+			Dim clipStartTime As Long  = overviewRange.StartProgress * cutDurationMs
+			Dim clipEndTime As Long = overviewRange.EndProgress * cutDurationMs
+			Dim clipTime As Long = clipEndTime - clipStartTime
+			timestampRange.PlayTimeProgress = (time - cutStartTimeMs - clipStartTime) / clipTime
+		End If
 	End If
 End Sub
 
