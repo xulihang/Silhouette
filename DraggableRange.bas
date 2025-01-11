@@ -60,7 +60,7 @@ Public Sub getEndProgress As Double
 End Sub
 
 Sub iv_MouseDragged (EventData As MouseEvent)
-	mCurrentProgress = -1
+	mMouseOverProgress = -1
 	Dim event As JavaObject = EventData
 	Dim view As ImageView = Sender
 	Dim pd As PositionData = view.Tag
