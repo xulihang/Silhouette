@@ -467,6 +467,7 @@ Private Sub SetTheRangeForTheSelectedRow
 	Dim cutEndTimePercent As Double = (endTimeMs - cutStartTimeMs) / cutDurationMs
 	overviewRange.setProgress(cutStartTimePercent,cutEndTimePercent)
 	overviewRange.TriggerRangeChanged
+	timestampRange.setProgress(0,1)
 End Sub
 
 Private Sub WaveFormPane_Resize (Width As Double, Height As Double)
