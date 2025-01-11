@@ -146,7 +146,8 @@ Sub Process_Globals
 	Private WaveFormImageView As ImageView
 	Private waveFormCreator As WaveFormBitmapCreator
 	Private overviewRange As DraggableRange
-	Private duration As Long
+	Private cutDurationMs As Long
+	Private cutStartTimeMs As Long
 	Private timestampRange As DraggableRange
 End Sub
 
@@ -453,6 +454,29 @@ Sub SelectRow(targetRowId As Int, color As Int,fromLongClick As Boolean)    'row
 	selectedRowID = targetRowId
 	LoadLineToEditor(fromLongClick)
 	DrawWaveForm
+	SetTheRangeForTheSelectedRow
+End Sub
+
+Private Sub SetTheRangeForTheSelectedRow
+	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+	Dim startTime As String = line.get("startTime")
+	Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
+	Dim endTime As String = line.get("endTime")
+	Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(endTime)
+	Log("startTimeMs")
+	Log(startTimeMs)
+	Log("cutStartTimeMs")
+	Log(cutStartTimeMs)
+	Log("cutDurationMs")
+	Log(cutDurationMs)
+	Dim cutStartTimePercent As Double = (startTimeMs - cutStartTimeMs) / cutDurationMs
+	Dim cutEndTimePercent As Double = (endTimeMs - cutStartTimeMs) / cutDurationMs
+	Log("cutStartTimePercent")
+	Log(cutStartTimePercent)
+	Log("cutEndTimePercent")
+	Log(cutEndTimePercent)
+	overviewRange.setProgress(cutStartTimePercent,cutEndTimePercent)
+	overviewRange.TriggerRangeChanged
 End Sub
 
 Private Sub WaveFormPane_Resize (Width As Double, Height As Double)
@@ -479,8 +503,10 @@ Private Sub GetWaveFilesToDraw As List
 	Dim startTime As String = line.get("startTime")
 	Dim ms As Long = Utils.GetMillisecondsFromTimeString(startTime)
 	Dim wavIndex As Int = ms/1000/30
+	Dim hasPrevious As Boolean
 	If wavFiles.Size>0 Then
 		If wavIndex - 1 >=0 Then
+			hasPrevious = True
 			waveFilesToDraw.Add(wavFiles.Get(wavIndex - 1))
 		End If
 		If wavIndex < wavFiles.Size Then
@@ -490,19 +516,28 @@ Private Sub GetWaveFilesToDraw As List
 			waveFilesToDraw.Add(wavFiles.Get(wavIndex + 1))
 		End If
 	End If
+	If hasPrevious Then
+		cutStartTimeMs = (wavIndex-1) * 30 * 1000
+	Else
+		cutStartTimeMs = wavIndex * 30 * 1000
+	End If
 	Return waveFilesToDraw
 End Sub
 
 Private Sub DrawWaveForm
+	Log("DrawWaveForm")
 	InitializeWaveFormCreatorIfNeeded
+	waveFormCreator.StartIndex = 0
+	waveFormCreator.EndIndex = waveFormCreator.SampleLength
 	OverviewWaveFormImageView.SetImage(waveFormCreator.Draw(OverviewWaveFormImageView.Width,OverviewWaveFormImageView.Height))
 End Sub
 
 Private Sub InitializeWaveFormCreatorIfNeeded
 	Dim waveFiles As List = GetWaveFilesToDraw
 	If waveFormCreator.IsInitialized Then
+		Log("waveform creator initialized")
 		Dim needReload As Boolean = False
-		 If waveFormCreator.Tag Is List Then
+		If waveFormCreator.Tag Is List Then
 			Dim prevousList As List = waveFormCreator.Tag
 			If prevousList.Get(0) <> waveFiles.Get(0) Then
 				needReload = True
@@ -532,26 +567,30 @@ Private Sub LoadDataFromWaveFiles(waveFiles As List) As Short()
 	Next
 	Dim jointBytes() As Byte = Utils.JoinBytes(bytesArray)
 	Dim jointShorts() As Short = Utils.getDataShortsFromBytes(jointBytes)
-	duration = totalDuration
+	cutDurationMs = totalDuration
 	Return jointShorts
 End Sub
 
 Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Double)
-	waveFormCreator.StartIndex = startProgress*waveFormCreator.SampleLength
-	waveFormCreator.EndIndex = endProgress*waveFormCreator.SampleLength
-	WaveFormImageView.SetImage(waveFormCreator.Draw(WaveFormImageView.Width,WaveFormImageView.Height))
+	Log("overviewRange_RangeChanged")
+	If currentProject.IsInitialized And selectedRowID <> -1 Then
+		waveFormCreator.StartIndex = startProgress*waveFormCreator.SampleLength
+		waveFormCreator.EndIndex = endProgress*waveFormCreator.SampleLength
+		WaveFormImageView.SetImage(waveFormCreator.Draw(WaveFormImageView.Width,WaveFormImageView.Height))
+	End If
 End Sub
 
 Private Sub timestampRange_RangeChanged(startProgress As Double,endProgress As Double)
-	Log(startProgress)
-	Log(endProgress)
-	Dim startTime As Long  = overviewRange.StartProgress * duration
-	Dim endTime As Long = overviewRange.EndProgress * duration
-	Dim clipTime As Long = endTime -startTime
-	Dim clipStartTime As Long = clipTime * startProgress + startTime
-	Dim clipEndTime As Long = clipTime * endProgress + startTime
-	StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipStartTime)
-	EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipEndTime)
+	Log("timestampRange_RangeChanged")
+	If currentProject.IsInitialized And selectedRowID <> -1 Then
+		Dim startTime As Long  = overviewRange.StartProgress * cutDurationMs
+		Dim endTime As Long = overviewRange.EndProgress * cutDurationMs
+		Dim clipTime As Long = endTime -startTime
+		Dim clipStartTime As Long = clipTime * startProgress + startTime
+		Dim clipEndTime As Long = clipTime * endProgress + startTime
+		StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipStartTime)
+		EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipEndTime)
+	End If
 End Sub
 
 Sub pretranslate(options As Map) As ResumableSub

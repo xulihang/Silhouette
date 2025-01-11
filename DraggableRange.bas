@@ -31,6 +31,18 @@ Public Sub getPane As Pane
 	Return mBase
 End Sub
 
+Public Sub setProgress(startProgress As Double,endProgress As Double)
+	mStartProgress = startProgress
+	mEndProgress = endProgress
+	Redraw(mBase.Width,mBase.Height)
+End Sub
+
+Public Sub TriggerRangeChanged
+	If SubExists(mCallBack,mEventName&"_RangeChanged") Then
+		CallSubDelayed3(mCallBack,mEventName&"_RangeChanged",mStartProgress,mEndProgress)
+	End If
+End Sub
+
 Public Sub getStartProgress As Double
 	Return mStartProgress
 End Sub
@@ -59,8 +71,6 @@ Sub iv_MouseDragged (EventData As MouseEvent)
 	End If
 End Sub
 
-
-
 Sub iv_MousePressed (EventData As MouseEvent)
 	Dim view As ImageView = Sender
 	Dim pd As PositionData
@@ -81,11 +91,15 @@ Private Sub iv_MouseMoved (EventData As MouseEvent)
 	iv.MouseCursor = fx.Cursors.MOVE
 End Sub
 
-Private Sub Pane_Resize(width As Double,height As Double)
+Public Sub Redraw(width As Double,height As Double)
 	Dim w As Int = width
 	Dim h As Int = height
 	iv.SetSize(w,h)
 	Draw(w,h)
+End Sub
+
+Private Sub Pane_Resize(width As Double,height As Double)
+	Redraw(width,height)
 End Sub
 
 Private Sub Draw(width As Int,height As Int)
