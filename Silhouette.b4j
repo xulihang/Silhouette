@@ -315,6 +315,26 @@ Private Sub MenuBar1_Action
 	End Select
 End Sub
 
+Private Sub ConvertToWav(parent As String,filename As String, tmpDir As String) As ResumableSub
+	If File.Exists(tmpDir,"audio.wav") = False Then
+		progressDialog.Show("Converting to audio...")
+		progressDialog.update2("Processing...")
+		Dim outpath As String = File.Combine(tmpDir,"audio.wav")
+		Log("convert video to wav...")
+		Wait For (FFMpeg.Video2Wav(parent,filename,outpath)) Complete (done As Object)
+		Log("convert video to wav done")
+		progressDialog.close
+	End If
+	If File.Exists(tmpDir,"segnemnt-00001.wav") = False Then
+		progressDialog.Show("Splitting audio...")
+		Log("split wav...")
+		Wait For (FFMpeg.SplitWav(segmentLength,tmpDir,"audio.wav")) Complete (done As Object)
+		Log("split wav done")
+		progressDialog.close
+	End If
+	Return ""
+End Sub
+
 Private Sub RecognizeSpeech
 	If currentProject.IsInitialized=False Then
 		Return
@@ -322,25 +342,11 @@ Private Sub RecognizeSpeech
 	
 	Dim parent As String = currentProject.GetMediaFolder
 	Dim filename As String = currentProject.GetMediaFilename
-	Dim dir As String = currentProject.GetTmpFolder
-
-	If File.Exists(dir,"audio.wav") = False Then
-		progressDialog.Show("Converting to audio...")
-		progressDialog.update2("Processing...")
-		Dim outpath As String = File.Combine(dir,"audio.wav")
-		Log("convert video to wav...")
-		Wait For (FFMpeg.Video2Wav(parent,filename,outpath)) Complete (done As Object)
-		Log("convert video to wav done")
-		progressDialog.close
-	End If
-	If File.Exists(dir,"segnemnt-00001.wav") = False Then
-		progressDialog.Show("Splitting audio...")
-		Log("split wav...")
-		Wait For (FFMpeg.SplitWav(segmentLength,dir,"audio.wav")) Complete (done As Object)
-		Log("split wav done")
-		progressDialog.close
-	End If
-	Dim files As List = File.ListFiles(dir)
+	Dim tmpDir As String = currentProject.GetTmpFolder
+	
+	wait for (ConvertToWav(parent,filename,tmpDir)) complete (done As Object)
+	
+	Dim files As List = File.ListFiles(tmpDir)
 	Dim wavFiles As List
 	wavFiles.Initialize
 	For Each filename As String In files
@@ -353,9 +359,9 @@ Private Sub RecognizeSpeech
 	For Each filename As String In wavFiles
 		Log(index & "/" & wavFiles.Size)
 		Dim purename As String = Utils.GetFilenameWithoutExtension(filename)
-		If File.Exists(dir,purename&".srt") = False Then
+		If File.Exists(tmpDir,purename&".srt") = False Then
 			progressDialog.update(index,wavFiles.Size)
-			Dim wavpath As String = File.Combine(dir,filename)
+			Dim wavpath As String = File.Combine(tmpDir,filename)
 			Wait For (ASR.RecognizeWav(wavpath,currentProject.SourceLang)) Complete (done As Object)
 		End If
 		index = index + 1
@@ -457,8 +463,10 @@ Sub SelectRow(targetRowId As Int, color As Int,fromLongClick As Boolean)    'row
 	Next
 	selectedRowID = targetRowId
 	LoadLineToEditor(fromLongClick)
-	DrawWaveForm
-	SetTheRangeForTheSelectedRow
+	If ReadyToDrawWaveForm Then
+		DrawWaveForm
+		SetTheRangeForTheSelectedRow
+	End If
 End Sub
 
 Private Sub SetTheRangeForTheSelectedRow
@@ -474,11 +482,15 @@ Private Sub SetTheRangeForTheSelectedRow
 	timestampRange.setProgress(0,1)
 End Sub
 
+Private Sub ReadyToDrawWaveForm As Boolean
+	Return currentProject.IsInitialized And selectedRowID <> - 1 And EnableWaveFormCheckBox.Checked
+End Sub
+
 Private Sub WaveFormPane_Resize (Width As Double, Height As Double)
 	timestampRange.Pane.SetSize(Width,Height/4*3)
 	overviewRange.Pane.Top = Height/4*3
 	overviewRange.Pane.SetSize(Width,Height/4)
-	If currentProject.IsInitialized And selectedRowID <> - 1 Then
+	If ReadyToDrawWaveForm Then
 		DrawWaveForm
 	End If
 End Sub
@@ -567,8 +579,7 @@ Private Sub LoadDataFromWaveFiles(waveFiles As List) As Short()
 End Sub
 
 Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Double)
-	Log("overviewRange_RangeChanged")
-	If currentProject.IsInitialized And selectedRowID <> -1 Then
+	If ReadyToDrawWaveForm Then
 		waveFormCreator.StartIndex = startProgress*waveFormCreator.SampleLength
 		waveFormCreator.EndIndex = endProgress*waveFormCreator.SampleLength
 		WaveFormImageView.SetImage(waveFormCreator.Draw(WaveFormImageView.Width,WaveFormImageView.Height))
@@ -576,8 +587,7 @@ Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Do
 End Sub
 
 Private Sub timestampRange_RangeChanged(startProgress As Double,endProgress As Double)
-	Log("timestampRange_RangeChanged")
-	If currentProject.IsInitialized And selectedRowID <> -1 Then
+	If ReadyToDrawWaveForm Then
 		Dim startTime As Long  = overviewRange.StartProgress * cutDurationMs
 		Dim endTime As Long = overviewRange.EndProgress * cutDurationMs
 		Dim clipTime As Long = endTime -startTime
@@ -589,14 +599,14 @@ Private Sub timestampRange_RangeChanged(startProgress As Double,endProgress As D
 End Sub
 
 Private Sub overviewRange_MouseMoved(mouseMoveProgress As Double)
-	If currentProject.IsInitialized And selectedRowID <> -1 Then
+	If ReadyToDrawWaveForm Then
 		Dim time As Long  = mouseMoveProgress * cutDurationMs + cutStartTimeMs
 		AudioProgressLabel.Text = Utils.GetTimeStringFromMilliseconds(time)
 	End If
 End Sub
 
 Private Sub timestampRange_MouseMoved(mouseMoveProgress As Double)
-	If currentProject.IsInitialized And selectedRowID <> -1 Then
+	If ReadyToDrawWaveForm Then
 		Dim startTime As Long  = overviewRange.StartProgress * cutDurationMs
 		Dim endTime As Long = overviewRange.EndProgress * cutDurationMs
 		Dim clipTime As Long = endTime - startTime
@@ -822,7 +832,7 @@ Private Sub ProgressTimer_Tick
 End Sub
 
 Private Sub DrawPositionLineInWaveForm(time As Long)
-	If currentProject.IsInitialized And selectedRowID <> -1 Then
+	If ReadyToDrawWaveForm Then
 		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
 		Dim startTime As String = line.Get("startTime")
 		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
@@ -1059,5 +1069,14 @@ End Sub
 Private Sub EndTimeTextField_FocusChanged (HasFocus As Boolean)
 	If HasFocus Then
 		focusedTimeTextField = EndTimeTextField
+	End If
+End Sub
+
+Private Sub EnableWaveFormCheckBox_CheckedChange(Checked As Boolean)
+	If Checked Then
+		Dim parent As String = currentProject.GetMediaFolder
+		Dim filename As String = currentProject.GetMediaFilename
+		Dim tmpDir As String = currentProject.GetTmpFolder
+		ConvertToWav(parent,filename,tmpDir)
 	End If
 End Sub
