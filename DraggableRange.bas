@@ -100,6 +100,9 @@ Private Sub iv_MouseMoved (EventData As MouseEvent)
 	iv.MouseCursor = fx.Cursors.MOVE
 	mMouseOverProgress = EventData.X / iv.Width
 	Draw(iv.Width,iv.Height)
+	If SubExists(mCallBack,mEventName&"_MouseMoved") Then
+		CallSubDelayed2(mCallBack,mEventName&"_MouseMoved",mMouseOverProgress)
+	End If
 End Sub
 
 Private Sub iv_MouseExited (EventData As MouseEvent)

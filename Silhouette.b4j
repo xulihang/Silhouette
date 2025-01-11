@@ -149,6 +149,8 @@ Sub Process_Globals
 	Private cutDurationMs As Long
 	Private cutStartTimeMs As Long
 	Private timestampRange As DraggableRange
+	Private AudioProgressLabel As Label
+	Private EnableWaveFormCheckBox As CheckBox
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -581,6 +583,23 @@ Private Sub timestampRange_RangeChanged(startProgress As Double,endProgress As D
 		Dim clipEndTime As Long = clipTime * endProgress + startTime
 		StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipStartTime)
 		EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(clipEndTime)
+	End If
+End Sub
+
+Private Sub overviewRange_MouseMoved(mouseMoveProgress As Double)
+	If currentProject.IsInitialized And selectedRowID <> -1 Then
+		Dim time As Long  = mouseMoveProgress * cutDurationMs + cutStartTimeMs
+		AudioProgressLabel.Text = Utils.GetTimeStringFromMilliseconds(time)
+	End If
+End Sub
+
+Private Sub timestampRange_MouseMoved(mouseMoveProgress As Double)
+	If currentProject.IsInitialized And selectedRowID <> -1 Then
+		Dim startTime As Long  = overviewRange.StartProgress * cutDurationMs
+		Dim endTime As Long = overviewRange.EndProgress * cutDurationMs
+		Dim clipTime As Long = endTime - startTime
+		Dim clipMouseMoveTime As Long = clipTime * mouseMoveProgress + startTime
+		AudioProgressLabel.Text = Utils.GetTimeStringFromMilliseconds(clipMouseMoveTime)
 	End If
 End Sub
 
