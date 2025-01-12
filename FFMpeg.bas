@@ -26,6 +26,21 @@ Public Sub GetFFMpegPath As String
 	Return ffmpegPath
 End Sub
 
+Public Sub CutWav(dir As String,filename As String,outName As String,startTime As String,endTime As String) As ResumableSub
+	startTime = Utils.GetMillisecondsFromTimeString(startTime) & "ms"
+	endTime = Utils.GetMillisecondsFromTimeString(endTime) & "ms"
+	Dim args As List
+	args = Array As String("-i",filename,"-ss",startTime,"-to",endTime,"-c","copy",outName)
+	Dim sh As Shell
+	sh.Initialize("sh",GetFFMpegPath,args)
+	sh.WorkingDirectory = dir
+	sh.Run(-1)
+	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	Log(StdOut)
+	Log(StdErr)
+	Return Success
+End Sub
+
 Public Sub Video2Wav(dir As String,filename As String,outpath As String) As ResumableSub
 	Dim args As List
 	args = Array("-i",filename,"-ar","16000",outpath)
