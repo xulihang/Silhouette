@@ -189,7 +189,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	TopRightSplitPane.Vertical = True
 	BottomSplitPane.LoadLayout("ListView")
 	BottomSplitPane.LoadLayout("TranslationAssist")
-	AssistTabPane.LoadLayout("TranslationMemory","TM")
+	AssistTabPane.LoadLayout("TranslationMemory","Translation")
 	TMTableView.SetColumnWidth(0,50)
 	TMTableView.SetColumnWidth(1,50)
 	TMTableView.SetColumnWidth(2,200)
