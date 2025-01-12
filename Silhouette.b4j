@@ -713,6 +713,7 @@ End Sub
 Private Sub Close
 	StopPlaying
 	LinesTable.SetData(Array())
+	selectedRowID = -1
 	ClearWaveForm
 	Dim currentProject As Project
 End Sub
@@ -724,6 +725,7 @@ Private Sub OpenFile
 	If File.Exists(path,"") Then
 		If currentProject.IsInitialized Then
 			Dim currentProject As Project
+			selectedRowID = -1
 			ClearWaveForm
 		End If
 		Dim isNew As Boolean = currentProject.Initialize(path)
