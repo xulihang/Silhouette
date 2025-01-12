@@ -200,7 +200,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressTimer.Initialize("ProgressTimer",100)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
-	For Each text As String In Array("Play this line","Delete this line","Prepend a line","Append a line")
+	For Each text As String In Array("Play this line","Delete this line","Prepend a line","Append a line","Recognize this line")
 		Dim mi As MenuItem
 		mi.Initialize(text,"tableMenuItem")
 		tableCM.MenuItems.Add(mi)
@@ -1009,7 +1009,32 @@ Private Sub tableMenuItem_Action
 		Case "Delete this line"
 			currentProject.DeleteLine(selectedRowID - 1)
 			LoadLinesToTable
+		Case "Recognize this line"
+			RecognizeTheSelectedLine
 	End Select
+End Sub
+
+Private Sub RecognizeTheSelectedLine
+	progressDialog.Show("Recognizing...")
+	progressDialog.update2("Processing...")
+	Dim currentLine As Map = currentProject.GetLine(selectedRowID - 1)
+	Dim startTime As String = currentLine.Get("startTime")
+	Dim endTime As String = currentLine.Get("endTime")
+	Dim tmpDir As String = currentProject.GetTmpFolder
+	wait for (FFMpeg.CutWav(tmpDir,"audio.wav","cut.wav",startTime,endTime)) Complete (done As Object)
+	Wait For (ASR.RecognizeWav(File.Combine(tmpDir,"cut.wav"),currentProject.SourceLang)) Complete (done As Object)
+	Dim content As String = File.ReadString(tmpDir,"cut.srt")
+	content = Utils.RemoveBOM(content)
+	Dim parser As SrtParser
+	parser.Initialize
+	Dim lines As List = parser.Parse(content)
+	Dim sb As StringBuilder
+	sb.Initialize
+	For Each line As SpeechLine In lines
+		sb.Append(line.text)
+	Next
+	SourceTextArea.Text = sb.ToString
+	progressDialog.close
 End Sub
 
 Private Sub PrependLine
