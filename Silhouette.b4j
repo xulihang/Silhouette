@@ -858,6 +858,12 @@ Private Sub DrawPositionLineInWaveForm(time As Long)
 			Dim clipEndTime As Long = overviewRange.EndProgress * cutDurationMs
 			Dim clipTime As Long = clipEndTime - clipStartTime
 			timestampRange.PlayTimeProgress = (time - cutStartTimeMs - clipStartTime) / clipTime
+			If timestampRange.StopProgress <> -1 Then
+				If timestampRange.PlayTimeProgress > timestampRange.StopProgress Then
+					vlc.Pause
+					TogglePlayingStatus(False)
+				End If
+			End If
 		End If
 	End If
 End Sub
@@ -890,6 +896,22 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 	Dim playHereMi As MenuItem
 	playHereMi.Initialize("Play from here","playHereMI")
 	WaveFormContextMenu.MenuItems.Add(playHereMi)
+	If isTimestampRange Then
+		Dim setPointPointMi As MenuItem
+		setPointPointMi.Initialize("Set stop point","setStopPointMI")
+		WaveFormContextMenu.MenuItems.Add(setPointPointMi)
+		Dim clearPointPointMi As MenuItem
+		clearPointPointMi.Initialize("Clear stop point","clearStopPointMI")
+		WaveFormContextMenu.MenuItems.Add(clearPointPointMi)
+	End If
+End Sub
+
+Private Sub setStopPointMI_Action
+    timestampRange.StopProgress = timestampRange.LastMouseOverProgress
+End Sub
+
+Private Sub clearStopPointMI_Action
+	timestampRange.StopProgress = -1
 End Sub
 
 Private Sub playHereMI_Action

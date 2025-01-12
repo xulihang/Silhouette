@@ -14,7 +14,9 @@ Sub Class_Globals
 	Private mCallBack As Object 'ignore
 	Private mEventName As String 'ignore
 	Private mCurrentProgress As Double = -1
+	Private mStopProgress As Double = -1
 	Private mMouseOverProgress As Double = -1
+	private mLastMouseOverProgress as Double
 	Public Tag As Object
 End Sub
 
@@ -49,6 +51,27 @@ Public Sub setPlayTimeProgress(progress As Double)
 	Redraw(mBase.Width,mBase.Height)
 End Sub
 
+Public Sub getPlayTimeProgress As Double
+	return mCurrentProgress
+End Sub
+
+Public Sub setStopProgress(progress As Double)
+	mStopProgress = progress
+	Redraw(mBase.Width,mBase.Height)
+End Sub
+
+Public Sub getStopProgress As Double
+	Return mStopProgress
+End Sub
+
+Public Sub getMouseOverProgress As Double
+	Return mMouseOverProgress
+End Sub
+
+Public Sub getLastMouseOverProgress As Double
+	Return mLastMouseOverProgress
+End Sub
+
 Public Sub TriggerRangeChanged
 	If SubExists(mCallBack,mEventName&"_RangeChanged") Then
 		CallSubDelayed3(mCallBack,mEventName&"_RangeChanged",mStartProgress,mEndProgress)
@@ -64,6 +87,7 @@ Public Sub getEndProgress As Double
 End Sub
 
 Sub iv_MouseDragged (EventData As MouseEvent)
+	mLastMouseOverProgress = mMouseOverProgress
 	mMouseOverProgress = -1
 	Dim event As JavaObject = EventData
 	Dim view As ImageView = Sender
@@ -103,6 +127,7 @@ End Sub
 Private Sub iv_MouseMoved (EventData As MouseEvent)
 	iv.MouseCursor = fx.Cursors.MOVE
 	mMouseOverProgress = EventData.X / iv.Width
+	mLastMouseOverProgress = mMouseOverProgress
 	Draw(iv.Width,iv.Height)
 	If SubExists(mCallBack,mEventName&"_MouseMoved") Then
 		CallSubDelayed2(mCallBack,mEventName&"_MouseMoved",mMouseOverProgress)
@@ -146,6 +171,10 @@ Private Sub Draw(width As Int,height As Int)
 	
 	If mMouseOverProgress <> -1 Then
 		bc.DrawLine(width * mMouseOverProgress,0,width * mMouseOverProgress,height,xui.Color_Black,1)
+	End If
+	
+	If mStopProgress <> -1 Then
+		bc.DrawLine(width * mStopProgress,0,width * mStopProgress,height,xui.Color_Yellow,1)
 	End If
 	
 	iv.SetImage(bc.Bitmap)
