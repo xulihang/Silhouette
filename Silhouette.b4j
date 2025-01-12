@@ -435,20 +435,46 @@ Private Sub LoadSRTToProject
 	Dim files As List = File.ListFiles(dir)
 	currentProject.Clear
 	Dim index As Int = 0
+	Dim srtFiles As List
+	srtFiles.Initialize
 	For Each filename As String In files
-		Dim offsetMS As Int = index * segmentLength * 1000
 		If filename.EndsWith(".srt") Then
-			Dim content As String = File.ReadString(dir,filename)
-			content = Utils.RemoveBOM(content)
-			Dim lines As List = parser.Parse(content)
-			For Each line As SpeechLine In lines
-				Dim startTime As String = Utils.ShiftTimeString(line.startTime,offsetMS)
-				Dim endTime As String = Utils.ShiftTimeString(line.endTime,offsetMS)
-				currentProject.AddLine(startTime,endTime,line.text,"")
-			Next
-			index = index + 1
+			srtFiles.Add(filename)
 		End If
 	Next
+	If srtFiles.Size>0 Then
+		srtFiles = SortedSRTFiles(srtFiles)
+	End If
+	For Each filename As String In srtFiles
+		Dim offsetMS As Int = index * segmentLength * 1000
+		Dim content As String = File.ReadString(dir,filename)
+		content = Utils.RemoveBOM(content)
+		Dim lines As List = parser.Parse(content)
+		For Each line As SpeechLine In lines
+			Dim startTime As String = Utils.ShiftTimeString(line.startTime,offsetMS)
+			Dim endTime As String = Utils.ShiftTimeString(line.endTime,offsetMS)
+			currentProject.AddLine(startTime,endTime,line.text,"")
+		Next
+		index = index + 1
+	Next
+End Sub
+
+Private Sub SortedSRTFiles(srtFiles As List) As List
+	Dim firstFilename As String = srtFiles.Get(0)
+	Dim newFilesList As List
+	newFilesList.Initialize
+	For i = 0 To srtFiles.Size-1
+		Dim sb As StringBuilder
+		sb.Initialize
+		sb.Append("segment-")
+		sb.Append(NumberFormat(i,5,0).Replace(",",""))
+		If firstFilename.Contains(".wav") Then
+			sb.Append(".wav")
+		End If
+		sb.Append(".srt")
+		newFilesList.Add(sb.ToString)
+	Next
+	Return newFilesList
 End Sub
 
 Private Sub ImportFromSRT(path As String)
