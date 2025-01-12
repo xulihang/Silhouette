@@ -298,7 +298,7 @@ Private Sub MenuBar1_Action
 			dialog.Initialize
 			Dim options As Map = dialog.ShowAndWait
 			pretranslate(options)
-		Case "_Jump to line"
+		Case "_Jump to Line"
 			JumpToLine
 		Case "_Settings"
 			Dim ps As ProjectSettings
