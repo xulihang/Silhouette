@@ -316,7 +316,7 @@ Private Sub MenuBar1_Action
 		Case "_Exit"
 			ExitApp
 		Case "_About"
-			fx.Msgbox(MainForm,"@xulihang, 2024","Silhouette")
+			fx.Msgbox(MainForm,"@xulihang, 2025","Silhouette")
 	End Select
 End Sub
 
