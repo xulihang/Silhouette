@@ -349,6 +349,7 @@ Private Sub JumpToLine
 End Sub
 
 Private Sub JumpToRow(rowID As Int)
+	ResetSelectStatusOfLineTable
 	Dim pageIndex As Int = Ceil(rowID / LinesTable.RowsPerPage)
 	LinesTable.CurrentPage = pageIndex
 	Sleep(500)
@@ -483,6 +484,19 @@ Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
 		y = m.Get("y") + cell.Height/2
 	End If
 	jo.RunMethod("show", Array(cell, x, y))
+End Sub
+
+Private Sub ResetSelectStatusOfLineTable
+	For i = 0 To LinesTable.VisibleRowIds.Size - 1
+		For Each c As B4XTableColumn In LinesTable.Columns
+			Dim pnl As B4XView = c.CellsLayouts.Get(i+1)
+			If i Mod 2 = 0 Then
+				pnl.Color = LinesTable.EvenRowColor
+			Else
+				pnl.Color = LinesTable.OddRowColor
+			End If
+		Next
+	Next
 End Sub
 
 Sub SelectRow(targetRowId As Int,fromLongClick As Boolean)    'rowid-1
@@ -714,6 +728,7 @@ Private Sub Close
 	StopPlaying
 	LinesTable.SetData(Array())
 	selectedRowID = -1
+	ResetSelectStatusOfLineTable
 	ClearWaveForm
 	Dim currentProject As Project
 End Sub
@@ -726,6 +741,7 @@ Private Sub OpenFile
 		If currentProject.IsInitialized Then
 			Dim currentProject As Project
 			selectedRowID = -1
+			ResetSelectStatusOfLineTable
 			ClearWaveForm
 		End If
 		Dim isNew As Boolean = currentProject.Initialize(path)
