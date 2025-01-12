@@ -1036,6 +1036,16 @@ Private Sub RecognizeTheSelectedLine
 	Dim startTime As String = currentLine.Get("startTime")
 	Dim endTime As String = currentLine.Get("endTime")
 	Dim tmpDir As String = currentProject.GetTmpFolder
+	
+	If File.Exists(tmpDir,"audio.wav") = False Then
+		Dim parent As String = currentProject.GetMediaFolder
+		Dim filename As String = currentProject.GetMediaFilename
+		Dim outpath As String = File.Combine(tmpDir,"audio.wav")
+		Log("convert video to wav...")
+		Wait For (FFMpeg.Video2Wav(parent,filename,outpath)) Complete (done As Object)
+		Log("convert video to wav done")
+	End If
+	
 	wait for (FFMpeg.CutWav(tmpDir,"audio.wav","cut.wav",startTime,endTime)) Complete (done As Object)
 	Wait For (ASR.RecognizeWav(File.Combine(tmpDir,"cut.wav"),currentProject.SourceLang)) Complete (done As Object)
 	Dim content As String = File.ReadString(tmpDir,"cut.srt")
