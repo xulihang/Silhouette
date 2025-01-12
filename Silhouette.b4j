@@ -918,12 +918,22 @@ Private Sub tableMenuItem_Action
 End Sub
 
 Private Sub PrependLine
-	currentProject.PrependLine(selectedRowID - 1)
+	Dim currentLine As Map = currentProject.GetLine(selectedRowID - 1)
+	Dim startTimeMs As Long = Max(0,Utils.GetMillisecondsFromTimeString(currentLine.Get("startTime"))-1*1000)
+	Dim endTimeMs As Long = startTimeMs + 1*1000
+	Dim startTime As String = Utils.GetTimeStringFromMilliseconds(startTimeMs)
+	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(endTimeMs)
+	currentProject.PrependLineWithTime(selectedRowID - 1,startTime,endTime)
 	LoadLinesToTable
 End Sub
 
 Private Sub AppendLine
-	currentProject.AppendLine(selectedRowID - 1)
+	Dim currentLine As Map = currentProject.GetLine(selectedRowID - 1)
+	Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(currentLine.Get("endTime"))
+	Dim endTimeMs As Long = startTimeMs + 1*1000
+	Dim startTime As String = Utils.GetTimeStringFromMilliseconds(startTimeMs)
+	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(endTimeMs)
+	currentProject.AppendLineWithTime(selectedRowID - 1,startTime,endTime)
 	LoadLinesToTable
 End Sub
 

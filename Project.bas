@@ -70,6 +70,22 @@ Public Sub AppendLine(index As Int) As Map
 	Return line
 End Sub
 
+Public Sub AppendLineWithTime(index As Int,startTime As String,endTime As String) As Map
+	Dim line As Map = DefaultLine
+	line.Put("startTime",startTime)
+	line.Put("endTime",endTime)
+	lines.InsertAt(index+1,line)
+	Return line
+End Sub
+
+Public Sub PrependLineWithTime(index As Int,startTime As String,endTime As String) As Map
+	Dim line As Map = DefaultLine
+	line.Put("startTime",startTime)
+	line.Put("endTime",endTime)
+	lines.InsertAt(index,line)
+	Return line
+End Sub
+
 Public Sub PrependLine(index As Int) As Map
 	Dim line As Map = DefaultLine
 	lines.InsertAt(index,line)
