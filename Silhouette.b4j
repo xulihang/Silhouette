@@ -589,6 +589,14 @@ Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Do
 		waveFormCreator.StartIndex = startProgress*waveFormCreator.SampleLength
 		waveFormCreator.EndIndex = endProgress*waveFormCreator.SampleLength
 		WaveFormImageView.SetImage(waveFormCreator.Draw(WaveFormImageView.Width,WaveFormImageView.Height))
+		Dim overViewStartTime As Long  = startProgress * cutDurationMs
+		Dim overViewEndTime As Long = endProgress * cutDurationMs
+		Dim clipTime As Long = overViewEndTime - overViewStartTime
+		Dim startTime As Long = Utils.GetMillisecondsFromTimeString(StartTimeTextField.Text)
+		Dim endTime As Long = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
+		Dim newStartProgress As Double = (startTime - overViewStartTime -cutStartTimeMs) / clipTime
+		Dim newEndProgress As Double = (endTime - overViewStartTime -cutStartTimeMs) / clipTime
+		timestampRange.setProgress(newStartProgress,newEndProgress)
 	End If
 End Sub
 
