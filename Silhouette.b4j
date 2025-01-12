@@ -539,6 +539,12 @@ Private Sub DrawWaveForm
 	OverviewWaveFormImageView.SetImage(waveFormCreator.Draw(OverviewWaveFormImageView.Width,OverviewWaveFormImageView.Height))
 End Sub
 
+Private Sub ClearWaveForm
+	Dim waveFormCreator As WaveFormBitmapCreator
+	OverviewWaveFormImageView.SetImage(Null)
+	WaveFormImageView.SetImage(Null)
+End Sub
+
 Private Sub InitializeWaveFormCreatorIfNeeded
 	Dim waveFiles As List = GetWaveFilesToDraw
 	If waveFormCreator.IsInitialized Then
@@ -658,6 +664,7 @@ End Sub
 Private Sub Close
 	StopPlaying
 	LinesTable.SetData(Array())
+	ClearWaveForm
 	Dim currentProject As Project
 End Sub
 
@@ -668,6 +675,7 @@ Private Sub OpenFile
 	If File.Exists(path,"") Then
 		If currentProject.IsInitialized Then
 			Dim currentProject As Project
+			ClearWaveForm
 		End If
 		Dim isNew As Boolean = currentProject.Initialize(path)
 		If isNew Then
