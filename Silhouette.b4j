@@ -610,7 +610,7 @@ Private Sub timestampRange_MouseMoved(mouseMoveProgress As Double)
 		Dim startTime As Long  = overviewRange.StartProgress * cutDurationMs
 		Dim endTime As Long = overviewRange.EndProgress * cutDurationMs
 		Dim clipTime As Long = endTime - startTime
-		Dim clipMouseMoveTime As Long = clipTime * mouseMoveProgress + startTime
+		Dim clipMouseMoveTime As Long = clipTime * mouseMoveProgress + startTime + cutStartTimeMs
 		AudioProgressLabel.Text = Utils.GetTimeStringFromMilliseconds(clipMouseMoveTime)
 	End If
 End Sub
