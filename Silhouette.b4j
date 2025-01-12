@@ -1,28 +1,29 @@
 ﻿AppType=JavaFX
 Build1=Default,b4j.example
 File1=apiparamfiller.bjl
-File10=LeftSplitPane.bjl
-File11=LineEditor.bjl
-File12=ListView.bjl
-File13=main.bjl
-File14=MTSetting.bjl
-File15=pretranslate.bjl
-File16=progress.bjl
-File17=projectSetting.bjl
-File18=TopRightSplitPane.bjl
-File19=TopSplitPane.bjl
+File10=langcodes.txt
+File11=LeftSplitPane.bjl
+File12=LineEditor.bjl
+File13=ListView.bjl
+File14=main.bjl
+File15=MTSetting.bjl
+File16=pretranslate.bjl
+File17=progress.bjl
+File18=projectSetting.bjl
+File19=TopRightSplitPane.bjl
 File2=APISetting.bjl
-File20=TranslationAssist.bjl
-File21=TranslationMemory.bjl
-File22=VideoPlayer.bjl
-File23=WaveForm.bjl
+File20=TopSplitPane.bjl
+File21=TranslationAssist.bjl
+File22=TranslationMemory.bjl
+File23=VideoPlayer.bjl
+File24=WaveForm.bjl
 File3=BottomSplitPane.bjl
 File4=Editor.bjl
 File5=ExportOptions.bjl
 File6=generalSettings.bjl
 File7=inputbox.bjl
-File8=LangaugePairSelector.bjl
-File9=langcodes.txt
+File8=JumpOptions.bjl
+File9=LangaugePairSelector.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -39,6 +40,7 @@ FileGroup20=Default Group
 FileGroup21=Default Group
 FileGroup22=Default Group
 FileGroup23=Default Group
+FileGroup24=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
@@ -64,27 +66,28 @@ Library7=jcore
 Library8=jfx
 Library9=jokhttputils2
 Module1=APIParamsFiller
-Module10=MT
-Module11=Preferences
-Module12=preTranslateDialog
-Module13=progressDialog
-Module14=Project
-Module15=ProjectSettings
-Module16=SrtParser
-Module17=Utils
-Module18=WaveFormBitmapCreator
-Module19=WavRandomAccessFile
+Module10=LanguagePairSelector
+Module11=MT
+Module12=Preferences
+Module13=preTranslateDialog
+Module14=progressDialog
+Module15=Project
+Module16=ProjectSettings
+Module17=SrtParser
+Module18=Utils
+Module19=WaveFormBitmapCreator
 Module2=ASR
+Module20=WavRandomAccessFile
 Module3=DraggableRange
 Module4=Exporter
 Module5=ExportOptions
 Module6=FFMpeg
 Module7=InputBox
-Module8=jVLC
-Module9=LanguagePairSelector
-NumberOfFiles=23
+Module8=JumpOptions
+Module9=jVLC
+NumberOfFiles=24
 NumberOfLibraries=16
-NumberOfModules=19
+NumberOfModules=20
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -291,6 +294,8 @@ Private Sub MenuBar1_Action
 			dialog.Initialize
 			Dim options As Map = dialog.ShowAndWait
 			pretranslate(options)
+		Case "_Jump to line"
+			JumpToLine
 		Case "_Settings"
 			Dim ps As ProjectSettings
 			ps.Initialize(currentProject)
@@ -313,6 +318,21 @@ Private Sub MenuBar1_Action
 		Case "_About"
 			fx.Msgbox(MainForm,"@xulihang, 2024","Silhouette")
 	End Select
+End Sub
+
+Private Sub JumpToLine
+	Dim optionsForm As JumpOptions
+	optionsForm.Initialize
+	Dim options As Map = optionsForm.ShowAndWait
+	If options.ContainsKey("index") Then
+		Dim index As Int = options.Get("index")
+		Dim pageIndex As Int = Ceil(index / LinesTable.RowsPerPage)
+		LinesTable.CurrentPage = pageIndex
+		Sleep(500)
+		SelectRow(index,False)
+	else if options.ContainsKey("time") Then
+		
+	End If
 End Sub
 
 Private Sub ConvertToWav(parent As String,filename As String, tmpDir As String) As ResumableSub
@@ -426,11 +446,11 @@ Private Sub LoadLinesToTable
 End Sub
 
 Sub LinesTable_CellClicked (ColumnId As String, RowId As Long)
-	SelectRow(RowId,xui.Color_RGB(119,198,255),False)
+	SelectRow(RowId,False)
 End Sub
 
 Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
-	SelectRow(RowId,xui.Color_RGB(119,198,255),True)
+	SelectRow(RowId,True)
 	Dim col As B4XTableColumn = LinesTable.GetColumn(ColumnId)
 	Dim i As Int = LinesTable.VisibleRowIds.IndexOf(RowId)
 	Dim cell As B4XView = col.CellsLayouts.Get(i)
@@ -445,7 +465,8 @@ Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
 	jo.RunMethod("show", Array(cell, x, y))
 End Sub
 
-Sub SelectRow(targetRowId As Int, color As Int,fromLongClick As Boolean)    'rowid-1
+Sub SelectRow(targetRowId As Int,fromLongClick As Boolean)    'rowid-1
+	Dim color As Int = xui.Color_RGB(119,198,255)
 	For i = 0 To LinesTable.VisibleRowIds.Size - 1
 		Dim RowId As Long = LinesTable.VisibleRowIds.Get(i)
 		For Each c As B4XTableColumn In LinesTable.Columns
