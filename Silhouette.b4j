@@ -1,30 +1,31 @@
 ﻿AppType=JavaFX
 Build1=Default,b4j.example
 File1=apiparamfiller.bjl
-File10=langcodes.txt
-File11=LeftSplitPane.bjl
-File12=LineEditor.bjl
-File13=ListView.bjl
-File14=main.bjl
-File15=MTSetting.bjl
-File16=PlayControl.bjl
-File17=pretranslate.bjl
-File18=progress.bjl
-File19=projectSetting.bjl
+File10=LangaugePairSelector.bjl
+File11=langcodes.txt
+File12=LeftSplitPane.bjl
+File13=LineEditor.bjl
+File14=ListView.bjl
+File15=main.bjl
+File16=MTSetting.bjl
+File17=PlayControl.bjl
+File18=pretranslate.bjl
+File19=progress.bjl
 File2=APISetting.bjl
-File20=TopRightSplitPane.bjl
-File21=TopSplitPane.bjl
-File22=TranslationAssist.bjl
-File23=TranslationMemory.bjl
-File24=VideoPlayer.bjl
-File25=WaveForm.bjl
+File20=projectSetting.bjl
+File21=TopRightSplitPane.bjl
+File22=TopSplitPane.bjl
+File23=TranslationAssist.bjl
+File24=TranslationMemory.bjl
+File25=VideoPlayer.bjl
+File26=WaveForm.bjl
 File3=BottomSplitPane.bjl
 File4=Editor.bjl
-File5=ExportOptions.bjl
-File6=generalSettings.bjl
-File7=inputbox.bjl
-File8=JumpOptions.bjl
-File9=LangaugePairSelector.bjl
+File5=ErrorReporter.bjl
+File6=ExportOptions.bjl
+File7=generalSettings.bjl
+File8=inputbox.bjl
+File9=JumpOptions.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -43,6 +44,7 @@ FileGroup22=Default Group
 FileGroup23=Default Group
 FileGroup24=Default Group
 FileGroup25=Default Group
+FileGroup26=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
@@ -68,29 +70,30 @@ Library7=jcore
 Library8=jfx
 Library9=jokhttputils2
 Module1=APIParamsFiller
-Module10=LanguagePairSelector
-Module11=MT
-Module12=PlayControlForm
-Module13=Preferences
-Module14=preTranslateDialog
-Module15=progressDialog
-Module16=Project
-Module17=ProjectSettings
-Module18=SrtParser
-Module19=Utils
+Module10=jVLC
+Module11=LanguagePairSelector
+Module12=MT
+Module13=PlayControlForm
+Module14=Preferences
+Module15=preTranslateDialog
+Module16=progressDialog
+Module17=Project
+Module18=ProjectSettings
+Module19=SrtParser
 Module2=ASR
-Module20=WaveFormBitmapCreator
-Module21=WavRandomAccessFile
+Module20=Utils
+Module21=WaveFormBitmapCreator
+Module22=WavRandomAccessFile
 Module3=DraggableRange
-Module4=Exporter
-Module5=ExportOptions
-Module6=FFMpeg
-Module7=InputBox
-Module8=JumpOptions
-Module9=jVLC
-NumberOfFiles=25
+Module4=ErrorReporter
+Module5=Exporter
+Module6=ExportOptions
+Module7=FFMpeg
+Module8=InputBox
+Module9=JumpOptions
+NumberOfFiles=26
 NumberOfLibraries=16
-NumberOfModules=21
+NumberOfModules=22
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -159,20 +162,10 @@ Sub Process_Globals
 	Private timestampRange As DraggableRange
 	Private AudioProgressLabel As Label
 	Private EnableWaveFormCheckBox As CheckBox
-	Private PlayControl as PlayControlForm
+	Private PlayControl As PlayControlForm
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
-	'** IMPORTANT - checking if VLC is installed on the computer should be the first thing to execute in your code
-	'If vlc.IsVLCInstalled = False Then
-		'Implement your own code to tell user that VLC must be installed.
-		'Note: if VLC has been installed in a non-standard directory, VLC might not be found.
-	'	fx.Msgbox(MainForm,"VLC must be installed on the computer to run this program.","")
-	'	ExitApplication
-	'End If
-
-	'** OK, VLC was found. We can proceed.
-
 	MainForm = Form1
 	MainForm.RootPane.LoadLayout("main")
 	MainForm.WindowWidth = 800
@@ -232,7 +225,9 @@ End Sub
 
 'Return true to allow the default exceptions handler to handle the uncaught exception.
 Sub Application_Error (Error As Exception, StackTrace As String) As Boolean
-    fx.Msgbox(MainForm,Error.Message,"Error")
+    Dim reporter As ErrorReporter
+	reporter.Initialize
+	reporter.ShowAndWait("error: "&Error.Message&CRLF&"StackTrace: "&StackTrace)
 	Return False
 End Sub
 
