@@ -817,7 +817,7 @@ Private Sub ResizeVLCImageView(Width As Double, Height As Double)
 End Sub
 
 Private Sub ExitApp
-	vlc.stop
+	'vlc.stop
 	vlc.release
 	ExitApplication
 End Sub
@@ -971,9 +971,7 @@ End Sub
 
 Sub MainForm_CloseRequest (EventData As Event)
 	Log("We are closing the mainform")
-	vlc.stop
 	vlc.release
-	Sleep(0)
 	ExitApplication
 End Sub
 
