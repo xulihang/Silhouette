@@ -30,7 +30,7 @@ Public Sub CutWav(dir As String,filename As String,outName As String,startTime A
 	startTime = Utils.GetMillisecondsFromTimeString(startTime) & "ms"
 	endTime = Utils.GetMillisecondsFromTimeString(endTime) & "ms"
 	Dim args As List
-	args = Array As String("-i",filename,"-ss",startTime,"-to",endTime,"-c","copy",outName)
+	args = Array As String("-i",filename,"-ss",startTime,"-to",endTime,"-c","copy",outName,"-y")
 	Dim sh As Shell
 	sh.Initialize("sh",GetFFMpegPath,args)
 	sh.WorkingDirectory = dir
