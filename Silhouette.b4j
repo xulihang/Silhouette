@@ -302,6 +302,8 @@ Private Sub MenuBar1_Action
 			NewLine
 		Case "_Jump to Line"
 			JumpToLine
+		Case "Jump to the line of the current _time"
+			JumpToLineOfCurrentTime
 		Case "_Settings"
 			Dim ps As ProjectSettings
 			ps.Initialize(currentProject)
@@ -324,6 +326,22 @@ Private Sub MenuBar1_Action
 		Case "_About"
 			fx.Msgbox(MainForm,"@xulihang, 2025","Silhouette")
 	End Select
+End Sub
+
+Private Sub JumpToLineOfCurrentTime
+	Dim timeMs As Long = vlc.GetTime
+	Dim index As Int = 1
+	index = 1
+	For Each line As Map In currentProject.lines
+		Dim startTime As String = line.Get("startTime")
+		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
+		If timeMs < startTimeMs Then
+			Exit
+		End If
+		index = index + 1
+	Next
+	index = Min(currentProject.lines.Size,index)
+	JumpToRow(index)
 End Sub
 
 Private Sub JumpToLine
