@@ -415,7 +415,8 @@ Private Sub RecognizeSpeech
 	For Each filename As String In wavFiles
 		Log(index & "/" & wavFiles.Size)
 		Dim purename As String = Utils.GetFilenameWithoutExtension(filename)
-		If File.Exists(tmpDir,purename&".srt") = False Then
+		'stored as "segment-00000.srt" or "segment-00000.wav.srt"
+		If File.Exists(tmpDir,purename&".srt") = False And File.Exists(tmpDir,filename&".srt") = False Then
 			progressDialog.update(index,wavFiles.Size)
 			Dim wavpath As String = File.Combine(tmpDir,filename)
 			Wait For (ASR.RecognizeWav(wavpath,currentProject.SourceLang)) Complete (done As Object)
