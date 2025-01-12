@@ -298,6 +298,8 @@ Private Sub MenuBar1_Action
 			dialog.Initialize
 			Dim options As Map = dialog.ShowAndWait
 			pretranslate(options)
+		Case "_New Line"
+			NewLine
 		Case "_Jump to Line"
 			JumpToLine
 		Case "_Settings"
@@ -1045,6 +1047,15 @@ Private Sub PrependLine
 	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(endTimeMs)
 	currentProject.PrependLineWithTime(selectedRowID - 1,startTime,endTime)
 	LoadLinesToTable
+End Sub
+
+private Sub NewLine
+	If selectedRowID <> -1 Then
+		AppendLine
+	Else
+		currentProject.AppendLine(-1)
+		LoadLinesToTable
+	End If
 End Sub
 
 Private Sub AppendLine
