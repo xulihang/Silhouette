@@ -28,6 +28,10 @@ Public Sub Pause
 	embeddedMediaPlayer.RunMethodJO("controls",Null).RunMethod("pause",Null)
 End Sub
 
+Public Sub setRate(value As Float)
+	embeddedMediaPlayer.RunMethodJO("controls",Null).RunMethod("setRate",Array(value))
+End Sub
+
 Public Sub Stop
 	embeddedMediaPlayer.RunMethodJO("controls",Null).RunMethod("stop",Null)
 End Sub

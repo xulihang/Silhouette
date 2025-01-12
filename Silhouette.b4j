@@ -7,16 +7,17 @@ File12=LineEditor.bjl
 File13=ListView.bjl
 File14=main.bjl
 File15=MTSetting.bjl
-File16=pretranslate.bjl
-File17=progress.bjl
-File18=projectSetting.bjl
-File19=TopRightSplitPane.bjl
+File16=PlayControl.bjl
+File17=pretranslate.bjl
+File18=progress.bjl
+File19=projectSetting.bjl
 File2=APISetting.bjl
-File20=TopSplitPane.bjl
-File21=TranslationAssist.bjl
-File22=TranslationMemory.bjl
-File23=VideoPlayer.bjl
-File24=WaveForm.bjl
+File20=TopRightSplitPane.bjl
+File21=TopSplitPane.bjl
+File22=TranslationAssist.bjl
+File23=TranslationMemory.bjl
+File24=VideoPlayer.bjl
+File25=WaveForm.bjl
 File3=BottomSplitPane.bjl
 File4=Editor.bjl
 File5=ExportOptions.bjl
@@ -41,6 +42,7 @@ FileGroup21=Default Group
 FileGroup22=Default Group
 FileGroup23=Default Group
 FileGroup24=Default Group
+FileGroup25=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
@@ -68,16 +70,17 @@ Library9=jokhttputils2
 Module1=APIParamsFiller
 Module10=LanguagePairSelector
 Module11=MT
-Module12=Preferences
-Module13=preTranslateDialog
-Module14=progressDialog
-Module15=Project
-Module16=ProjectSettings
-Module17=SrtParser
-Module18=Utils
-Module19=WaveFormBitmapCreator
+Module12=PlayControlForm
+Module13=Preferences
+Module14=preTranslateDialog
+Module15=progressDialog
+Module16=Project
+Module17=ProjectSettings
+Module18=SrtParser
+Module19=Utils
 Module2=ASR
-Module20=WavRandomAccessFile
+Module20=WaveFormBitmapCreator
+Module21=WavRandomAccessFile
 Module3=DraggableRange
 Module4=Exporter
 Module5=ExportOptions
@@ -85,9 +88,9 @@ Module6=FFMpeg
 Module7=InputBox
 Module8=JumpOptions
 Module9=jVLC
-NumberOfFiles=24
+NumberOfFiles=25
 NumberOfLibraries=16
-NumberOfModules=20
+NumberOfModules=21
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -156,6 +159,7 @@ Sub Process_Globals
 	Private timestampRange As DraggableRange
 	Private AudioProgressLabel As Label
 	Private EnableWaveFormCheckBox As CheckBox
+	Private PlayControl as PlayControlForm
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -1162,4 +1166,26 @@ Private Sub EnableWaveFormCheckBox_CheckedChange(Checked As Boolean)
 		Dim tmpDir As String = currentProject.GetTmpFolder
 		ConvertToWav(parent,filename,tmpDir)
 	End If
+End Sub
+
+Private Sub VLCImageView_MouseClicked (EventData As MouseEvent)
+	If EventData.SecondaryButtonPressed Then
+		Dim view As B4XView = Sender
+		Dim cm As ContextMenu
+		cm.Initialize("")
+		Dim playControlMi As MenuItem
+		playControlMi.Initialize("Play control","playControlMi")
+		cm.MenuItems.Add(playControlMi)
+		Dim map1 As Map
+		map1=Utils.GetScreenPosition(view)
+		Dim jo As JavaObject = cm
+		jo.RunMethod("show", Array(view, map1.Get("x")+EventData.X, map1.Get("y")+EventData.Y))
+	End If
+End Sub
+
+Private Sub playControlMi_Action
+	If PlayControl.IsInitialized = False Then
+		PlayControl.Initialize(vlc)
+	End If
+	PlayControl.Show
 End Sub
