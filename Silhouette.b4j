@@ -324,15 +324,31 @@ Private Sub JumpToLine
 	Dim optionsForm As JumpOptions
 	optionsForm.Initialize
 	Dim options As Map = optionsForm.ShowAndWait
+	Dim index As Int = 1
 	If options.ContainsKey("index") Then
-		Dim index As Int = options.Get("index")
-		Dim pageIndex As Int = Ceil(index / LinesTable.RowsPerPage)
-		LinesTable.CurrentPage = pageIndex
-		Sleep(500)
-		SelectRow(index,False)
+		index= options.Get("index")
 	else if options.ContainsKey("time") Then
-		
+		Dim time As String = options.Get("time")
+		Dim timeMs As Long = Utils.GetMillisecondsFromTimeString(time)
+		index = 1
+		For Each line As Map In currentProject.lines
+			Dim startTime As String = line.Get("startTime")
+			Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
+			If timeMs < startTimeMs Then
+				Exit
+			End If
+			index = index + 1
+		Next
+		index = Min(currentProject.lines.Size,index)
 	End If
+	JumpToRow(index)
+End Sub
+
+Private Sub JumpToRow(rowID As Int)
+	Dim pageIndex As Int = Ceil(rowID / LinesTable.RowsPerPage)
+	LinesTable.CurrentPage = pageIndex
+	Sleep(500)
+	SelectRow(rowID,False)
 End Sub
 
 Private Sub ConvertToWav(parent As String,filename As String, tmpDir As String) As ResumableSub
