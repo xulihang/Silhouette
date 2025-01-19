@@ -15,7 +15,7 @@ End Sub
 Public Sub Initialize(mediaPath As String) As Boolean
 	Dim filename As String = File.GetName(mediaPath)
 	Dim dir As String = File.GetFileParent(mediaPath)
-	projectPath = File.Combine(dir,Utils.GetFilenameWithoutExtension(filename)&".sip")
+	projectPath = File.Combine(dir,filename&".sip")
 	If File.Exists(projectPath,"") Then
 		readProjectFile
 		CreateTempFolder
