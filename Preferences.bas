@@ -114,6 +114,7 @@ End Sub
 Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("mt",mtPreferences)
 	preferencesMap.Put("api",apiPreferences)
+	preferencesMap.Put("whisper_model_path",WhisperModelPathTextField.Text)
 	Utils.resetPref
 	Dim json As JSONGenerator
 	json.Initialize(preferencesMap)
