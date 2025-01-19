@@ -64,6 +64,17 @@ Private Sub DefaultLine As Map
 	Return line
 End Sub
 
+Public Sub MergeWithTheNextLine(index As Int)
+	If index < lines.Size -2 Then
+		Dim line As Map = GetLine(index)
+		Dim nextLine As Map = GetLine(index+1)
+		line.Put("endTime",nextLine.Get("endTime"))
+		line.Put("source",line.Get("source")&nextLine.Get("source"))
+		line.Put("target",line.Get("target")&nextLine.Get("target"))
+		lines.RemoveAt(index+1)
+	End If
+End Sub
+
 Public Sub AppendLine(index As Int) As Map
 	Dim line As Map = DefaultLine
 	lines.InsertAt(index+1,line)

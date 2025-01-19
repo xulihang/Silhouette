@@ -193,7 +193,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressTimer.Initialize("ProgressTimer",100)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
-	For Each text As String In Array("Play this line","Delete this line","Prepend a line","Append a line","Recognize this line")
+	For Each text As String In Array("Play this line","Delete this line","Prepend a line","Append a line","Merge with the next line","Recognize this line")
 		Dim mi As MenuItem
 		mi.Initialize(text,"tableMenuItem")
 		tableCM.MenuItems.Add(mi)
@@ -1051,6 +1051,8 @@ Private Sub tableMenuItem_Action
 		Case "Delete this line"
 			currentProject.DeleteLine(selectedRowID - 1)
 			LoadLinesToTable
+		Case "Merge with the next line"
+			MergeWithTheNextLine
 		Case "Recognize this line"
 			RecognizeTheSelectedLine
 	End Select
@@ -1104,6 +1106,13 @@ private Sub NewLine
 		AppendLine
 	Else
 		currentProject.AppendLine(-1)
+		LoadLinesToTable
+	End If
+End Sub
+
+Private Sub MergeWithTheNextLine
+	If selectedRowID <> -1 Then
+		currentProject.MergeWithTheNextLine(selectedRowID - 1)
 		LoadLinesToTable
 	End If
 End Sub
