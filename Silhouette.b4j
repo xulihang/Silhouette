@@ -1,5 +1,5 @@
 ﻿AppType=JavaFX
-Build1=Default,b4j.example
+Build1=Default,org.xulihang.silhouette
 File1=apiparamfiller.bjl
 File10=LangaugePairSelector.bjl
 File11=langcodes.txt
