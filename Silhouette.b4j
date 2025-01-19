@@ -1289,7 +1289,11 @@ Private Sub EnableWaveFormCheckBox_CheckedChange(Checked As Boolean)
 		Dim parent As String = currentProject.GetMediaFolder
 		Dim filename As String = currentProject.GetMediaFilename
 		Dim tmpDir As String = currentProject.GetTmpFolder
-		ConvertToWav(parent,filename,tmpDir)
+		wait for (ConvertToWav(parent,filename,tmpDir)) Complete (done As Object)
+		If ReadyToDrawWaveForm Then
+			DrawWaveForm
+			SetTheRangeForTheSelectedRow
+		End If
 	End If
 End Sub
 
