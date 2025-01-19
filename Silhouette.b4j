@@ -111,6 +111,7 @@ Version=10
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 
 Sub Process_Globals
+	Public prefPath As String = File.Combine(File.DirData("Silhouette"),"preferences.conf")
 	Private fx As JFX
 	Private MainForm As Form
 	Private xui As XUI 

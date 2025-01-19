@@ -365,14 +365,8 @@ End Sub
 
 Sub MyMemory(source As String,sourceLang As String,targetLang As String) As ResumableSub
     Dim email As String
-	Try
-		If File.Exists(File.DirApp,"preferences.conf") Then
-			Dim preferencesMap As Map = Utils.readJsonAsMap(File.ReadString(File.DirApp,"preferences.conf"))
-			email=Utils.getMap("mymemory",Utils.getMap("api",preferencesMap)).GetDefault("email","")
-		End If
-	Catch
-		Log(LastException)
-	End Try
+	Dim preferencesMap As Map = Utils.getPrefMap
+	email=Utils.getMap("mymemory",Utils.getMap("api",preferencesMap)).GetDefault("email","")
 	Dim su As StringUtils
 	source=su.EncodeUrl(source,"UTF-8")
 	Dim job As HttpJob

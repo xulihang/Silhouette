@@ -134,8 +134,8 @@ Sub getPrefMap As Map
 		map1 = mPref
 	Else
 		Dim preferencesMap As Map
-		If File.Exists(File.DirApp,"preferences.conf") Then
-			preferencesMap = readJsonAsMap(File.ReadString(File.DirApp,"preferences.conf"))
+		If File.Exists(Main.prefPath,"") Then
+			preferencesMap = readJsonAsMap(File.ReadString(Main.prefPath,""))
 		Else
 			preferencesMap.Initialize
 		End If

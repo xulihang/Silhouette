@@ -26,9 +26,9 @@ Public Sub Initialize(mb As MenuBar)
 	preferencesMap.Initialize
 	apiPreferences.Initialize
 	mtPreferences.Initialize
-    If File.Exists(File.DirApp,"preferences.conf") Then
+	If File.Exists(Main.prefPath,"") Then
 		Dim json As JSONParser
-		json.Initialize(File.ReadString(File.DirApp,"preferences.conf"))
+		json.Initialize(File.ReadString(Main.prefPath,""))
 		preferencesMap=json.NextObject
 		If preferencesMap.ContainsKey("api") Then
 			apiPreferences=preferencesMap.Get("api")
@@ -110,6 +110,6 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	Utils.resetPref
 	Dim json As JSONGenerator
 	json.Initialize(preferencesMap)
-	File.WriteString(File.DirApp,"preferences.conf",json.ToPrettyString(4))
+	File.WriteString(Main.prefPath,"",json.ToPrettyString(4))
 	frm.Close
 End Sub
