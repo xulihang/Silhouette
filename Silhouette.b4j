@@ -998,12 +998,12 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 	playHereMi.Initialize("Play from here","playHereMI")
 	WaveFormContextMenu.MenuItems.Add(playHereMi)
 	If isTimestampRange Then
-		Dim setPointPointMi As MenuItem
-		setPointPointMi.Initialize("Set stop point","setStopPointMI")
-		WaveFormContextMenu.MenuItems.Add(setPointPointMi)
-		Dim clearPointPointMi As MenuItem
-		clearPointPointMi.Initialize("Clear stop point","clearStopPointMI")
-		WaveFormContextMenu.MenuItems.Add(clearPointPointMi)
+		Dim setStopPointMi As MenuItem
+		setStopPointMi.Initialize("Set stop point","setStopPointMI")
+		WaveFormContextMenu.MenuItems.Add(setStopPointMi)
+		Dim clearStopPointMi As MenuItem
+		clearStopPointMi.Initialize("Clear stop point","clearStopPointMI")
+		WaveFormContextMenu.MenuItems.Add(clearStopPointMi)
 	End If
 End Sub
 
