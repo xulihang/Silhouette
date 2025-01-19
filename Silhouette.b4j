@@ -972,7 +972,7 @@ End Sub
 Private Sub WaveFormPane_MouseClicked (EventData As MouseEvent)
 	Dim view As Node = Sender
 	Dim jo As JavaObject = EventData
-	If EventData.SecondaryButtonPressed Then
+	If EventData.SecondaryButtonPressed And EnableWaveFormCheckBox.Checked Then
 		RightClickTarget = jo.RunMethod("getTarget",Null)
 		Dim isTimestampRange As Boolean = False
 		If RightClickTarget Is ImageView Then
@@ -998,12 +998,24 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 	playHereMi.Initialize("Play from here","playHereMI")
 	WaveFormContextMenu.MenuItems.Add(playHereMi)
 	If isTimestampRange Then
+		Dim splitHereMI As MenuItem
+		splitHereMI.Initialize("Split here","splitHereMI")
+		WaveFormContextMenu.MenuItems.Add(splitHereMI)
 		Dim setStopPointMi As MenuItem
 		setStopPointMi.Initialize("Set stop point","setStopPointMI")
 		WaveFormContextMenu.MenuItems.Add(setStopPointMi)
 		Dim clearStopPointMi As MenuItem
 		clearStopPointMi.Initialize("Clear stop point","clearStopPointMI")
 		WaveFormContextMenu.MenuItems.Add(clearStopPointMi)
+	End If
+End Sub
+
+private Sub splitHereMI_Action
+	If selectedRowID <> -1 Then
+		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+		currentProject.AppendLineWithTime(selectedRowID - 1,AudioProgressLabel.Text,line.get("endTime"))
+		line.Put("endTime",AudioProgressLabel.Text)
+		LoadLinesToTable
 	End If
 End Sub
 
