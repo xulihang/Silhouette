@@ -127,3 +127,7 @@ Private Sub ChooseWhisperModelButton_MouseClicked (EventData As MouseEvent)
 	Dim path As String = fc.ShowOpen(frm)
 	WhisperModelPathTextField.Text = path
 End Sub
+
+Private Sub DownloadModelButton_MouseClicked (EventData As MouseEvent)
+	fx.ShowExternalDocument("https://github.com/xulihang/Silhouette_plugins/blob/main/README.md#whisper-models")
+End Sub
