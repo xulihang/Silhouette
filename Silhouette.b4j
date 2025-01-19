@@ -632,7 +632,7 @@ Private Sub DrawWaveForm
 	Log("DrawWaveForm")
 	InitializeWaveFormCreatorIfNeeded
 	waveFormCreator.StartIndex = 0
-	waveFormCreator.EndIndex = waveFormCreator.SampleLength
+	waveFormCreator.EndIndex = waveFormCreator.SampleLength - 1
 	OverviewWaveFormImageView.SetImage(waveFormCreator.Draw(OverviewWaveFormImageView.Width,OverviewWaveFormImageView.Height))
 End Sub
 
@@ -684,7 +684,7 @@ End Sub
 Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Double)
 	If ReadyToDrawWaveForm Then
 		waveFormCreator.StartIndex = startProgress*waveFormCreator.SampleLength
-		waveFormCreator.EndIndex = endProgress*waveFormCreator.SampleLength
+		waveFormCreator.EndIndex = Min(endProgress*waveFormCreator.SampleLength, waveFormCreator.SampleLength - 1)
 		WaveFormImageView.SetImage(waveFormCreator.Draw(WaveFormImageView.Width,WaveFormImageView.Height))
 		Dim overViewStartTime As Long  = startProgress * cutDurationMs
 		Dim overViewEndTime As Long = endProgress * cutDurationMs
