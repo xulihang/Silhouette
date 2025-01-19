@@ -13,6 +13,7 @@ Sub Class_Globals
 	Private preferencesMap As Map
 	Private apiPreferences As Map
 	Private mtPreferences As Map
+	Private WhisperModelPathTextField As TextField
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -22,6 +23,7 @@ Public Sub Initialize(mb As MenuBar)
 	frm.Title = "Preferences"
 	TabPane1.LoadLayout("APISetting", "API")
 	TabPane1.LoadLayout("MTSetting", "Machine Translation")
+	TabPane1.LoadLayout("modelPreference", "Speech Recognition")
 	APITableView.SetColumns(Array("API Name","value"))
 	preferencesMap.Initialize
 	apiPreferences.Initialize
@@ -36,6 +38,7 @@ Public Sub Initialize(mb As MenuBar)
 		If preferencesMap.ContainsKey("mt") Then
 			mtPreferences=preferencesMap.Get("mt")
 		End If
+		WhisperModelPathTextField.Text = preferencesMap.GetDefault("whisper_model_path","")
     End If
 	loadAPI
 	loadMT
@@ -43,6 +46,10 @@ End Sub
 
 Public Sub Show
 	frm.Show
+End Sub
+
+Public Sub SwitchTab(index As Int)
+	TabPane1.SelectedIndex = index
 End Sub
 
 Sub loadAPI
@@ -112,4 +119,11 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	json.Initialize(preferencesMap)
 	File.WriteString(Main.prefPath,"",json.ToPrettyString(4))
 	frm.Close
+End Sub
+
+Private Sub ChooseWhisperModelButton_MouseClicked (EventData As MouseEvent)
+	Dim fc As FileChooser
+	fc.Initialize
+	Dim path As String = fc.ShowOpen(frm)
+	WhisperModelPathTextField.Text = path
 End Sub

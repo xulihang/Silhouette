@@ -32,6 +32,9 @@ Public Sub GetWhisperPath As String
 End Sub
 
 Public Sub GetModelPath As String
+	If Utils.getPrefMap.ContainsKey("whisper_model_path") Then
+		Return Utils.getPrefMap.Get("whisper_model_path")
+	End If
 	Dim modelDir As String = File.Combine(File.DirApp,"models")
 	Dim modelName As String = "ggml-medium.bin"
 	If File.Exists(modelDir,"model") Then

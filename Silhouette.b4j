@@ -7,18 +7,19 @@ File12=LeftSplitPane.bjl
 File13=LineEditor.bjl
 File14=ListView.bjl
 File15=main.bjl
-File16=MTSetting.bjl
-File17=PlayControl.bjl
-File18=pretranslate.bjl
-File19=progress.bjl
+File16=modelPreference.bjl
+File17=MTSetting.bjl
+File18=PlayControl.bjl
+File19=pretranslate.bjl
 File2=APISetting.bjl
-File20=projectSetting.bjl
-File21=TopRightSplitPane.bjl
-File22=TopSplitPane.bjl
-File23=TranslationAssist.bjl
-File24=TranslationMemory.bjl
-File25=VideoPlayer.bjl
-File26=WaveForm.bjl
+File20=progress.bjl
+File21=projectSetting.bjl
+File22=TopRightSplitPane.bjl
+File23=TopSplitPane.bjl
+File24=TranslationAssist.bjl
+File25=TranslationMemory.bjl
+File26=VideoPlayer.bjl
+File27=WaveForm.bjl
 File3=BottomSplitPane.bjl
 File4=Editor.bjl
 File5=ErrorReporter.bjl
@@ -45,6 +46,7 @@ FileGroup23=Default Group
 FileGroup24=Default Group
 FileGroup25=Default Group
 FileGroup26=Default Group
+FileGroup27=Default Group
 FileGroup3=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
@@ -91,7 +93,7 @@ Module6=ExportOptions
 Module7=FFMpeg
 Module8=InputBox
 Module9=JumpOptions
-NumberOfFiles=26
+NumberOfFiles=27
 NumberOfLibraries=16
 NumberOfModules=22
 Version=10
@@ -284,9 +286,7 @@ Private Sub MenuBar1_Action
 		Case "_Close"
 			Close
 		Case "_Preferences"
-			Dim pref As Preferences
-			pref.Initialize(MenuBar1)
-			pref.Show
+			ShowPreferences
 		Case "_Recognize Speech"
 			RecognizeSpeech
 		Case "_Pretranslate"
@@ -322,6 +322,13 @@ Private Sub MenuBar1_Action
 		Case "_About"
 			fx.Msgbox(MainForm,"@xulihang, 2025","Silhouette")
 	End Select
+End Sub
+
+Private Sub ShowPreferences As Preferences
+	Dim pref As Preferences
+	pref.Initialize(MenuBar1)
+	pref.Show
+	Return pref
 End Sub
 
 Private Sub JumpToLineOfCurrentTime
@@ -396,7 +403,13 @@ Private Sub RecognizeSpeech
 	If currentProject.IsInitialized=False Then
 		Return
 	End If
-	
+	If HasValidateModel=False Then
+		Dim response As Int = fx.Msgbox2(MainForm,"No models found","","Go to perferences","","Close",fx.MSGBOX_CONFIRMATION)
+		If response = fx.DialogResponse.POSITIVE Then
+			ShowPreferences.SwitchTab(2)
+		End If
+		Return
+	End If
 	Dim parent As String = currentProject.GetMediaFolder
 	Dim filename As String = currentProject.GetMediaFilename
 	Dim tmpDir As String = currentProject.GetTmpFolder
@@ -1082,7 +1095,23 @@ Private Sub tableMenuItem_Action
 	End Select
 End Sub
 
+Private Sub HasValidateModel As Boolean
+	Dim path As String = ASR.GetModelPath
+	Log(path)
+	If File.Exists(path,"") Then
+		Return True
+	End If
+	Return False
+End Sub
+
 Private Sub RecognizeTheSelectedLine
+	If HasValidateModel=False Then
+		Dim response As Int = fx.Msgbox2(MainForm,"No models found","","Go to perferences","","Close",fx.MSGBOX_CONFIRMATION)
+		If response = fx.DialogResponse.POSITIVE Then
+			ShowPreferences.SwitchTab(2)
+		End If
+		Return
+	End If
 	progressDialog.Show("Recognizing...")
 	progressDialog.update2("Processing...")
 	Dim currentLine As Map = currentProject.GetLine(selectedRowID - 1)
