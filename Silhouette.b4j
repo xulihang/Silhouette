@@ -993,6 +993,9 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 		Dim playMi As MenuItem
 		playMi.Initialize("Play the selection","playSelectionMI")
 		WaveFormContextMenu.MenuItems.Add(playMi)
+		Dim playSelectionHereMi As MenuItem
+		playSelectionHereMi.Initialize("Play the selection from here","playSelectionHereMI")
+		WaveFormContextMenu.MenuItems.Add(playSelectionHereMi)
 	End If
 	Dim playHereMi As MenuItem
 	playHereMi.Initialize("Play from here","playHereMI")
@@ -1038,6 +1041,14 @@ End Sub
 
 Private Sub playSelectionMI_Action
 	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(StartTimeTextField.Text)
+	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
+	vlc.Resume
+	vlc.SetTime(startTime)
+	TogglePlayingStatus(True)
+End Sub
+
+Private Sub playSelectionHereMI_Action
+	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
 	vlc.Resume
 	vlc.SetTime(startTime)
