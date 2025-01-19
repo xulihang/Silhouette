@@ -43,7 +43,7 @@ End Sub
 
 Public Sub Video2Wav(dir As String,filename As String,outpath As String) As ResumableSub
 	Dim args As List
-	args = Array("-i",filename,"-ac","1","-ar","16000",outpath)
+	args = Array("-i",$"${filename}""$,"-ac","1","-ar","16000",outpath)
 	Dim sh As Shell
 	sh.Initialize("sh",GetFFMpegPath,args)
 	sh.WorkingDirectory = dir
