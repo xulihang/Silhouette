@@ -167,6 +167,8 @@ Sub Process_Globals
 	Private AudioProgressLabel As Label
 	Private EnableWaveFormCheckBox As CheckBox
 	Private PlayControl As PlayControlForm
+	Private playbackStartDate As Long
+	Private playbackStartTime As Long
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -953,18 +955,21 @@ End Sub
 
 Private Sub ProgressTimer_Tick
 	If vlc.IsPlaying Then
-		If vlc.GetTime > expectedEndTime And expectedEndTime<>-1 Then
+		Dim currentVideoTime As Long = playbackStartTime + DateTime.Now - playbackStartDate
+		If currentVideoTime > expectedEndTime And expectedEndTime <> -1 And playbackStartDate <> -1 Then
 			expectedEndTime = -1
+			playbackStartTime = -1
+			playbackStartDate = -1
 			vlc.Pause
 			TogglePlayingStatus(False)
 		End If
 		ProgressSlider.Tag = False
-		DrawPositionLineInWaveForm(vlc.GetTime)
-		Dim time As Long = vlc.GetTime / 1000
+		DrawPositionLineInWaveForm(currentVideoTime)
+		Dim time As Long = currentVideoTime / 1000
 		Dim minutes As Int = Floor(time / 60)
 		Dim seconds As Int = time - minutes*60
 		ProgressLabel.Text = NumberFormat(minutes,2,0) & ":" & NumberFormat(seconds,2,0)
-		ProgressSlider.Value = vlc.GetTime/vlc.GetLength * 100
+		ProgressSlider.Value = currentVideoTime/vlc.GetLength * 100
 		Sleep(0)
 		ProgressSlider.Tag = True
 	Else
@@ -1066,6 +1071,8 @@ End Sub
 Private Sub playSelectionMI_Action
 	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(StartTimeTextField.Text)
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
+	playbackStartDate = DateTime.Now
+	playbackStartTime = startTime
 	vlc.Resume
 	vlc.SetTime(startTime)
 	TogglePlayingStatus(True)
@@ -1074,6 +1081,8 @@ End Sub
 Private Sub playSelectionHereMI_Action
 	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
+	playbackStartDate = DateTime.Now
+	playbackStartTime = startTime
 	vlc.Resume
 	vlc.SetTime(startTime)
 	TogglePlayingStatus(True)
@@ -1194,6 +1203,8 @@ Private Sub PlayTheSelectedLine
 	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
 	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
+	playbackStartDate = DateTime.Now
+	playbackStartTime = startTime
 	vlc.Resume
 	vlc.SetTime(startTime)
 	TogglePlayingStatus(True)
