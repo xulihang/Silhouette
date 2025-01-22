@@ -97,7 +97,7 @@ Module9=JumpOptions
 NumberOfFiles=27
 NumberOfLibraries=17
 NumberOfModules=22
-Version=9.8
+Version=10
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
@@ -167,8 +167,8 @@ Sub Process_Globals
 	Private AudioProgressLabel As Label
 	Private EnableWaveFormCheckBox As CheckBox
 	Private PlayControl As PlayControlForm
-	Private playbackStartDate As Long
-	Private playbackStartTime As Long
+	Private playbackStartDate As Long = -1
+	Private playbackStartTime As Long = -1
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -955,7 +955,12 @@ End Sub
 
 Private Sub ProgressTimer_Tick
 	If vlc.IsPlaying Then
-		Dim currentVideoTime As Long = playbackStartTime + DateTime.Now - playbackStartDate
+		Dim currentVideoTime As Long
+		If playbackStartDate <> -1 Then
+			currentVideoTime = playbackStartTime + DateTime.Now - playbackStartDate
+		Else
+			currentVideoTime = vlc.GetTime
+		End If
 		If currentVideoTime > expectedEndTime And expectedEndTime <> -1 And playbackStartDate <> -1 Then
 			expectedEndTime = -1
 			playbackStartTime = -1
