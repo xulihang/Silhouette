@@ -97,7 +97,7 @@ Module9=JumpOptions
 NumberOfFiles=27
 NumberOfLibraries=17
 NumberOfModules=22
-Version=10
+Version=9.8
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
