@@ -114,7 +114,7 @@ Version=9.8
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 
 Sub Process_Globals
-	Public prefPath As String = File.Combine(File.DirData("Silhouette"),"preferences.conf")
+	Public prefPath As String
 	Private fx As JFX
 	Private MainForm As Form
 	Private xui As XUI 
@@ -170,6 +170,7 @@ Sub Process_Globals
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
+	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
 	MainForm = Form1
 	MainForm.RootPane.LoadLayout("main")
 	MainForm.WindowWidth = 800
