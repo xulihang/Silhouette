@@ -583,16 +583,24 @@ Sub SelectRow(targetRowId As Int,fromLongClick As Boolean)    'rowid-1
 End Sub
 
 Private Sub SetTheRangeForTheSelectedRow
+	Dim padding As Int = 1000 '1 seconds padding
 	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
 	Dim startTime As String = line.get("startTime")
 	Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
 	Dim endTime As String = line.get("endTime")
 	Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(endTime)
-	Dim cutStartTimePercent As Double = (startTimeMs - cutStartTimeMs) / cutDurationMs
-	Dim cutEndTimePercent As Double = (endTimeMs - cutStartTimeMs) / cutDurationMs
+	Dim paddedStartTimeMs As Long = Max(0,startTimeMs - padding)
+	Dim paddedEndTimeMs As Long = Min(endTimeMs + padding, vlc.GetLength)
+	
+	Dim lineDuration As Int = paddedEndTimeMs - paddedStartTimeMs
+	
+	Dim cutStartTimePercent As Double = (paddedStartTimeMs - cutStartTimeMs) / cutDurationMs
+	Dim cutEndTimePercent As Double = (paddedEndTimeMs - cutStartTimeMs) / cutDurationMs
 	overviewRange.setProgress(cutStartTimePercent,cutEndTimePercent)
 	overviewRange.TriggerRangeChanged
-	timestampRange.setProgress(0,1)
+	Dim startProgress As Double = paddedStartTimeMs / lineDuration
+	Dim endProgress As Double = paddedEndTimeMs / lineDuration
+	timestampRange.setProgress(startProgress,endProgress)
 End Sub
 
 Private Sub ReadyToDrawWaveForm As Boolean
