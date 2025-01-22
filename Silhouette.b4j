@@ -965,11 +965,11 @@ Private Sub ProgressTimer_Tick
 		End If
 		ProgressSlider.Tag = False
 		DrawPositionLineInWaveForm(currentVideoTime)
-		Dim time As Long = currentVideoTime / 1000
+		Dim time As Long = vlc.GetTime / 1000
 		Dim minutes As Int = Floor(time / 60)
 		Dim seconds As Int = time - minutes*60
 		ProgressLabel.Text = NumberFormat(minutes,2,0) & ":" & NumberFormat(seconds,2,0)
-		ProgressSlider.Value = currentVideoTime/vlc.GetLength * 100
+		ProgressSlider.Value = vlc.GetTime/vlc.GetLength * 100
 		Sleep(0)
 		ProgressSlider.Tag = True
 	Else
