@@ -19,6 +19,9 @@ Public Sub RecognizeWav(filepath As String,lang As String) As ResumableSub
 	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
 	Log(StdOut)
 	Log(StdErr)
+	If ExitCode <> 0 Then
+		Utils.ReportError(StdOut)
+	End If
 	Return Success
 End Sub
 

@@ -9,6 +9,12 @@ Sub Process_Globals
 	Private mPref As Map
 End Sub
 
+public Sub ReportError(message As String)
+	Dim reporter As ErrorReporter
+	reporter.Initialize
+	reporter.ShowAndWait("error: "&message)
+End Sub
+
 Public Sub getDataShortsFromBytes(Bytes() As Byte) As Short()
 	Dim BC As ByteConverter
 	BC.LittleEndian = True
