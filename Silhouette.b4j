@@ -232,9 +232,13 @@ End Sub
 
 'Return true to allow the default exceptions handler to handle the uncaught exception.
 Sub Application_Error (Error As Exception, StackTrace As String) As Boolean
-    Dim reporter As ErrorReporter
-	reporter.Initialize
-	reporter.ShowAndWait("error: "&Error.Message&CRLF&"StackTrace: "&StackTrace)
+	If StackTrace.Contains("Unable to load library 'libvlc'") Then
+		fx.Msgbox(MainForm,"Please install VLC first.","")
+	Else
+		Dim reporter As ErrorReporter
+		reporter.Initialize
+		reporter.ShowAndWait("error: "&Error.Message&CRLF&"StackTrace: "&StackTrace)
+	End If
 	Return False
 End Sub
 
@@ -908,7 +912,11 @@ End Sub
 
 Private Sub ExitApp
 	'vlc.stop
-	vlc.release
+	Try
+		vlc.release
+	Catch
+		Log(LastException)
+	End Try
 	ExitApplication
 End Sub
 
@@ -1096,7 +1104,11 @@ End Sub
 
 Sub MainForm_CloseRequest (EventData As Event)
 	Log("We are closing the mainform")
-	vlc.release
+	Try
+	    vlc.release
+	Catch
+		Log(LastException)
+	End Try
 	ExitApplication
 End Sub
 
