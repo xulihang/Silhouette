@@ -82,11 +82,12 @@ Module15=preTranslateDialog
 Module16=progressDialog
 Module17=Project
 Module18=ProjectSettings
-Module19=SrtParser
+Module19=SileroVad
 Module2=ASR
-Module20=Utils
-Module21=WaveFormBitmapCreator
-Module22=WavRandomAccessFile
+Module20=SrtParser
+Module21=Utils
+Module22=WaveFormBitmapCreator
+Module23=WavRandomAccessFile
 Module3=DraggableRange
 Module4=ErrorReporter
 Module5=Exporter
@@ -96,7 +97,7 @@ Module8=InputBox
 Module9=JumpOptions
 NumberOfFiles=27
 NumberOfLibraries=17
-NumberOfModules=22
+NumberOfModules=23
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -112,6 +113,8 @@ Version=10
 #AdditionalJar: vlcj-javafx-1.2.0
 #AdditionalJar: vlcj-natives-4.8.3
 #AdditionalJar: sqlite-jdbc-3.43.0.0
+#AdditionalJar: silero-vad
+#AdditionalJar: onnxruntime-1.16.0-rc1
 
 Sub Process_Globals
 	Public prefPath As String
@@ -297,6 +300,8 @@ Private Sub MenuBar1_Action
 			ShowPreferences
 		Case "_Recognize Speech"
 			RecognizeSpeech
+		Case "_Detect voice activity"
+			DetectVoiceActivity
 		Case "_Pretranslate"
 			Dim dialog As preTranslateDialog
 			dialog.Initialize
@@ -1396,4 +1401,35 @@ Private Sub playControlMi_Action
 		PlayControl.Initialize(vlc)
 	End If
 	PlayControl.Show
+End Sub
+
+private Sub DetectVoiceActivity
+	If currentProject.IsInitialized=False Then
+		Return
+	End If
+	If HasValidateModel=False Then
+		Dim response As Int = fx.Msgbox2(MainForm,"No models found","","Go to perferences","","Close",fx.MSGBOX_CONFIRMATION)
+		If response = fx.DialogResponse.POSITIVE Then
+			ShowPreferences.SwitchTab(2)
+		End If
+		Return
+	End If
+	Dim parent As String = currentProject.GetMediaFolder
+	Dim filename As String = currentProject.GetMediaFilename
+	Dim tmpDir As String = currentProject.GetTmpFolder
+	
+	wait for (ConvertToWav(parent,filename,tmpDir)) complete (done As Object)
+	Dim outpath As String = File.Combine(tmpDir,"audio.wav")
+	Dim vad As SileroVad
+	vad.Initialize
+	Dim result As List = vad.Detect(outpath)
+	For Each segment As Map In result
+		Dim startMS As Long = segment.Get("startTime")*1000
+		Dim endMS As Long = segment.Get("endTime")*1000
+		Dim startTime As String = Utils.GetTimeStringFromMilliseconds(startMS)
+		Dim endTime As String = Utils.GetTimeStringFromMilliseconds(endMS)
+		currentProject.AddLine(startTime,endTime,"","")
+	Next
+	LoadLinesToTable
+	fx.Msgbox(MainForm,"Done","")
 End Sub
