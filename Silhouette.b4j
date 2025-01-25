@@ -80,18 +80,19 @@ Module10=JumpOptions
 Module11=jVLC
 Module12=LanguagePairSelector
 Module13=MT
-Module14=PlayControlForm
-Module15=Preferences
-Module16=preTranslateDialog
-Module17=progressDialog
-Module18=Project
-Module19=ProjectSettings
+Module14=NativeHook
+Module15=PlayControlForm
+Module16=Preferences
+Module17=preTranslateDialog
+Module18=progressDialog
+Module19=Project
 Module2=ASR
-Module20=SileroVad
-Module21=SrtParser
-Module22=Utils
-Module23=WaveFormBitmapCreator
-Module24=WavRandomAccessFile
+Module20=ProjectSettings
+Module21=SileroVad
+Module22=SrtParser
+Module23=Utils
+Module24=WaveFormBitmapCreator
+Module25=WavRandomAccessFile
 Module3=ASROptions
 Module4=DraggableRange
 Module5=ErrorReporter
@@ -101,7 +102,7 @@ Module8=FFMpeg
 Module9=InputBox
 NumberOfFiles=28
 NumberOfLibraries=18
-NumberOfModules=24
+NumberOfModules=25
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -119,6 +120,7 @@ Version=10
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 #AdditionalJar: silero-vad
 #AdditionalJar: onnxruntime-1.20.0
+#AdditionalJar: jnativehook-2.2.2
 
 Sub Process_Globals
 	Public prefPath As String
@@ -179,11 +181,12 @@ Sub Process_Globals
 	Private SetEndPointButton As Button
 	Private FollowProgressCheckBox As CheckBox
 	Private KeepRatioCheckBox As CheckBox
-	Private Backward500Button As Button
+	Private hook As NativeHook
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
 	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
+	hook.Initialize(Me,"Hook")
 	MainForm = Form1
 	MainForm.RootPane.LoadLayout("main")
 	MainForm.WindowWidth = 800
@@ -1059,6 +1062,7 @@ End Sub
 
 Private Sub ExitApp
 	'vlc.stop
+	cleanupHook
 	Try
 		vlc.release
 	Catch
@@ -1291,12 +1295,7 @@ End Sub
 
 Sub MainForm_CloseRequest (EventData As Event)
 	Log("We are closing the mainform")
-	Try
-	    vlc.release
-	Catch
-		Log(LastException)
-	End Try
-	ExitApplication
+	ExitApp
 End Sub
 
 Private Sub tableMenuItem_Action
@@ -1655,4 +1654,32 @@ Private Sub Forward(span As Int)
 	vlc.SetTime(Min(vlc.GetTime + span,vlc.GetLength))
 End Sub
 
+Public Sub cleanupHook
+	If hook.IsInitialized Then
+		hook.cleanup
+	End If
+End Sub
 
+Private Sub Hook_NativeKeyPressed(code As String)
+	If code = 57 Then 'space pressed
+		If VLCPane.Tag = True Then
+			TogglePlaying
+		End If
+	End If
+End Sub
+
+Private Sub VLCPane_MouseEntered (EventData As MouseEvent)
+	VLCPane.Tag = True
+End Sub
+
+Private Sub VLCPane_MouseExited (EventData As MouseEvent)
+	VLCPane.Tag = False
+End Sub
+
+Private Sub WaveFormPane_MouseEntered (EventData As MouseEvent)
+	VLCPane.Tag = True
+End Sub
+
+Private Sub WaveFormPane_MouseExited (EventData As MouseEvent)
+	VLCPane.Tag = False
+End Sub
