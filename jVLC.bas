@@ -21,7 +21,11 @@ Public Sub Initialize(iv As ImageView)
 	embeddedMediaPlayer.RunMethodJO("videoSurface",Null).RunMethod("set",Array(surface))
 End Sub
 
-Public Sub getStopped as Boolean
+Public Sub setStopped(value As Boolean)
+	mStopped = value
+End Sub
+
+Public Sub getStopped As Boolean
 	Return mStopped
 End Sub
 
