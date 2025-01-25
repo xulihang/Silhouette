@@ -7,10 +7,12 @@ Version=10
 Sub Class_Globals
 	Private fx As JFX
 	Private vadDetector As JavaObject
+	Private th As Thread
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
 Public Sub Initialize
+	th.Initialise("th")
 	Dim MODEL_PATH As String = File.Combine(File.DirApp,"silero_vad.onnx")
 	Dim SAMPLE_RATE As Int = 16000
 	Dim THRESHOLD As Float= 0.5f
@@ -23,18 +25,35 @@ Public Sub Initialize
 	vadDetector.InitializeNewInstance("org.silerovad.SileroVadDetector",Array(MODEL_PATH, THRESHOLD, SAMPLE_RATE, MIN_SPEECH_DURATION_MS, MAX_SPEECH_DURATION_SECONDS, MIN_SILENCE_DURATION_MS, SPEECH_PAD_MS))
 End Sub
 
+Public Sub DetectAsync(wavPath As String) As ResumableSub
+	Dim result As List
+	result.Initialize
+	th.Start(Me,"DetectInner",Array As Map(CreateMap("path":wavPath,"result":result)))
+	wait for th_Ended(endedOK As Boolean, error As String)
+	Log(endedOK)
+	Log(error)
+	Return result
+End Sub
+
 Public Sub Detect(wavPath As String) As List
+	Dim result As List
+	result.Initialize
+	Return DetectInner(CreateMap("path":wavPath,"result":result))
+End Sub
+
+Public Sub DetectInner(map1 As Map) As List
+	Dim result As List = map1.Get("result")
+	Dim wavPath As String = map1.Get("path")
 	Dim fileJO As JavaObject
 	fileJO.InitializeNewInstance("java.io.File",Array(wavPath))
-	Dim result As List = vadDetector.RunMethod("getSpeechSegmentList",Array(fileJO))
-	Dim timeSegments As List
-	timeSegments.Initialize
-	For Each segment As JavaObject In result
+	Dim segments As List = vadDetector.RunMethod("getSpeechSegmentList",Array(fileJO))
+	For Each segment As JavaObject In segments
 		Dim m As Map
 		m.Initialize
 		m.Put("startTime",segment.RunMethod("getStartSecond",Null))
 		m.Put("endTime",segment.RunMethod("getEndSecond",Null))
-		timeSegments.Add(m)
+		result.Add(m)
 	Next
-	Return timeSegments
+	Return result
 End Sub
+

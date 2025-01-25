@@ -61,9 +61,10 @@ Library11=jreflection
 Library12=jshell
 Library13=json
 Library14=jxui
-Library15=xcustomlistview
-Library16=xui views
-Library17=okhttp
+Library15=okhttp
+Library16=xcustomlistview
+Library17=xui views
+Library18=threading
 Library2=b4xcollections
 Library3=b4xtable
 Library4=byteconverter
@@ -96,7 +97,7 @@ Module7=FFMpeg
 Module8=InputBox
 Module9=JumpOptions
 NumberOfFiles=27
-NumberOfLibraries=17
+NumberOfLibraries=18
 NumberOfModules=23
 Version=10
 @EndOfDesignText@
@@ -114,7 +115,7 @@ Version=10
 #AdditionalJar: vlcj-natives-4.8.3
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 #AdditionalJar: silero-vad
-#AdditionalJar: onnxruntime-1.16.0-rc1
+#AdditionalJar: onnxruntime-1.20.0
 
 Sub Process_Globals
 	Public prefPath As String
@@ -1420,16 +1421,21 @@ private Sub DetectVoiceActivity
 	
 	wait for (ConvertToWav(parent,filename,tmpDir)) complete (done As Object)
 	Dim outpath As String = File.Combine(tmpDir,"audio.wav")
+	progressDialog.Show("Detecting...")
+	progressDialog.update2("Detecting...")
 	Dim vad As SileroVad
 	vad.Initialize
-	Dim result As List = vad.Detect(outpath)
-	For Each segment As Map In result
-		Dim startMS As Long = segment.Get("startTime")*1000
-		Dim endMS As Long = segment.Get("endTime")*1000
-		Dim startTime As String = Utils.GetTimeStringFromMilliseconds(startMS)
-		Dim endTime As String = Utils.GetTimeStringFromMilliseconds(endMS)
-		currentProject.AddLine(startTime,endTime,"","")
-	Next
-	LoadLinesToTable
-	fx.Msgbox(MainForm,"Done","")
+	wait for (vad.DetectAsync(outpath)) Complete (result As List)
+	If progressDialog.isShowing Then
+		For Each segment As Map In result
+			Dim startMS As Long = segment.Get("startTime")*1000
+			Dim endMS As Long = segment.Get("endTime")*1000
+			Dim startTime As String = Utils.GetTimeStringFromMilliseconds(startMS)
+			Dim endTime As String = Utils.GetTimeStringFromMilliseconds(endMS)
+			currentProject.AddLine(startTime,endTime,"","")
+		Next
+		LoadLinesToTable
+		progressDialog.close
+		fx.Msgbox(MainForm,"Done","")
+	End If
 End Sub
