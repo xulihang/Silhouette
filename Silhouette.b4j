@@ -176,6 +176,7 @@ Sub Process_Globals
 	Private PlayControl As PlayControlForm
 	Private playbackStartDate As Long = -1
 	Private playbackStartTime As Long = -1
+	Private SetEndPointButton As Button
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -1515,4 +1516,24 @@ private Sub DetectVoiceActivity
 	LoadLinesToTable
 	progressDialog.close
 	fx.Msgbox(MainForm,"Done","")
+End Sub
+
+Private Sub SetStartPointButton_MouseClicked (EventData As MouseEvent)
+	If selectedRowID <> -1 Then
+		StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(vlc.GetTime)
+	End If
+End Sub
+
+Private Sub SetEndPointButton_MouseClicked (EventData As MouseEvent)
+	If selectedRowID <> -1 Then
+		EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(vlc.GetTime)
+	End If
+End Sub
+
+Private Sub Skip500Button_MouseClicked (EventData As MouseEvent)
+	vlc.SetTime(Min(vlc.GetTime + 500,vlc.GetLength))
+End Sub
+
+Private Sub Forward500Button_MouseClicked (EventData As MouseEvent)
+	vlc.SetTime(Max(0, vlc.GetTime - 500))
 End Sub
