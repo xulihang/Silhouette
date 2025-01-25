@@ -10,6 +10,7 @@ Sub Class_Globals
 	Private embeddedMediaPlayer As JavaObject
 	Private jo As JavaObject = Me
 	Private surface As JavaObject
+	Private mStopped As Boolean = True
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -18,6 +19,10 @@ Public Sub Initialize(iv As ImageView)
 	embeddedMediaPlayer = jo.RunMethodJO("getMediaPlayer",Array(mediaPlayerFactory))
 	surface = jo.RunMethod("setVideoSurface",Array(embeddedMediaPlayer,iv))
 	embeddedMediaPlayer.RunMethodJO("videoSurface",Null).RunMethod("set",Array(surface))
+End Sub
+
+Public Sub getStopped as Boolean
+	Return mStopped
 End Sub
 
 Public Sub Release
@@ -33,10 +38,12 @@ Public Sub setRate(value As Float)
 End Sub
 
 Public Sub Stop
+	mStopped = True
 	embeddedMediaPlayer.RunMethodJO("controls",Null).RunMethod("stop",Null)
 End Sub
 
 Public Sub Resume
+	mStopped = False
 	embeddedMediaPlayer.RunMethodJO("controls",Null).RunMethod("play",Null)
 End Sub
 
@@ -49,10 +56,12 @@ Public Sub SetPosition(pos As Float)
 End Sub
 
 Public Sub Play(mrl As String)
+	mStopped = False
 	jo.RunMethod("play",Array(embeddedMediaPlayer,mrl))
 End Sub
 
 Public Sub PlayWithOptions(mrl As String,options() As String)
+	mStopped = False
 	embeddedMediaPlayer.RunMethodJO("media",Null).RunMethod("play",Array(mrl,options))
 End Sub
 

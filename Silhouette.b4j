@@ -736,7 +736,7 @@ private Sub DisplaySiblingRanges(overViewStartTime As Long,lineDuration As Long)
 End Sub
 
 Private Sub ReadyToDrawWaveForm As Boolean
-	Return currentProject.IsInitialized And selectedRowID <> - 1 And EnableWaveFormCheckBox.Checked
+	Return currentProject.IsInitialized And selectedRowID <> - 1 And EnableWaveFormCheckBox.Checked And vlc.Stopped = False
 End Sub
 
 Private Sub WaveFormPane_Resize (Width As Double, Height As Double)
