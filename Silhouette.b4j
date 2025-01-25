@@ -1130,6 +1130,9 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 		Dim clearStopPointMi As MenuItem
 		clearStopPointMi.Initialize("Clear stop point","clearStopPointMI")
 		WaveFormContextMenu.MenuItems.Add(clearStopPointMi)
+		Dim newLineHereMI As MenuItem
+		newLineHereMI.Initialize("Create a new line here","newLineHereMI")
+		WaveFormContextMenu.MenuItems.Add(newLineHereMI)
 	End If
 End Sub
 
@@ -1156,6 +1159,33 @@ Private Sub playHereMI_Action
 	If vlc.IsPlaying = False Then
 		vlc.Resume
 		TogglePlayingStatus(True)
+	End If
+End Sub
+
+Private Sub newLineHereMI_Action
+	Dim rowID As Int = selectedRowID
+	If rowID <> -1 Then
+		Dim time As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
+		Dim currentStartTime As Long = Utils.GetMillisecondsFromTimeString(StartTimeTextField.Text)
+		Dim append As Boolean
+		If time < currentStartTime Then
+			append = False
+		Else
+			append = True
+		End If
+		Dim startTime As String = AudioProgressLabel.Text
+		Dim endTime As String = Utils.GetTimeStringFromMilliseconds(time + 1000)
+		If append Then
+			currentProject.AppendLineWithTime(rowID - 1,startTime,endTime)
+		Else
+			currentProject.PrependLineWithTime(rowID - 1,startTime,endTime)
+		End If
+		LoadLinesToTable
+		If append Then
+			SelectRow(rowID+1,True)
+		Else
+			SelectRow(rowID,True)
+		End If
 	End If
 End Sub
 
