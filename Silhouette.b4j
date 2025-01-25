@@ -177,6 +177,7 @@ Sub Process_Globals
 	Private playbackStartDate As Long = -1
 	Private playbackStartTime As Long = -1
 	Private SetEndPointButton As Button
+	Private FollowProgressCheckBox As CheckBox
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -352,19 +353,31 @@ Private Sub ShowPreferences As Preferences
 End Sub
 
 Private Sub JumpToLineOfCurrentTime
+	JumpToRow(FindTheRowIDOfCurrentTime)
+End Sub
+
+Private Sub FindTheRowIDOfCurrentTime As Int
 	Dim timeMs As Long = vlc.GetTime
-	Dim index As Int = 1
-	index = 1
+	Dim rowID As Int = 1
+	rowID = 1
+	Dim NotInRange As Boolean = True
 	For Each line As Map In currentProject.lines
 		Dim startTime As String = line.Get("startTime")
 		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
-		If timeMs < startTimeMs Then
+		Dim endTime As String = line.Get("endTime")
+		Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(endTime)
+		If startTimeMs < timeMs And endTimeMs > timeMs Then
+			NotInRange = False
 			Exit
 		End If
-		index = index + 1
+		rowID = rowID + 1
 	Next
-	index = Min(currentProject.lines.Size,index)
-	JumpToRow(index)
+	If NotInRange = True Then
+		rowID = -1
+	Else
+		rowID = Min(currentProject.lines.Size,rowID)
+	End If
+	Return rowID
 End Sub
 
 Private Sub JumpToLine
@@ -392,11 +405,14 @@ Private Sub JumpToLine
 End Sub
 
 Private Sub JumpToRow(rowID As Int)
+	If rowID = -1 Then
+		Return
+	End If
 	ResetSelectStatusOfLineTable
 	Dim pageIndex As Int = Ceil(rowID / LinesTable.RowsPerPage)
 	LinesTable.CurrentPage = pageIndex
 	Sleep(500)
-	SelectRow(rowID,False)
+	SelectRow(rowID,True)
 End Sub
 
 Private Sub ConvertToWav(parent As String,filename As String, tmpDir As String) As ResumableSub
@@ -1096,6 +1112,13 @@ Private Sub ProgressTimer_Tick
 		ProgressSlider.Value = vlc.GetTime/vlc.GetLength * 100
 		Sleep(0)
 		ProgressSlider.Tag = True
+		If FollowProgressCheckBox.Checked Then
+			Dim rowID As Int = FindTheRowIDOfCurrentTime
+			If rowID <> selectedRowID And rowID <> -1 Then
+				selectedRowID = rowID
+				JumpToRow(rowID)
+			End If
+		End If
 	Else
 		TogglePlayingStatus(False)
 	End If
