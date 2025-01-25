@@ -1657,10 +1657,12 @@ Private Sub Forward500Button_MouseClicked (EventData As MouseEvent)
 End Sub
 
 Private Sub Backward(span As Int)
+	playbackStartTime = playbackStartTime - span
 	vlc.SetTime(Max(0, vlc.GetTime - span))
 End Sub
 
 Private Sub Forward(span As Int)
+	playbackStartTime = playbackStartTime + span
 	vlc.SetTime(Min(vlc.GetTime + span,vlc.GetLength))
 End Sub
 
