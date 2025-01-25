@@ -1692,3 +1692,12 @@ End Sub
 Private Sub WaveFormPane_MouseExited (EventData As MouseEvent)
 	VLCPane.Tag = False
 End Sub
+
+Private Sub NewLineHereButton_MouseClicked (EventData As MouseEvent)
+	Dim currentStartTime As Long = vlc.gettime
+	Dim startTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime)
+	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime + 1000)
+	currentProject.AddLine(startTime,endTime,"","")
+	LoadLinesToTable
+	JumpToRow(currentProject.lines.Size)
+End Sub
