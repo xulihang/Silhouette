@@ -322,6 +322,12 @@ Private Sub MenuBar1_Action
 			JumpToLine
 		Case "Jump to the Line of the Current _Time"
 			JumpToLineOfCurrentTime
+		Case "Jump _forward"
+			Forward(500)
+		Case "Jump _backward"
+			Backward(500)
+		Case "Pause/Resume"
+			TogglePlaying
 		Case "_Settings"
 			Dim ps As ProjectSettings
 			ps.Initialize(currentProject)
@@ -1075,6 +1081,10 @@ Private Sub StopPlaying
 End Sub
 
 Private Sub PlayButton_MouseClicked (EventData As MouseEvent)
+	TogglePlaying
+End Sub
+
+Private Sub TogglePlaying
 	If vlc.IsPlaying Then
 		vlc.Pause
 		TogglePlayingStatus(False)
@@ -1086,7 +1096,6 @@ Private Sub PlayButton_MouseClicked (EventData As MouseEvent)
 		TogglePlayingStatus(True)
 	End If
 End Sub
-
 
 Private Sub TogglePlayingStatus(isPlaying As Boolean)
 	If isPlaying Then
@@ -1630,9 +1639,17 @@ Private Sub SetEndPointButton_MouseClicked (EventData As MouseEvent)
 End Sub
 
 Private Sub Skip500Button_MouseClicked (EventData As MouseEvent)
-	vlc.SetTime(Min(vlc.GetTime + 500,vlc.GetLength))
+	Backward(500)
 End Sub
 
 Private Sub Forward500Button_MouseClicked (EventData As MouseEvent)
-	vlc.SetTime(Max(0, vlc.GetTime - 500))
+	Forward(500)
+End Sub
+
+Private Sub Backward(span As Int)
+	vlc.SetTime(Max(0, vlc.GetTime - span))
+End Sub
+
+Private Sub Forward(span As Int)
+	vlc.SetTime(Min(vlc.GetTime + span,vlc.GetLength))
 End Sub
