@@ -503,6 +503,9 @@ Private Sub RecognizeSpeechByFixedSpan
 			Dim wavpath As String = File.Combine(tmpDir,filename)
 			Wait For (ASR.RecognizeWav(wavpath,currentProject.SourceLang)) Complete (done As Object)
 		End If
+		If progressDialog.isShowing = False Then
+			Exit
+		End If
 		index = index + 1
 	Next
 	progressDialog.close

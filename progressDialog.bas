@@ -67,5 +67,6 @@ Sub frm_CloseRequest (EventData As Event)
 End Sub
 
 Sub Button1_MouseClicked (EventData As MouseEvent)
+	ASR.KillCurrentShell
 	frm.Close
 End Sub

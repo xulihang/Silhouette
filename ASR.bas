@@ -7,6 +7,7 @@ Version=8.9
 'Static code module
 Sub Process_Globals
 	Private fx As JFX
+	Private sh As Shell
 End Sub
 
 Public Sub RecognizeCut(dir As String,filename As String,startTime As String,endTime As String,lang As String) As ResumableSub
@@ -84,4 +85,10 @@ Public Sub GetModelPath As String
 	    Next
 	End If
 	Return File.Combine(modelDir,modelName)
+End Sub
+
+Public Sub KillCurrentShell
+	If sh.IsInitialized Then
+		sh.KillProcess
+	End If
 End Sub
