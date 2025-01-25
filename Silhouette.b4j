@@ -1678,12 +1678,12 @@ Private Sub Hook_NativeKeyPressed(code As String)
 	End If
 End Sub
 
-Private Sub VLCPane_MouseEntered (EventData As MouseEvent)
+Private Sub VideoPlayerPane_MouseEntered (EventData As MouseEvent)
 	VLCPane.Tag = True
 	PlayButton.RequestFocus
 End Sub
 
-Private Sub VLCPane_MouseExited (EventData As MouseEvent)
+Private Sub VideoPlayerPane_MouseExited (EventData As MouseEvent)
 	VLCPane.Tag = False
 End Sub
 
