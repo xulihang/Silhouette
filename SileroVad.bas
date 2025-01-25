@@ -16,7 +16,7 @@ Public Sub Initialize
 	Dim MODEL_PATH As String = File.Combine(File.DirApp,"silero_vad.onnx")
 	Dim SAMPLE_RATE As Int = 16000
 	Dim THRESHOLD As Float= 0.5f
-	Dim MIN_SPEECH_DURATION_MS As Int = 250
+	Dim MIN_SPEECH_DURATION_MS As Int = 500
 	Dim FloatJO As JavaObject
 	FloatJO.InitializeStatic("java.lang.Float")
 	Dim MAX_SPEECH_DURATION_SECONDS As Float = FloatJO.GetField("POSITIVE_INFINITY")

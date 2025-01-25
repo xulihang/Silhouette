@@ -1439,15 +1439,16 @@ private Sub DetectVoiceActivity
 	vad.Initialize
 	progressDialog.Show("Detecting...")
 	Dim length As Long = vlc.GetLength
-	Dim segments As Int = length/1000/60
+	Dim segLength As Int = 30
+	Dim segments As Int = length/1000/segLength
 	For i = 0 To segments
 		progressDialog.update(i,segments)
 		If progressDialog.isShowing = False Then
 			Exit
 		End If
-		Dim timeOffset As Int = i * 60
-		Dim cutStartTimeStr As String = Utils.GetTimeStringFromMilliseconds(i * 60 * 1000)
-		Dim cutEndTimeStr As String = Utils.GetTimeStringFromMilliseconds(Min(i * 60 * 1000 + 60 * 1000,length))
+		Dim timeOffset As Int = i * segLength
+		Dim cutStartTimeStr As String = Utils.GetTimeStringFromMilliseconds(i * segLength * 1000)
+		Dim cutEndTimeStr As String = Utils.GetTimeStringFromMilliseconds(Min(i * segLength * 1000 + segLength * 1000,length))
 		Dim path As String = File.Combine(tmpDir,"cut.wav")
 		wait for (FFMpeg.CutWav(tmpDir,"audio.wav","cut.wav",cutStartTimeStr,cutEndTimeStr)) complete (done As Object)
 		wait for (vad.DetectAsync(path)) Complete (result As List)
