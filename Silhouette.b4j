@@ -310,6 +310,8 @@ Private Sub MenuBar1_Action
 			pretranslate(options)
 		Case "_New Line"
 			NewLine
+		Case "_Clear Lines"
+			ClearLines
 		Case "_Jump to Line"
 			JumpToLine
 		Case "Jump to the Line of the Current _Time"
@@ -1221,6 +1223,11 @@ private Sub NewLine
 		currentProject.AppendLine(-1)
 		LoadLinesToTable
 	End If
+End Sub
+
+Private Sub ClearLines
+	currentProject.lines.Clear
+	LoadLinesToTable
 End Sub
 
 Private Sub MergeWithTheNextLine
