@@ -438,6 +438,7 @@ Private Sub RecognizeSpeech
 			wavFiles.Add(filename)
 		End If
 	Next
+	wavFiles = SortedWavFiles(wavFiles)
 	progressDialog.Show("Recognizing audio...")
 	Dim index As Int = 1
 	For Each filename As String In wavFiles
@@ -500,6 +501,20 @@ Private Sub SortedSRTFiles(srtFiles As List) As List
 			sb.Append(".wav")
 		End If
 		sb.Append(".srt")
+		newFilesList.Add(sb.ToString)
+	Next
+	Return newFilesList
+End Sub
+
+Private Sub SortedWavFiles(wavfiles As List) As List
+	Dim newFilesList As List
+	newFilesList.Initialize
+	For i = 0 To wavfiles.Size-1
+		Dim sb As StringBuilder
+		sb.Initialize
+		sb.Append("segment-")
+		sb.Append(NumberFormat(i,5,0).Replace(",",""))
+		sb.Append(".wav")
 		newFilesList.Add(sb.ToString)
 	Next
 	Return newFilesList
@@ -1420,22 +1435,32 @@ private Sub DetectVoiceActivity
 	Dim tmpDir As String = currentProject.GetTmpFolder
 	
 	wait for (ConvertToWav(parent,filename,tmpDir)) complete (done As Object)
-	Dim outpath As String = File.Combine(tmpDir,"audio.wav")
-	progressDialog.Show("Detecting...")
-	progressDialog.update2("Detecting...")
 	Dim vad As SileroVad
 	vad.Initialize
-	wait for (vad.DetectAsync(outpath)) Complete (result As List)
-	If progressDialog.isShowing Then
+	progressDialog.Show("Detecting...")
+	Dim length As Long = vlc.GetLength
+	Dim segments As Int = length/1000/60
+	For i = 0 To segments
+		progressDialog.update(i,segments)
+		If progressDialog.isShowing = False Then
+			Exit
+		End If
+		Dim timeOffset As Int = i * 60
+		Dim cutStartTimeStr As String = Utils.GetTimeStringFromMilliseconds(i * 60 * 1000)
+		Dim cutEndTimeStr As String = Utils.GetTimeStringFromMilliseconds(Min(i * 60 * 1000 + 60 * 1000,length))
+		Dim path As String = File.Combine(tmpDir,"cut.wav")
+		wait for (FFMpeg.CutWav(tmpDir,"audio.wav","cut.wav",cutStartTimeStr,cutEndTimeStr)) complete (done As Object)
+		wait for (vad.DetectAsync(path)) Complete (result As List)
+		Log(result)
 		For Each segment As Map In result
-			Dim startMS As Long = segment.Get("startTime")*1000
-			Dim endMS As Long = segment.Get("endTime")*1000
+			Dim startMS As Long = (segment.Get("startTime")+timeOffset)*1000
+			Dim endMS As Long = (segment.Get("endTime")+timeOffset)*1000
 			Dim startTime As String = Utils.GetTimeStringFromMilliseconds(startMS)
 			Dim endTime As String = Utils.GetTimeStringFromMilliseconds(endMS)
 			currentProject.AddLine(startTime,endTime,"","")
 		Next
-		LoadLinesToTable
-		progressDialog.close
-		fx.Msgbox(MainForm,"Done","")
-	End If
+	Next
+	LoadLinesToTable
+	progressDialog.close
+	fx.Msgbox(MainForm,"Done","")
 End Sub
