@@ -462,22 +462,8 @@ Private Sub RecognizeExistingLines
 		Dim startTime As String = line.Get("startTime")
 		Dim endTime As String = line.Get("endTime")
 		Dim tmpDir As String = currentProject.GetTmpFolder
-		wait for (FFMpeg.CutWav(tmpDir,"audio.wav","cut.wav",startTime,endTime)) Complete (done As Object)
-		File.Copy(tmpDir,"cut.wav",tmpDir,"cut-o.wav")
-		wait for (FFMpeg.AddPadding(tmpDir,"cut-o.wav","cut.wav",2)) complete (done As Object)
-		File.Delete(tmpDir,"cut-o.wav")
-		Wait For (ASR.RecognizeWav(File.Combine(tmpDir,"cut.wav"),currentProject.SourceLang)) Complete (done As Object)
-		Dim content As String = File.ReadString(tmpDir,"cut.srt")
-		content = Utils.RemoveBOM(content)
-		Dim parser As SrtParser
-		parser.Initialize
-		Dim parsedlines As List = parser.Parse(content)
-		Dim sb As StringBuilder
-		sb.Initialize
-		For Each parsedline As SpeechLine In parsedlines
-			sb.Append(parsedline.text)
-		Next
-		line.Put("source",sb.ToString)
+		wait for (ASR.RecognizeCut(tmpDir,"audio.wav",startTime,endTime,currentProject.SourceLang)) complete (str As String)
+		line.Put("source",str)
 	Next
 	LoadLinesToTable
 	progressDialog.close
@@ -1252,22 +1238,9 @@ Private Sub RecognizeTheSelectedLine
 		Log("convert video to wav done")
 	End If
 	
-	wait for (FFMpeg.CutWav(tmpDir,"audio.wav","cut.wav",startTime,endTime)) Complete (done As Object)
-	File.Copy(tmpDir,"cut.wav",tmpDir,"cut-o.wav")
-	wait for (FFMpeg.AddPadding(tmpDir,"cut-o.wav","cut.wav",2)) complete (done As Object)
-	File.Delete(tmpDir,"cut-o.wav")
-	Wait For (ASR.RecognizeWav(File.Combine(tmpDir,"cut.wav"),currentProject.SourceLang)) Complete (done As Object)
-	Dim content As String = File.ReadString(tmpDir,"cut.srt")
-	content = Utils.RemoveBOM(content)
-	Dim parser As SrtParser
-	parser.Initialize
-	Dim lines As List = parser.Parse(content)
-	Dim sb As StringBuilder
-	sb.Initialize
-	For Each line As SpeechLine In lines
-		sb.Append(line.text)
-	Next
-	SourceTextArea.Text = sb.ToString
+	wait for (ASR.RecognizeCut(tmpDir,"audio.wav",startTime,endTime,currentProject.SourceLang)) complete (str As String)
+	
+	SourceTextArea.Text = str
 	progressDialog.close
 End Sub
 
