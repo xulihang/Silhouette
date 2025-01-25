@@ -1429,6 +1429,9 @@ Private Sub clearTMandMT
 End Sub
 
 Private Sub ShowMT(sourceText As String,fromTextArea As Boolean)
+	If SourceTextArea.Text = "" Then
+		Return
+	End If
 	Dim preferencesMap As Map = Utils.getPrefMap
 	If preferencesMap.ContainsKey("mt") Then
 		Dim mtPreferences As Map=preferencesMap.Get("mt")
