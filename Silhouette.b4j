@@ -179,6 +179,7 @@ Sub Process_Globals
 	Private SetEndPointButton As Button
 	Private FollowProgressCheckBox As CheckBox
 	Private KeepRatioCheckBox As CheckBox
+	Private Backward500Button As Button
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -1638,7 +1639,7 @@ Private Sub SetEndPointButton_MouseClicked (EventData As MouseEvent)
 	End If
 End Sub
 
-Private Sub Skip500Button_MouseClicked (EventData As MouseEvent)
+Private Sub Backward500Button_MouseClicked (EventData As MouseEvent)
 	Backward(500)
 End Sub
 
@@ -1653,3 +1654,5 @@ End Sub
 Private Sub Forward(span As Int)
 	vlc.SetTime(Min(vlc.GetTime + span,vlc.GetLength))
 End Sub
+
+
