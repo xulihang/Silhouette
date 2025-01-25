@@ -17,6 +17,10 @@ Sub Class_Globals
 	Private mStopProgress As Double = -1
 	Private mMouseOverProgress As Double = -1
 	Private mLastMouseOverProgress As Double
+	Private mPreviousRangeStartProgress As Double
+	Private mPreviousRangeEndProgress As Double
+	Private mNextRangeStartProgress As Double
+	Private mNextRangeEndProgress As Double
 	Public Tag As Object
 End Sub
 
@@ -43,6 +47,18 @@ End Sub
 Public Sub setProgress(startProgress As Double,endProgress As Double)
 	mStartProgress = startProgress
 	mEndProgress = endProgress
+	Redraw(mBase.Width,mBase.Height)
+End Sub
+
+Public Sub setPreviousAndNextProgress(previousStartProgress As Double,preivousEndProgress As Double,nextStartProgress As Double,nextEndProgress As Double)
+	Log(previousStartProgress)
+	Log(preivousEndProgress)
+	Log(nextStartProgress)
+	Log(nextEndProgress)
+	mPreviousRangeStartProgress = previousStartProgress
+	mPreviousRangeEndProgress = preivousEndProgress
+	mNextRangeStartProgress = nextStartProgress
+	mNextRangeEndProgress = nextEndProgress
 	Redraw(mBase.Width,mBase.Height)
 End Sub
 
@@ -158,20 +174,25 @@ Private Sub Pane_Resize(width As Double,height As Double)
 End Sub
 
 Private Sub Draw(width As Int,height As Int)
-	Dim startIndex As Int = width * mStartProgress
-	Dim endIndex As Int = width * mEndProgress
 	Dim xui As XUI
 	Dim bc As BitmapCreator
 	bc.Initialize(width,height)
-	bc.DrawLine(startIndex,0,startIndex,height,xui.Color_Green,3)
-	bc.DrawLine(endIndex,0,endIndex,height,xui.Color_Green,3)
 	
-	bc.DrawLine(startIndex,0,startIndex+5,0,xui.Color_Green,5)
-	bc.DrawLine(startIndex,height-1,startIndex+5,height-1,xui.Color_Green,5)
+	Dim i As Int
+	For Each progress As Double In Array(mPreviousRangeStartProgress,mPreviousRangeEndProgress,mNextRangeStartProgress,mNextRangeEndProgress)
+		If progress <> -1 Then
+			If i Mod 2 == 0 Then
+				DrawLeftLine(bc,width,height,progress,xui.Color_LightGray)
+			Else
+				DrawRightLine(bc,width,height,progress,xui.Color_LightGray)
+			End If
+		End If
+		i = i+1
+	Next
 	
-	bc.DrawLine(endIndex,0,endIndex - 5,0,xui.Color_Green,5)
-	bc.DrawLine(endIndex,height-1,endIndex - 5,height-1,xui.Color_Green,5)
-	
+	DrawLeftLine(bc,width,height,mStartProgress,xui.Color_Green)
+	DrawRightLine(bc,width,height,mEndProgress,xui.Color_Green)
+
 	If mCurrentProgress <> -1 Then
 		bc.DrawLine(width * mCurrentProgress,0,width * mCurrentProgress,height,xui.Color_Blue,1)
 	End If
@@ -185,4 +206,18 @@ Private Sub Draw(width As Int,height As Int)
 	End If
 	
 	iv.SetImage(bc.Bitmap)
+End Sub
+
+Private Sub DrawLeftLine(bc As BitmapCreator,width As Int,height As Int,progress As Double,color As Int)
+	Dim startIndex As Int = width * progress
+	bc.DrawLine(startIndex,0,startIndex,height,color,3)
+	bc.DrawLine(startIndex,0,startIndex+5,0,color,5)
+	bc.DrawLine(startIndex,height-1,startIndex+5,height-1,color,5)
+End Sub
+
+Private Sub DrawRightLine(bc As BitmapCreator,width As Int,height As Int,progress As Double,color As Int)
+	Dim endIndex As Int = width * progress
+	bc.DrawLine(endIndex,0,endIndex,height,color,3)
+	bc.DrawLine(endIndex,0,endIndex - 5,0,color,5)
+	bc.DrawLine(endIndex,height-1,endIndex - 5,height-1,color,5)
 End Sub

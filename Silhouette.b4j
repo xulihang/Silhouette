@@ -676,15 +676,41 @@ Private Sub SetTheRangeForTheSelectedRow
 	Dim paddedStartTimeMs As Long = Max(0,startTimeMs - padding)
 	Dim paddedEndTimeMs As Long = Min(endTimeMs + padding, vlc.GetLength)
 	
+	'duration for timestamp
 	Dim lineDuration As Int = paddedEndTimeMs - paddedStartTimeMs
 	
 	Dim cutStartTimePercent As Double = (paddedStartTimeMs - cutStartTimeMs) / cutDurationMs
 	Dim cutEndTimePercent As Double = (paddedEndTimeMs - cutStartTimeMs) / cutDurationMs
 	overviewRange.setProgress(cutStartTimePercent,cutEndTimePercent)
 	overviewRange.TriggerRangeChanged
-	Dim startProgress As Double = paddedStartTimeMs / lineDuration
-	Dim endProgress As Double = paddedEndTimeMs / lineDuration
+	
+	Dim overViewStartTime As Long  = cutStartTimePercent * cutDurationMs
+	Dim startProgress As Double = (paddedStartTimeMs - overViewStartTime - cutStartTimeMs) / lineDuration
+	Dim endProgress As Double = (paddedEndTimeMs - overViewStartTime - cutStartTimeMs) / lineDuration
 	timestampRange.setProgress(startProgress,endProgress)
+	DisplaySiblingRanges(overViewStartTime,lineDuration)
+End Sub
+
+private Sub DisplaySiblingRanges(overViewStartTime As Long,lineDuration As Long)
+	Dim previousStartProgress As Double = -1
+	Dim previousEndProgress As Double = -1
+	Dim nextStartProgress As Double = -1
+	Dim nextEndProgress As Double = -1
+	If selectedRowID - 2 >= 0 Then
+		Dim line As Map = currentProject.GetLine(selectedRowID - 2)
+		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+		Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
+		previousStartProgress = (startTimeMs - overViewStartTime - cutStartTimeMs) / lineDuration
+		previousEndProgress  = (endTimeMs - overViewStartTime - cutStartTimeMs) / lineDuration
+	End If
+	If selectedRowID <= currentProject.lines.Size - 1 Then
+		Dim line As Map = currentProject.GetLine(selectedRowID)
+		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+		Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
+		nextStartProgress = (startTimeMs - overViewStartTime - cutStartTimeMs) / lineDuration
+		nextEndProgress  = (endTimeMs - overViewStartTime - cutStartTimeMs) / lineDuration
+	End If
+	timestampRange.setPreviousAndNextProgress(previousStartProgress,previousEndProgress,nextStartProgress,nextEndProgress)
 End Sub
 
 Private Sub ReadyToDrawWaveForm As Boolean
@@ -802,6 +828,7 @@ Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Do
 		Dim newStartProgress As Double = (startTime - overViewStartTime -cutStartTimeMs) / clipTime
 		Dim newEndProgress As Double = (endTime - overViewStartTime -cutStartTimeMs) / clipTime
 		timestampRange.setProgress(newStartProgress,newEndProgress)
+		DisplaySiblingRanges(overViewStartTime, clipTime)
 	End If
 End Sub
 
