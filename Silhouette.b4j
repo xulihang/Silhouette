@@ -1677,6 +1677,7 @@ End Sub
 
 Private Sub VLCPane_MouseEntered (EventData As MouseEvent)
 	VLCPane.Tag = True
+	PlayButton.RequestFocus
 End Sub
 
 Private Sub VLCPane_MouseExited (EventData As MouseEvent)
@@ -1684,6 +1685,7 @@ Private Sub VLCPane_MouseExited (EventData As MouseEvent)
 End Sub
 
 Private Sub WaveFormPane_MouseEntered (EventData As MouseEvent)
+	PlayButton.RequestFocus
 	VLCPane.Tag = True
 End Sub
 
