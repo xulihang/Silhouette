@@ -467,7 +467,7 @@ Private Sub LoadSRTToProject
 	Dim srtFiles As List
 	srtFiles.Initialize
 	For Each filename As String In files
-		If filename.EndsWith(".srt") Then
+		If filename.EndsWith(".srt") And filename.StartsWith("segment") Then
 			srtFiles.Add(filename)
 		End If
 	Next
