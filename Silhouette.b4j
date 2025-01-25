@@ -1186,6 +1186,9 @@ Private Sub RecognizeTheSelectedLine
 	End If
 	
 	wait for (FFMpeg.CutWav(tmpDir,"audio.wav","cut.wav",startTime,endTime)) Complete (done As Object)
+	File.Copy(tmpDir,"cut.wav",tmpDir,"cut-o.wav")
+	wait for (FFMpeg.AddPadding(tmpDir,"cut-o.wav","cut.wav",2)) complete (done As Object)
+	File.Delete(tmpDir,"cut-o.wav")
 	Wait For (ASR.RecognizeWav(File.Combine(tmpDir,"cut.wav"),currentProject.SourceLang)) Complete (done As Object)
 	Dim content As String = File.ReadString(tmpDir,"cut.srt")
 	content = Utils.RemoveBOM(content)

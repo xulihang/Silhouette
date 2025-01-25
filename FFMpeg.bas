@@ -36,6 +36,21 @@ Public Sub CutWav(dir As String,filename As String,outName As String,startTime A
 	sh.WorkingDirectory = dir
 	sh.Run(-1)
 	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	Log(StdOut)
+	Log(StdErr)
+	Return Success
+End Sub
+
+Public Sub AddPadding(dir As String,filename As String,outName As String,pad As Int) As ResumableSub
+	Dim args As List
+	args = Array As String("-i",filename,"-af",$""apad=pad_dur=${pad}""$,outName,"-y")
+	Dim sh As Shell
+	sh.Initialize("sh",GetFFMpegPath,args)
+	sh.WorkingDirectory = dir
+	sh.Run(-1)
+	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	Log(StdOut)
+	Log(StdErr)
 	Return Success
 End Sub
 
