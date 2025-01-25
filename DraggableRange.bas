@@ -16,7 +16,7 @@ Sub Class_Globals
 	Private mCurrentProgress As Double = -1
 	Private mStopProgress As Double = -1
 	Private mMouseOverProgress As Double = -1
-	private mLastMouseOverProgress as Double
+	Private mLastMouseOverProgress As Double
 	Public Tag As Object
 End Sub
 
@@ -52,7 +52,7 @@ Public Sub setPlayTimeProgress(progress As Double)
 End Sub
 
 Public Sub getPlayTimeProgress As Double
-	return mCurrentProgress
+	Return mCurrentProgress
 End Sub
 
 Public Sub setStopProgress(progress As Double)
@@ -133,6 +133,13 @@ Private Sub iv_MouseMoved (EventData As MouseEvent)
 		CallSubDelayed2(mCallBack,mEventName&"_MouseMoved",mMouseOverProgress)
 	End If
 End Sub
+
+Private Sub iv_MouseClicked (EventData As MouseEvent)
+	If SubExists(mCallBack,mEventName&"_MouseClicked") Then
+		CallSubDelayed2(mCallBack,mEventName&"_MouseClicked",EventData)
+	End If
+End Sub
+
 
 Private Sub iv_MouseExited (EventData As MouseEvent)
 	mMouseOverProgress = -1

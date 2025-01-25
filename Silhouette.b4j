@@ -805,6 +805,12 @@ Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Do
 	End If
 End Sub
 
+Private Sub timestampRange_MouseClicked (EventData As MouseEvent)
+	If EventData.ClickCount = 2 Then
+		newLineHereMI_Action
+	End If
+End Sub
+
 Private Sub timestampRange_RangeChanged(startProgress As Double,endProgress As Double)
 	If ReadyToDrawWaveForm Then
 		Dim startTime As Long  = overviewRange.StartProgress * cutDurationMs
