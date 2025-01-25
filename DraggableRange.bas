@@ -22,6 +22,7 @@ Sub Class_Globals
 	Private mNextRangeStartProgress As Double
 	Private mNextRangeEndProgress As Double
 	Public Tag As Object
+	Public time As Long
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -51,10 +52,6 @@ Public Sub setProgress(startProgress As Double,endProgress As Double)
 End Sub
 
 Public Sub setPreviousAndNextProgress(previousStartProgress As Double,preivousEndProgress As Double,nextStartProgress As Double,nextEndProgress As Double)
-	Log(previousStartProgress)
-	Log(preivousEndProgress)
-	Log(nextStartProgress)
-	Log(nextEndProgress)
 	mPreviousRangeStartProgress = previousStartProgress
 	mPreviousRangeEndProgress = preivousEndProgress
 	mNextRangeStartProgress = nextStartProgress
@@ -121,6 +118,9 @@ Sub iv_MouseDragged (EventData As MouseEvent)
 	Draw(view.Width,view.Height)
 	If SubExists(mCallBack,mEventName&"_RangeChanged") Then
 		CallSubDelayed3(mCallBack,mEventName&"_RangeChanged",mStartProgress,mEndProgress)
+	End If
+	If SubExists(mCallBack,mEventName&"_MouseDragged") Then
+		CallSubDelayed3(mCallBack,mEventName&"_MouseDragged",mStartProgress,mEndProgress)
 	End If
 End Sub
 

@@ -178,6 +178,7 @@ Sub Process_Globals
 	Private playbackStartTime As Long = -1
 	Private SetEndPointButton As Button
 	Private FollowProgressCheckBox As CheckBox
+	Private KeepRatioCheckBox As CheckBox
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -688,7 +689,12 @@ Private Sub SetTheRangeForTheSelectedRow
 	Dim startTime As String = line.get("startTime")
 	Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
 	Dim endTime As String = line.get("endTime")
-	Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(endTime)
+	Dim endTimeMs As Long
+	If KeepRatioCheckBox.Checked And overviewRange.time <> 0 Then
+		endTimeMs = startTimeMs + overviewRange.time
+	Else
+		endTimeMs = Utils.GetMillisecondsFromTimeString(endTime)
+	End If
 	Dim paddedStartTimeMs As Long = Max(0,startTimeMs - padding)
 	Dim paddedEndTimeMs As Long = Min(endTimeMs + padding, vlc.GetLength)
 	
@@ -846,6 +852,13 @@ Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Do
 		timestampRange.setProgress(newStartProgress,newEndProgress)
 		DisplaySiblingRanges(overViewStartTime, clipTime)
 	End If
+End Sub
+
+Private Sub overviewRange_MouseDragged(startProgress As Double,endProgress As Double)
+	Dim overViewStartTime As Long  = startProgress * cutDurationMs
+	Dim overViewEndTime As Long = endProgress * cutDurationMs
+	Dim clipTime As Long = overViewEndTime - overViewStartTime
+	overviewRange.time = clipTime
 End Sub
 
 Private Sub timestampRange_MouseClicked (EventData As MouseEvent)
