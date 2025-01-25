@@ -301,7 +301,7 @@ Private Sub MenuBar1_Action
 			ShowPreferences
 		Case "_Recognize Speech"
 			RecognizeSpeech
-		Case "_Detect voice activity"
+		Case "_Detect Voice Activity"
 			DetectVoiceActivity
 		Case "_Pretranslate"
 			Dim dialog As preTranslateDialog
@@ -312,7 +312,7 @@ Private Sub MenuBar1_Action
 			NewLine
 		Case "_Jump to Line"
 			JumpToLine
-		Case "Jump to the line of the current _time"
+		Case "Jump to the Line of the Current _Time"
 			JumpToLineOfCurrentTime
 		Case "_Settings"
 			Dim ps As ProjectSettings
