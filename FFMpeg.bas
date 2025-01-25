@@ -36,9 +36,32 @@ Public Sub CutWav(dir As String,filename As String,outName As String,startTime A
 	sh.WorkingDirectory = dir
 	sh.Run(-1)
 	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
-	Log(StdOut)
-	Log(StdErr)
 	Return Success
+End Sub
+
+Public Sub MergeWavFiles(dir As String,filenames As List,outName As String) As ResumableSub
+	GenerateWavListFile(dir,filenames)
+	Dim args As List
+	args = Array As String("-f","concat","-i","mylist.txt","-c","copy",outName,"-y")
+	Dim sh As Shell
+	sh.Initialize("sh",GetFFMpegPath,args)
+	sh.WorkingDirectory = dir
+	sh.Run(-1)
+	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	File.Delete(dir,"mylist.txt")
+	Return Success
+End Sub
+
+Private Sub GenerateWavListFile(dir As String,filenames As List)
+	Dim sb As StringBuilder
+	sb.Initialize
+	For Each filename As String In filenames
+		sb.Append("file")
+		sb.Append(" ")
+		sb.Append(filename)
+		sb.Append(CRLF)
+	Next
+	File.WriteString(dir,"mylist.txt",sb.ToString)
 End Sub
 
 Public Sub Video2Wav(dir As String,filename As String,outpath As String) As ResumableSub
