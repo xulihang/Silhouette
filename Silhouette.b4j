@@ -377,7 +377,7 @@ Private Sub MenuBar1_Action
 			JumpToLine
 		Case "Jump to the Line of the Current _Time"
 			JumpToLineOfCurrentTime
-		Case "Jump _forward"
+		Case "Jump _Forward"
 			Forward(500)
 		Case "Jump _Backward"
 			Backward(500)
