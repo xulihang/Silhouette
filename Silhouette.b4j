@@ -407,15 +407,38 @@ Private Sub MenuBar1_Action
 			Dim fc As FileChooser
 			fc.Initialize
 			Dim path As String = fc.ShowOpen(MainForm)
-			ImportFromSRT(path)
-			LoadLinesToTable
-			fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			If File.Exists(path,"") Then
+				ImportFromSRT(path)
+				LoadLinesToTable
+				fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			End If
+		Case "import from tab-delimited _txt"
+			Dim fc As FileChooser
+			fc.Initialize
+			Dim path As String = fc.ShowOpen(MainForm)
+			If File.Exists(path,"") Then
+				ImportFromTXT(path)
+				LoadLinesToTable
+				fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			End If
 		Case "export to _srt"
 			Dim fc As FileChooser
 			fc.Initialize
+			fc.SetExtensionFilter("SRT",Array As String("*.srt"))
 			Dim path As String = fc.ShowSave(MainForm)
-			Exporter.ExportToSRT(currentProject.lines,path)
-			fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			If path <> "" Then
+				Exporter.ExportToSRT(currentProject.lines,path)
+				fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			End If
+		Case "export to tab-delimited _txt"
+			Dim fc As FileChooser
+			fc.Initialize
+			fc.SetExtensionFilter("TXT",Array As String("*.txt"))
+			Dim path As String = fc.ShowSave(MainForm)
+			If path <> "" Then
+				Exporter.ExportToTXT(currentProject.lines,path)
+				fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			End If
 		Case "_Exit"
 			ExitApp
 		Case "Export UI strings"
@@ -673,6 +696,22 @@ Private Sub SortedWavFiles(wavfiles As List) As List
 		newFilesList.Add(sb.ToString)
 	Next
 	Return newFilesList
+End Sub
+
+
+Private Sub ImportFromTXT(path As String)
+	Dim content As String = File.ReadString(path,"")
+	content = Utils.RemoveBOM(content)
+	For Each line As String In Regex.Split(CRLF,content)
+		Log(line)
+		Dim values() As String = Regex.Split("	",line)
+		Log(values.Length)
+		Dim startTime As String = values(0)
+		Dim endTime As String = values(1)
+		Dim source As String = Exporter.Unescape(values(2))
+		Dim target As String = Exporter.Unescape(values(3))
+		currentProject.AddLine(startTime,endTime,source,target)
+	Next
 End Sub
 
 Private Sub ImportFromSRT(path As String)

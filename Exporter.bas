@@ -47,3 +47,35 @@ Public Sub ExportToSRT(lines As List,path As String)
 		File.WriteString(path,"",sb.ToString)
 	End If
 End Sub
+
+
+Public Sub ExportToTXT(lines As List,path As String)
+	Dim sb As StringBuilder
+	sb.Initialize
+	For Each line As Map In lines
+		sb.Append(line.Get("startTime"))
+		sb.Append("	")
+		sb.Append(line.Get("endTime"))
+		sb.Append("	")
+		sb.Append(Escape(line.Get("source")))
+		sb.Append("	")
+		sb.Append(Escape(line.Get("target")))
+	    sb.Append(CRLF)
+	Next
+	File.WriteString(path,"",sb.ToString)
+End Sub
+
+Private Sub Escape(str As String) As String
+	str = str.Replace("	","\t")
+	str = str.Replace(CRLF,"\n")
+	If str = "" Then
+		str = " "
+	End If
+	Return str
+End Sub
+
+public Sub Unescape(str As String) As String
+	str = str.Replace("\t","	")
+	str = str.Replace("\n",CRLF)
+	Return str.Trim
+End Sub
