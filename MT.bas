@@ -9,6 +9,7 @@ Sub Process_Globals
 	Private fx As JFX
 	Private Bconv As ByteConverter
 	Private mtResultStore As Map
+	Private internalMTWithBatchSupportList As List=Array As String("baidu")
 End Sub
 
 public Sub getMTList As List
@@ -28,6 +29,23 @@ Sub getMTPluginList As List
 		End If
 	Next
 	Return mtList
+End Sub
+
+Public Sub supportBatchTranslation(MTEngine As String) As ResumableSub
+	If Utils.getPref("multiple_sentences_mt",True)=False Then
+		Return False
+	End If
+	If internalMTWithBatchSupportList.IndexOf(MTEngine)<>-1 Then
+		Return True
+	else if getMTPluginList.IndexOf(MTEngine)<>-1 Then
+		wait for (Main.plugin.RunPlugin(MTEngine&"MT","supportBatchTranslation",Null)) complete (result As Object)
+		If result Is Boolean Then
+			Return result
+		Else
+			Return False
+		End If
+	End If
+	Return False
 End Sub
 
 public Sub getMT(source As String,sourceLang As String,targetLang As String,MTEngine As String) As ResumableSub
@@ -83,6 +101,38 @@ Private Sub getMTImpl(source As String,sourceLang As String,targetLang As String
 		storeMTResult(source,result,MTEngine,sourceLang,targetLang)
 	End If
 	Return result
+End Sub
+
+Public Sub batchTranslate(sourceList As List,sourceLang As String,targetLang As String,MTEngine As String) As ResumableSub
+	wait for (batchTranslateImpl(sourceList,sourceLang,targetLang,MTEngine)) Complete (targetList As List)
+	Return targetList
+End Sub
+
+private Sub batchTranslateImpl(sourceList As List,sourceLang As String,targetLang As String,MTEngine As String) As ResumableSub
+	sourceLang=convertLangCode(sourceLang,MTEngine)
+	targetLang=convertLangCode(targetLang,MTEngine)
+	
+	Dim targetList As List
+
+	If internalMTWithBatchSupportList.IndexOf(MTEngine)<>-1 Then
+		If MTEngine="baidu" Then
+			wait for (BaiduMT(sourceList,sourceLang,targetLang)) Complete (targetList As List)
+		End If
+	else if getMTPluginList.IndexOf(MTEngine)<>-1 Then
+		
+		Dim params As Map
+		params.Initialize
+		params.Put("source",sourceList)
+		params.Put("sourceLang",sourceLang)
+		params.Put("targetLang",targetLang)
+		params.Put("preferencesMap",getPreferencesMap(MTEngine))
+		
+		wait for (Main.plugin.RunPlugin(MTEngine&"MT","batchtranslate",params)) complete (targetList As List)
+	End If
+	If targetList.IsInitialized=False Then
+		targetList.Initialize
+	End If
+	Return targetList
 End Sub
 
 Sub getPreferencesMap(MTEngine As String) As Map

@@ -170,6 +170,14 @@ Public Sub resetPref
 	Dim mPref As Map
 End Sub
 
+Sub getPref(key As String,default As Object) As Object
+	Dim preferencesMap As Map=getPrefMap
+	If preferencesMap.ContainsKey(key) Then
+		Return preferencesMap.Get(key)
+	End If
+	Return default
+End Sub
+
 Sub getPrefMap As Map
 	Dim map1 As Map
 	If mPref.IsInitialized Then
