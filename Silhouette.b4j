@@ -1309,6 +1309,11 @@ Private Sub ProgressTimer_Tick
 				selectedRowID = rowID
 				JumpToRow(rowID,0)
 			End If
+			If rowID = -1 Then
+				If DisplaySubtitleCheckBox.Checked Then
+					SubtitleLabel.Text = ""
+				End If
+			End If
 		End If
 		ProgressSlider.Tag = False
 		DrawPositionLineInWaveForm(currentVideoTime)
