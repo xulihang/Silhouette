@@ -235,6 +235,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
 	For Each text As String In Array(loc.Localize("Play this line"), _ 
+                                     loc.Localize("Play from line"), _ 
 		                             loc.Localize("Delete this line"), _ 
 									 loc.Localize("Prepend a line"), _ 
 									 loc.Localize("Append a line"), _ 
@@ -1489,6 +1490,8 @@ Private Sub tableMenuItem_Action
 	Select loc.FindSource(mi.Text)
 	    Case "Play this line"
 			PlayTheSelectedLine
+		Case "Play from line"
+			PlayFromTheSelectedLine
 		Case "Prepend a line"
 			PrependLine
 			SelectRow(selectedRowID,True)
@@ -1596,6 +1599,22 @@ End Sub
 
 Private Sub PlayTheSelectedLine
 	PlayLineByID(selectedRowID)
+End Sub
+
+Private Sub PlayFromTheSelectedLine
+	PlayFromLineByID(selectedRowID)
+End Sub
+
+Private Sub PlayFromLineByID(rowID As Int)
+	Try
+		Dim line As Map = currentProject.GetLine(rowID - 1)
+		Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+		vlc.Resume
+		vlc.SetTime(startTime)
+		TogglePlayingStatus(True,startTime)
+	Catch
+		Log(LastException)
+	End Try
 End Sub
 
 Private Sub PlayLineByID(rowID As Int)
