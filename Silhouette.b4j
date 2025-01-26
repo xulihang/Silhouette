@@ -235,7 +235,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
 	For Each text As String In Array(loc.Localize("Play this line"), _ 
-                                     loc.Localize("Play from line"), _ 
+                                     loc.Localize("Play from this line"), _ 
 		                             loc.Localize("Delete this line"), _ 
 									 loc.Localize("Prepend a line"), _ 
 									 loc.Localize("Append a line"), _ 
@@ -1496,7 +1496,7 @@ Private Sub tableMenuItem_Action
 	Select loc.FindSource(mi.Text)
 	    Case "Play this line"
 			PlayTheSelectedLine
-		Case "Play from line"
+		Case "Play from this line"
 			PlayFromTheSelectedLine
 		Case "Prepend a line"
 			PrependLine
