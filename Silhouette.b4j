@@ -199,6 +199,8 @@ Sub Process_Globals
 	Private hook As NativeHook
 	Public loc As Localizator
 	Type SortCriteria (o As Object,value As Long)
+	Private SubtitleLabel As Label
+	Private DisplaySubtitleCheckBox As CheckBox
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -256,6 +258,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	SetTable
 	loadPlugins
 	AddWaveFormControls
+	SubtitleLabel.Visible = False
 	LocalizeMainFrom
 End Sub
 
@@ -800,6 +803,10 @@ Sub SelectRow(targetRowId As Int,fromLongClick As Boolean)    'rowid-1
 	Next
 	selectedRowID = targetRowId
 	LoadLineToEditor(fromLongClick)
+	If DisplaySubtitleCheckBox.Checked Then
+		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+		SubtitleLabel.Text = line.Get("source")&CRLF&line.Get("target")
+	End If
 	If ReadyToDrawWaveForm Then
 		DrawWaveForm
 		SetTheRangeForTheSelectedRow
@@ -1887,4 +1894,8 @@ Private Sub NewLineHereButton_MouseClicked (EventData As MouseEvent)
 	currentProject.AddLine(startTime,endTime,"","")
 	LoadLinesToTable
 	JumpToRow(currentProject.lines.Size)
+End Sub
+
+Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
+	SubtitleLabel.Visible = Checked
 End Sub
