@@ -10,10 +10,15 @@ Sub Class_Globals
 	Public lines As List
 	Public settings As Map
 	Private manager As UndoManager
+	Public changed As Boolean = False
+	Private mCallback As Object
+	Private mEventName As String
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
-Public Sub Initialize(mediaPath As String) As Boolean
+Public Sub Initialize(mediaPath As String, Callback As Object, EventName As String) As Boolean
+	mCallback = Callback
+	mEventName = EventName
 	Dim filename As String = File.GetName(mediaPath)
 	Dim dir As String = File.GetFileParent(mediaPath)
 	projectPath = File.Combine(dir,filename&".sip")
@@ -36,6 +41,10 @@ Public Sub Initialize(mediaPath As String) As Boolean
 End Sub
 
 Public Sub AddState
+	changed = True
+	If SubExists(mCallback,mEventName&"_Changed") Then
+		CallSubDelayed2(mCallback,mEventName&"_Changed",changed)
+	End If
 	manager.AddState(projectFile)
 End Sub
 
@@ -183,6 +192,10 @@ Public Sub save
 	Dim json As JSONGenerator
 	json.Initialize(projectFile)
 	File.WriteString(projectPath,"",json.ToPrettyString(4))
+	changed = False
+	If SubExists(mCallback,mEventName&"_Changed") Then
+		CallSubDelayed2(mCallback,mEventName&"_Changed",changed)
+	End If
 End Sub
 
 Private Sub CreateTempFolder
