@@ -364,7 +364,7 @@ Sub resultListView_Action
 	Dim taglist As List
 	taglist=p.Tag
 	Dim index As Int = taglist.Get(0)
-	Main.JumpToRow(index+1)
+	Main.JumpToRow(index+1,200)
 End Sub
 
 Sub replaceTextField_TextChanged (Old As String, New As String)

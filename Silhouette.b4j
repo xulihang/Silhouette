@@ -382,11 +382,11 @@ Private Sub MenuBar1_Action
 			JumpToLineOfCurrentTime
 		Case "Jump to the _Next Line"
 			If selectedRowID <> -1 Then
-				JumpToRow(selectedRowID + 1)
+				JumpToRow(selectedRowID + 1,0)
 			End If
 		Case "Jump to the _Previous Line"
 			If selectedRowID <> -1 Then
-				JumpToRow(selectedRowID - 1)
+				JumpToRow(selectedRowID - 1,0)
 			End If
 		Case "Jump _Forward"
 			Forward(500)
@@ -459,7 +459,7 @@ Private Sub ShowPreferences As Preferences
 End Sub
 
 Private Sub JumpToLineOfCurrentTime
-	JumpToRow(FindTheRowIDOfCurrentTime)
+	JumpToRow(FindTheRowIDOfCurrentTime,200)
 End Sub
 
 Private Sub FindTheRowIDOfCurrentTime As Int
@@ -507,17 +507,19 @@ Private Sub JumpToLine
 		Next
 		index = Min(currentProject.lines.Size,index)
 	End If
-	JumpToRow(index)
+	JumpToRow(index,200)
 End Sub
 
-Public Sub JumpToRow(rowID As Int)
+Public Sub JumpToRow(rowID As Int,sleepTime As Int)
 	If rowID = -1 Then
 		Return
 	End If
 	ResetSelectStatusOfLineTable
 	Dim pageIndex As Int = Ceil(rowID / LinesTable.RowsPerPage)
 	LinesTable.CurrentPage = pageIndex
-	Sleep(500)
+	If sleepTime > 0 Then
+		Sleep(sleepTime)
+	End If
 	SelectRow(rowID,True)
 End Sub
 
@@ -803,13 +805,17 @@ Sub SelectRow(targetRowId As Int,fromLongClick As Boolean)    'rowid-1
 	Next
 	selectedRowID = targetRowId
 	LoadLineToEditor(fromLongClick)
-	If DisplaySubtitleCheckBox.Checked Then
-		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
-		SubtitleLabel.Text = line.Get("source")&CRLF&line.Get("target")
-	End If
+	UpdateSubtitleLabel
 	If ReadyToDrawWaveForm Then
 		DrawWaveForm
 		SetTheRangeForTheSelectedRow
+	End If
+End Sub
+
+private Sub UpdateSubtitleLabel
+	If DisplaySubtitleCheckBox.Checked Then
+		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+		SubtitleLabel.Text = line.Get("source")&CRLF&line.Get("target")
 	End If
 End Sub
 
@@ -1287,6 +1293,7 @@ Private Sub ProgressTimer_Tick
 		Else
 			currentVideoTime = vlc.GetTime
 		End If
+		currentVideoTime = currentVideoTime + 100
 		If currentVideoTime > expectedEndTime And expectedEndTime <> -1 And playbackStartDate <> -1 Then
 			expectedEndTime = -1
 			playbackStartTime = -1
@@ -1307,7 +1314,7 @@ Private Sub ProgressTimer_Tick
 			Dim rowID As Int = FindTheRowIDOfCurrentTime
 			If rowID <> selectedRowID And rowID <> -1 Then
 				selectedRowID = rowID
-				JumpToRow(rowID)
+				JumpToRow(rowID,0)
 			End If
 		End If
 	Else
@@ -1893,7 +1900,7 @@ Private Sub NewLineHereButton_MouseClicked (EventData As MouseEvent)
 	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime + 1000)
 	currentProject.AddLine(startTime,endTime,"","")
 	LoadLinesToTable
-	JumpToRow(currentProject.lines.Size)
+	JumpToRow(currentProject.lines.Size,0)
 End Sub
 
 Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
