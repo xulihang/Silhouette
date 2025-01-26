@@ -9,6 +9,7 @@ Sub Class_Globals
 	Public projectFile As Map
 	Public lines As List
 	Public settings As Map
+	Private manager As UndoManager
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -19,6 +20,7 @@ Public Sub Initialize(mediaPath As String) As Boolean
 	If File.Exists(projectPath,"") Then
 		readProjectFile
 		CreateTempFolder
+		manager.Initialize(projectFile)
 		Return False
 	Else
 		projectFile.Initialize
@@ -28,7 +30,38 @@ Public Sub Initialize(mediaPath As String) As Boolean
 		projectFile.Put("lines",lines)
 		projectFile.Put("settings",settings)
 		CreateTempFolder
+		manager.Initialize(projectFile)
 		Return True
+	End If
+End Sub
+
+Public Sub AddState
+	manager.AddState(projectFile)
+End Sub
+
+Public Sub Undo
+	Dim result As Object=manager.Undo
+	If result<>Null Then
+		projectFile=result
+		If projectFile.ContainsKey("lines") Then
+			lines=projectFile.get("lines")
+		End If
+		If projectFile.ContainsKey("settings") Then
+			settings=projectFile.get("settings")
+		End If
+	End If
+End Sub
+
+Public Sub Redo
+	Dim result As Object=manager.Redo
+	If result<>Null Then
+		projectFile=result
+		If projectFile.ContainsKey("lines") Then
+			lines=projectFile.get("lines")
+		End If
+		If projectFile.ContainsKey("settings") Then
+			settings=projectFile.get("settings")
+		End If
 	End If
 End Sub
 
@@ -38,10 +71,12 @@ End Sub
 
 Public Sub Clear
 	lines.Clear
+	AddState
 End Sub
 
 Public Sub DeleteLine(index As Int)
 	lines.RemoveAt(index)
+	AddState
 End Sub
 
 Public Sub AddLine(startTime As String,endTime As String,source As String,target As String)
@@ -52,6 +87,7 @@ Public Sub AddLine(startTime As String,endTime As String,source As String,target
 	line.Put("source",source)
 	line.Put("target",target)
 	lines.Add(line)
+	AddState
 End Sub
 
 Private Sub DefaultLine As Map
@@ -72,12 +108,14 @@ Public Sub MergeWithTheNextLine(index As Int)
 		line.Put("source",line.Get("source")&nextLine.Get("source"))
 		line.Put("target",line.Get("target")&nextLine.Get("target"))
 		lines.RemoveAt(index+1)
+		AddState
 	End If
 End Sub
 
 Public Sub AppendLine(index As Int) As Map
 	Dim line As Map = DefaultLine
 	lines.InsertAt(index+1,line)
+	AddState
 	Return line
 End Sub
 
@@ -86,6 +124,7 @@ Public Sub AppendLineWithTime(index As Int,startTime As String,endTime As String
 	line.Put("startTime",startTime)
 	line.Put("endTime",endTime)
 	lines.InsertAt(index+1,line)
+	AddState
 	Return line
 End Sub
 
@@ -94,12 +133,14 @@ Public Sub PrependLineWithTime(index As Int,startTime As String,endTime As Strin
 	line.Put("startTime",startTime)
 	line.Put("endTime",endTime)
 	lines.InsertAt(index,line)
+	AddState
 	Return line
 End Sub
 
 Public Sub PrependLine(index As Int) As Map
 	Dim line As Map = DefaultLine
 	lines.InsertAt(index,line)
+	AddState
 	Return line
 End Sub
 
@@ -116,6 +157,7 @@ Sub readProjectFile
 End Sub
 
 Public Sub save
+	AddState
 	Dim json As JSONGenerator
 	json.Initialize(projectFile)
 	File.WriteString(projectPath,"",json.ToPrettyString(4))

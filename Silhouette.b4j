@@ -101,10 +101,11 @@ Module23=SearchAndReplaceDialog
 Module24=SileroVad
 Module25=SrtParser
 Module26=TextFlow
-Module27=Utils
-Module28=WaveFormBitmapCreator
-Module29=WavRandomAccessFile
+Module27=UndoManager
+Module28=Utils
+Module29=WaveFormBitmapCreator
 Module3=ASROptions
+Module30=WavRandomAccessFile
 Module4=DraggableRange
 Module5=ErrorReporter
 Module6=Exporter
@@ -113,7 +114,7 @@ Module8=FFMpeg
 Module9=InputBox
 NumberOfFiles=31
 NumberOfLibraries=19
-NumberOfModules=29
+NumberOfModules=30
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -339,6 +340,12 @@ Private Sub MenuBar1_Action
 			Dim snr As SearchAndReplaceDialog
 			snr.Initialize(currentProject.lines)
 			snr.show
+		Case "_Undo"
+			currentProject.Undo
+			LoadLinesToTable
+		Case "R_edo"
+			currentProject.redo
+			LoadLinesToTable
 		Case "_Jump to Line"
 			JumpToLine
 		Case "Jump to the Line of the Current _Time"
@@ -1402,7 +1409,7 @@ private Sub NewLine
 End Sub
 
 Private Sub ClearLines
-	currentProject.lines.Clear
+	currentProject.Clear
 	LoadLinesToTable
 End Sub
 
