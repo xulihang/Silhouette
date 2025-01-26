@@ -14,6 +14,7 @@ Sub Class_Globals
 	Private apiPreferences As Map
 	Private mtPreferences As Map
 	Private WhisperModelPathTextField As TextField
+	Private LanguageComboBox As ComboBox
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -21,6 +22,7 @@ Public Sub Initialize(mb As MenuBar)
 	frm.Initialize("frm",650,700)
 	frm.RootPane.LoadLayout("projectSetting")
 	frm.Title = Main.loc.Localize("Preferences")
+	TabPane1.LoadLayout("generalPreference", Main.loc.Localize("General"))
 	TabPane1.LoadLayout("APISetting", "API")
 	TabPane1.LoadLayout("MTSetting", Main.loc.Localize("Machine Translation"))
 	TabPane1.LoadLayout("modelPreference", Main.loc.Localize("Speech Recognition"))
@@ -42,7 +44,39 @@ Public Sub Initialize(mb As MenuBar)
     End If
 	loadAPI
 	loadMT
+	LoadLanaugesList
+	LoadSelectedLang
 	Main.loc.LocalizeForm(frm)
+End Sub
+
+Private Sub LoadLanaugesList
+	LanguageComboBox.Items.Clear
+	If File.Exists(File.DirApp,"supportedLangs.txt") Then
+		LanguageComboBox.Items.AddAll(File.ReadList(File.DirApp,"supportedLangs.txt"))
+	Else
+		LanguageComboBox.Items.Add("zh (中文)")
+		LanguageComboBox.Items.Add("en (English)")
+		For Each lang As String In Main.loc.GetLangs
+			If lang.StartsWith("zh") == False And lang.StartsWith("en") == False Then
+				LanguageComboBox.Items.Add(lang)
+			End If
+		Next
+	End If
+End Sub
+
+Private Sub LoadSelectedLang
+	If preferencesMap.ContainsKey("lang") Then
+		For i = 0 To LanguageComboBox.Items.Size-2
+			Dim languageItem As String = LanguageComboBox.Items.Get(i)
+			If languageItem.Contains(" ") Then
+				languageItem = languageItem.SubString2(0,languageItem.IndexOf(" "))
+			End If
+			If languageItem=preferencesMap.Get("lang") Then
+				LanguageComboBox.SelectedIndex=i
+				Exit
+			End If
+		Next
+	End If
 End Sub
 
 Public Sub Show
@@ -116,6 +150,24 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("mt",mtPreferences)
 	preferencesMap.Put("api",apiPreferences)
 	preferencesMap.Put("whisper_model_path",WhisperModelPathTextField.Text)
+	
+	Dim lang As String
+	If LanguageComboBox.SelectedIndex<>-1 Then
+		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)
+		If lang.Contains(" ") Then
+			lang=lang.SubString2(0,lang.IndexOf(" "))
+		End If
+		If lang<>preferencesMap.GetDefault("lang","") Then
+			preferencesMap.Put("lang",lang)
+			If Main.loc.Language=Main.loc.sourceLang Then
+				Main.loc.ForceLocale(lang)
+				Main.LocalizeMainFrom
+			Else
+				fx.Msgbox(frm,Main.loc.Localize("Please restart the program."),"")
+			End If
+		End If
+	End If
+	
 	Utils.resetPref
 	Dim json As JSONGenerator
 	json.Initialize(preferencesMap)

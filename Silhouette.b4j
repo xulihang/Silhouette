@@ -1,36 +1,37 @@
 ﻿AppType=JavaFX
 Build1=Default,org.xulihang.silhouette
 File1=apiparamfiller.bjl
-File10=inputbox.bjl
-File11=JumpOptions.bjl
-File12=LangaugePairSelector.bjl
-File13=langcodes.txt
-File14=LeftSplitPane.bjl
-File15=LineEditor.bjl
-File16=ListView.bjl
-File17=main.bjl
-File18=modelPreference.bjl
-File19=MTSetting.bjl
+File10=icon.png
+File11=inputbox.bjl
+File12=JumpOptions.bjl
+File13=LangaugePairSelector.bjl
+File14=langcodes.txt
+File15=LeftSplitPane.bjl
+File16=LineEditor.bjl
+File17=ListView.bjl
+File18=main.bjl
+File19=modelPreference.bjl
 File2=APISetting.bjl
-File20=PlayControl.bjl
-File21=pretranslate.bjl
-File22=progress.bjl
-File23=projectSetting.bjl
-File24=searchandreplace.bjl
-File25=silhouette.png
-File26=TopRightSplitPane.bjl
-File27=TopSplitPane.bjl
-File28=TranslationAssist.bjl
-File29=TranslationMemory.bjl
+File20=MTSetting.bjl
+File21=PlayControl.bjl
+File22=pretranslate.bjl
+File23=progress.bjl
+File24=projectSetting.bjl
+File25=searchandreplace.bjl
+File26=silhouette.png
+File27=TopRightSplitPane.bjl
+File28=TopSplitPane.bjl
+File29=TranslationAssist.bjl
 File3=ASROptions.bjl
-File30=VideoPlayer.bjl
-File31=WaveForm.bjl
+File30=TranslationMemory.bjl
+File31=VideoPlayer.bjl
+File32=WaveForm.bjl
 File4=BottomSplitPane.bjl
 File5=Editor.bjl
 File6=ErrorReporter.bjl
 File7=ExportOptions.bjl
-File8=generalSettings.bjl
-File9=icon.png
+File8=generalPreference.bjl
+File9=generalSettings.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -56,6 +57,7 @@ FileGroup29=Default Group
 FileGroup3=Default Group
 FileGroup30=Default Group
 FileGroup31=Default Group
+FileGroup32=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
@@ -113,7 +115,7 @@ Module6=Exporter
 Module7=ExportOptions
 Module8=FFMpeg
 Module9=InputBox
-NumberOfFiles=31
+NumberOfFiles=32
 NumberOfLibraries=20
 NumberOfModules=30
 Version=10
@@ -199,8 +201,8 @@ Sub Process_Globals
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
-	loc.Initialize(File.DirApp,"strings.db")
 	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
+	initLoc
 	hook.Initialize(Me,"Hook")
 	MainForm = Form1
 	MainForm.RootPane.LoadLayout("main")
@@ -253,6 +255,18 @@ Sub AppStart (Form1 As Form, Args() As String)
 	SetTable
 	loadPlugins
 	AddWaveFormControls
+	LocalizeMainFrom
+End Sub
+
+Public Sub initLoc
+	loc.Initialize(File.DirApp,"strings.db")
+	Dim preferencesMap As Map = Utils.getPrefMap
+	If preferencesMap.ContainsKey("lang") Then
+		loc.ForceLocale(preferencesMap.Get("lang"))
+	End If
+End Sub
+
+Public Sub LocalizeMainFrom
 	loc.LocalizeForm(MainForm)
 End Sub
 
