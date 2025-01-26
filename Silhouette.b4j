@@ -460,11 +460,10 @@ Private Sub ShowPreferences As Preferences
 End Sub
 
 Private Sub JumpToLineOfCurrentTime
-	JumpToRow(FindTheRowIDOfCurrentTime,200)
+	JumpToRow(FindTheRowIDOfTime(vlc.GetTime),200)
 End Sub
 
-Private Sub FindTheRowIDOfCurrentTime As Int
-	Dim timeMs As Long = vlc.GetTime
+Private Sub FindTheRowIDOfTime(timeMs As Long) As Int
 	Dim rowID As Int = 1
 	rowID = 1
 	Dim NotInRange As Boolean = True
@@ -1295,7 +1294,7 @@ Private Sub ProgressTimer_Tick
 		Else
 			currentVideoTime = vlc.GetTime
 		End If
-		currentVideoTime = currentVideoTime + 100
+		'currentVideoTime = currentVideoTime + 100
 		If currentVideoTime > expectedEndTime And expectedEndTime <> -1 And playbackStartDate <> -1 Then
 			expectedEndTime = -1
 			playbackStartTime = -1
@@ -1304,7 +1303,7 @@ Private Sub ProgressTimer_Tick
 			TogglePlayingStatus(False,-1)
 		End If
 		If FollowProgressCheckBox.Checked Then
-			Dim rowID As Int = FindTheRowIDOfCurrentTime
+			Dim rowID As Int = FindTheRowIDOfTime(currentVideoTime)
 			If rowID <> selectedRowID And rowID <> -1 Then
 				selectedRowID = rowID
 				JumpToRow(rowID,0)
