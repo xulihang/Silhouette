@@ -1729,6 +1729,7 @@ Private Sub UpdateTime(isStartTime As Boolean,new As String)
 		LinesTable.sql1.ExecNonQuery2($"UPDATE data SET ${EndColumn.SQLID} = ? WHERE rowid = ?"$, Array As String(new, selectedRowID))
 	End If
 	LinesTable.Refresh
+	currentProject.AddState
 End Sub
 
 Private Sub UpdateText(isSource As Boolean,new As String)
