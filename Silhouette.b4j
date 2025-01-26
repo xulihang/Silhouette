@@ -360,7 +360,7 @@ Private Sub MenuBar1_Action
 			ClearLines
 		Case "Sor_t Lines"
 			SortLines
-		Case "_Search and replace"
+		Case "_Search and Replace"
 			Dim snr As SearchAndReplaceDialog
 			snr.Initialize(currentProject.lines)
 			snr.show
@@ -376,15 +376,15 @@ Private Sub MenuBar1_Action
 			JumpToLineOfCurrentTime
 		Case "Jump _forward"
 			Forward(500)
-		Case "Jump _backward"
+		Case "Jump _Backward"
 			Backward(500)
 		Case "Pause/Resume"
 			TogglePlaying
-		Case "Play the _previous line"
+		Case "Play the _Previous Line"
 			If selectedRowID <> -1 Then
 				PlayLineByID(selectedRowID - 1)
 			End If
-		Case "Play the _next line"
+		Case "Play the _Next Line"
 			If selectedRowID <> -1 Then
 				PlayLineByID(selectedRowID + 1)
 			End If
