@@ -74,6 +74,28 @@ Public Sub Clear
 	AddState
 End Sub
 
+Public Sub Sort
+	Dim newLines As List
+	newLines.Initialize
+	Dim listForSorting As List
+	listForSorting.Initialize
+	For Each line As Map In lines
+		Dim criteria As SortCriteria
+		criteria.Initialize
+		criteria.o = line
+		criteria.value = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+		listForSorting.Add(criteria)
+	Next
+	listForSorting.SortType("value",True)
+	For Each criteria As SortCriteria In listForSorting
+		newLines.Add(criteria.o)
+	Next
+	lines.Clear
+	lines.AddAll(newLines)
+	AddState
+End Sub
+
+
 Public Sub DeleteLine(index As Int)
 	lines.RemoveAt(index)
 	AddState

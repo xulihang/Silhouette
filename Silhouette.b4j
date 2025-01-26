@@ -198,6 +198,7 @@ Sub Process_Globals
 	Private KeepRatioCheckBox As CheckBox
 	Private hook As NativeHook
 	Public loc As Localizator
+	Type SortCriteria (o As Object,value As Long)
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -357,6 +358,8 @@ Private Sub MenuBar1_Action
 			NewLine
 		Case "_Clear Lines"
 			ClearLines
+		Case "Sor_t Lines"
+			SortLines
 		Case "_Search and replace"
 			Dim snr As SearchAndReplaceDialog
 			snr.Initialize(currentProject.lines)
@@ -1437,6 +1440,11 @@ private Sub NewLine
 		currentProject.AppendLine(-1)
 		LoadLinesToTable
 	End If
+End Sub
+
+Private Sub SortLines
+	currentProject.Sort
+	LoadLinesToTable
 End Sub
 
 Private Sub ClearLines
