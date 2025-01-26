@@ -201,6 +201,7 @@ Sub Process_Globals
 	Type SortCriteria (o As Object,value As Long)
 	Private SubtitleLabel As Label
 	Private DisplaySubtitleCheckBox As CheckBox
+	private version as string = "v1.0.0" 
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -448,7 +449,7 @@ Private Sub MenuBar1_Action
 		Case "Export UI strings"
 			LocalizationHelper.Export
 		Case "_About"
-			fx.Msgbox(MainForm,"@xulihang, 2025","Silhouette")
+			fx.Msgbox(MainForm,"@xulihang, 2025","Silhouette "&version)
 	End Select
 End Sub
 
