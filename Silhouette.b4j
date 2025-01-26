@@ -461,7 +461,7 @@ Private Sub ShowPreferences As Preferences
 End Sub
 
 Private Sub JumpToLineOfCurrentTime
-	JumpToRow(FindTheRowIDOfTime(vlc.GetTime),200)
+	JumpToRow(FindTheRowIDOfTime(GetCurrentVideoTime),200)
 End Sub
 
 Private Sub FindTheRowIDOfTime(timeMs As Long) As Int
@@ -1287,14 +1287,19 @@ Private Sub TogglePlayingStatus(isPlaying As Boolean,startTime As Long)
 	End If
 End Sub
 
+Private Sub GetCurrentVideoTime As Long
+	Dim currentVideoTime As Long 
+	If playbackStartDate <> -1 Then
+		currentVideoTime = playbackStartTime + DateTime.Now - playbackStartDate
+	Else
+		currentVideoTime = vlc.GetTime
+	End If
+	Return currentVideoTime
+End Sub
+
 Private Sub ProgressTimer_Tick
 	If vlc.IsPlaying Then
-		Dim currentVideoTime As Long
-		If playbackStartDate <> -1 Then
-			currentVideoTime = playbackStartTime + DateTime.Now - playbackStartDate
-		Else
-			currentVideoTime = vlc.GetTime
-		End If
+		Dim currentVideoTime As Long = GetCurrentVideoTime
 		'currentVideoTime = currentVideoTime + 100
 		If currentVideoTime > expectedEndTime And expectedEndTime <> -1 And playbackStartDate <> -1 Then
 			expectedEndTime = -1
@@ -1766,7 +1771,7 @@ End Sub
 
 Private Sub UseCurrentTimeButton_MouseClicked (EventData As MouseEvent)
 	If focusedTimeTextField.IsInitialized Then
-		focusedTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(vlc.GetTime)
+		focusedTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
 	End If
 End Sub
 
@@ -1859,13 +1864,13 @@ End Sub
 
 Private Sub SetStartPointButton_MouseClicked (EventData As MouseEvent)
 	If selectedRowID <> -1 Then
-		StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(vlc.GetTime)
+		StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
 	End If
 End Sub
 
 Private Sub SetEndPointButton_MouseClicked (EventData As MouseEvent)
 	If selectedRowID <> -1 Then
-		EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(vlc.GetTime)
+		EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
 	End If
 End Sub
 
@@ -1879,12 +1884,12 @@ End Sub
 
 Private Sub Backward(span As Int)
 	playbackStartTime = playbackStartTime - span
-	vlc.SetTime(Max(0, vlc.GetTime - span))
+	vlc.SetTime(Max(0, GetCurrentVideoTime - span))
 End Sub
 
 Private Sub Forward(span As Int)
 	playbackStartTime = playbackStartTime + span
-	vlc.SetTime(Min(vlc.GetTime + span,vlc.GetLength))
+	vlc.SetTime(Min(GetCurrentVideoTime + span,vlc.GetLength))
 End Sub
 
 Public Sub cleanupHook
@@ -1920,7 +1925,7 @@ Private Sub WaveFormPane_MouseExited (EventData As MouseEvent)
 End Sub
 
 Private Sub NewLineHereButton_MouseClicked (EventData As MouseEvent)
-	Dim currentStartTime As Long = vlc.gettime
+	Dim currentStartTime As Long = GetCurrentVideoTime
 	Dim startTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime)
 	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime + 1000)
 	currentProject.AddLine(startTime,endTime,"","")
