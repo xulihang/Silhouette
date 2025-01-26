@@ -978,22 +978,49 @@ Sub pretranslate(options As Map) As ResumableSub
 			sourceLang=currentProject.SourceLang
 			targetLang=currentProject.TargetLang
 			Dim interval As Int=options.GetDefault("interval",0)
+			wait for (MT.supportBatchTranslation(mtengine)) Complete (BatchSupported As Boolean)
 			progressDialog.Show(loc.Localize("translating..."))
-			Dim index As Int = 0
-			For Each line As Map In currentProject.lines
-				index = index + 1
-				progressDialog.update(index,currentProject.lines.Size)
-				If progressDialog.isShowing = False Then
-					Exit
-				End If
-				Dim source As String = line.Get("source")
-				Dim target As String = line.Get("target")
-				If target = "" Then
-					wait for (MT.getMT(source,sourceLang,targetLang,mtengine)) complete (target As String)
-					line.Put("target",target)
+			If BatchSupported Then
+				Dim index As Int = 0
+				Dim segmentationResult As Map = MT.readLinesInSegmentsForTranslation(currentProject.lines)
+				Dim linesToTranslate As List = segmentationResult.Get("lines")
+				Dim segments As List = segmentationResult.Get("segments")
+				For Each sourceList As List In segments
+					index = index + 1
+					progressDialog.update(index,segments.Size)
+					If progressDialog.isShowing = False Then
+						Exit
+					End If
+					wait for (MT.batchTranslate(sourceList,sourceLang,targetLang,mtengine)) complete (targetList As List)
+					Dim j As Int = 0
+					For Each target As String In targetList
+						Dim line As Map = linesToTranslate.Get(j)
+						line.Put("target",target)
+						j = j + 1
+					Next
+					For j = sourceList.Size - 1 To 0 Step -1 
+						linesToTranslate.RemoveAt(j)
+					Next
 					Sleep(interval)
-				End If
-			Next
+				Next
+			Else
+				Dim index As Int = 0
+				For Each line As Map In currentProject.lines
+					index = index + 1
+					progressDialog.update(index,currentProject.lines.Size)
+					If progressDialog.isShowing = False Then
+						Exit
+					End If
+					Dim source As String = line.Get("source")
+					Dim target As String = line.Get("target")
+					If target = "" Then
+						wait for (MT.getMT(source,sourceLang,targetLang,mtengine)) complete (target As String)
+						line.Put("target",target)
+						Sleep(interval)
+					End If
+				Next
+			End If
+			
 			progressDialog.close
 		Else
 			fx.Msgbox(MainForm,loc.Localize("Not supported now"),"")

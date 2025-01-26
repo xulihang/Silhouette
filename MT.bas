@@ -12,6 +12,46 @@ Sub Process_Globals
 	Private internalMTWithBatchSupportList As List=Array As String("baidu")
 End Sub
 
+Public Sub readLinesInSegmentsForTranslation(lines As List) As Map
+	Dim maxLength As Int = Utils.getPref("multiple_sentences_mt_char_length",2000)
+	Dim segments As List
+	segments.Initialize
+	Dim length As Int
+	Dim sourceList As List
+	sourceList.Initialize
+	Dim linesToTranslate As List
+	linesToTranslate.Initialize
+	For Each line As Map In lines
+		Dim source As String = line.Get("source")
+		Dim target As String = line.Get("target")
+		If source = "" Then
+			Continue
+		End If
+		If target <> "" Then
+			Continue
+		End If
+		linesToTranslate.Add(line)
+		sourceList.Add(source)
+		length = length + source.Length
+		If length > maxLength Then
+			length = 0
+			Dim newList As List
+			newList.Initialize
+			newList.AddAll(sourceList)
+			sourceList.Clear
+			segments.Add(newList)
+		End If
+	Next
+	If sourceList.Size > 0 Then
+		segments.Add(sourceList)
+	End If
+	Dim map1 As Map
+	map1.Initialize
+	map1.Put("lines",linesToTranslate)
+	map1.Put("segments",segments)
+	Return map1
+End Sub
+
 public Sub getMTList As List
 	Dim mtList As List
 	mtList.Initialize
