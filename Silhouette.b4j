@@ -283,7 +283,10 @@ End Sub
 'Return true to allow the default exceptions handler to handle the uncaught exception.
 Sub Application_Error (Error As Exception, StackTrace As String) As Boolean
 	If StackTrace.Contains("Unable to load library 'libvlc'") Then
-		fx.Msgbox(MainForm,loc.Localize("Please install VLC first."),"")
+		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("Please install VLC v3 first."),"",loc.Localize("Download"),loc.Localize("Okay"),"",fx.MSGBOX_CONFIRMATION)
+		If response = fx.DialogResponse.POSITIVE Then
+			fx.ShowExternalDocument("https://www.videolan.org/vlc/")
+		End If
 	Else
 		Dim reporter As ErrorReporter
 		reporter.Initialize
