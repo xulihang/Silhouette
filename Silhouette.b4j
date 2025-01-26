@@ -254,7 +254,6 @@ Sub AppStart (Form1 As Form, Args() As String)
 	loadPlugins
 	AddWaveFormControls
 	loc.LocalizeForm(MainForm)
-	'LocalizationHelper.Export
 End Sub
 
 Private Sub AddWaveFormControls
@@ -391,6 +390,8 @@ Private Sub MenuBar1_Action
 			fx.Msgbox(MainForm,loc.Localize("Done"),"")
 		Case "_Exit"
 			ExitApp
+		Case "Export UI strings"
+			LocalizationHelper.Export
 		Case "_About"
 			fx.Msgbox(MainForm,"@xulihang, 2025","Silhouette")
 	End Select

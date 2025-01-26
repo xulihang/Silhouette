@@ -20,11 +20,11 @@ End Sub
 Public Sub Initialize(mb As MenuBar)
 	frm.Initialize("frm",650,700)
 	frm.RootPane.LoadLayout("projectSetting")
-	frm.Title = "Preferences"
+	frm.Title = Main.loc.Localize("Preferences")
 	TabPane1.LoadLayout("APISetting", "API")
 	TabPane1.LoadLayout("MTSetting", Main.loc.Localize("Machine Translation"))
 	TabPane1.LoadLayout("modelPreference", Main.loc.Localize("Speech Recognition"))
-	APITableView.SetColumns(Array("API Name","value"))
+	APITableView.SetColumns(Array(Main.loc.Localize("API Name"),Main.loc.Localize("value")))
 	preferencesMap.Initialize
 	apiPreferences.Initialize
 	mtPreferences.Initialize
