@@ -1426,8 +1426,8 @@ Private Sub playHereMI_Action
 	vlc.SetTime(time)
 	If vlc.IsPlaying = False Then
 		vlc.Resume
-		TogglePlayingStatus(True,time)
 	End If
+	TogglePlayingStatus(True,time)
 End Sub
 
 Private Sub newLineHereMI_Action
