@@ -1461,7 +1461,6 @@ Sub MainForm_CloseRequest (EventData As Event)
 				'yes -1, no -2, cancel -3
 				Case fx.DialogResponse.POSITIVE
 					currentProject.save
-					Return
 				Case fx.DialogResponse.CANCEL
 					EventData.Consume
 					Return
