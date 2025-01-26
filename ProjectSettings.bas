@@ -19,7 +19,7 @@ Public Sub Initialize(p As Project)
 	frm.RootPane.LoadLayout("projectSetting")
 	settings=p.settings
 	mProject=p
-	TabPane1.LoadLayout("generalSettings", "General")
+	TabPane1.LoadLayout("generalSettings", main.loc.Localize("General"))
 	Dim langmap As Map
 	langmap.Initialize
 	Dim sourceLang As String
@@ -32,6 +32,7 @@ Public Sub Initialize(p As Project)
 	langmap.Put("source",sourceLang)
 	langmap.Put("target",targetLang)
 	LangPairLabel.Tag=langmap
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub Show

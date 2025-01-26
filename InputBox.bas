@@ -14,6 +14,7 @@ End Sub
 Public Sub Initialize
 	frm.Initialize("frm",400,200)
 	frm.RootPane.LoadLayout("inputbox")
+	main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub setTitle(title As String)

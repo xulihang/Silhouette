@@ -19,6 +19,7 @@ Sub Show(title As String)
 	frm.RootPane.LoadLayout("progress")
 	frm.Title=title
 	frm.Show
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 'show with width and height
@@ -28,6 +29,7 @@ Sub Show2(title As String,width As Int,height As Int)
 	frm.RootPane.LoadLayout("progress")
 	frm.Title=title
 	frm.Show
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Sub isShowing As Boolean

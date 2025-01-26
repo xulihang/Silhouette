@@ -16,6 +16,7 @@ Public Sub Initialize(vlc As jVLC)
 	mVLC = vlc
 	frm.Initialize("frm",500,250)
 	frm.RootPane.LoadLayout("PlayControl")
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub Show

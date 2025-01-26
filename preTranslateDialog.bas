@@ -21,6 +21,7 @@ Public Sub Initialize
 	mtComboBox.Items.AddAll(MT.getMTList)
 	mtComboBox.SelectedIndex=0
 	IntervalSpinner.Value=1000
+	main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub ShowAndWait As Map

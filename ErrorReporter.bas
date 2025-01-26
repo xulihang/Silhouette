@@ -14,6 +14,7 @@ End Sub
 Public Sub Initialize
 	frm.Initialize("frm",500,500)
 	frm.RootPane.LoadLayout("ErrorReporter")
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub ShowAndWait(error As String)

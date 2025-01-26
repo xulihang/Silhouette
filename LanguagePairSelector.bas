@@ -28,6 +28,7 @@ Public Sub Initialize
 	langcodes=Utils.readLanguageCode(File.Combine(File.DirApp,"langcodes.txt"))
 	fillComboBox
 	ReadLastLangs
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Sub fillComboBox
@@ -61,19 +62,19 @@ End Sub
 
 Sub OkButton_MouseClicked (EventData As MouseEvent)
 	If sourceTextField.Text="" Or targetTextField.Text="" Then
-		fx.Msgbox(frm,"Please set the language pair","")
+		fx.Msgbox(frm,Main.loc.Localize("Please set the language pair"),"")
 		Return
 	End If
 	result.put("source",sourceTextField.Text)
 	result.put("target",targetTextField.Text)
-	File.WriteMap(File.DirData("ImageTrans"),"lastLangs",result)
+	File.WriteMap(File.DirData("Silhouette"),"lastLangs",result)
 	close
 End Sub
 
 Sub ReadLastLangs
-	If File.Exists(File.DirData("ImageTrans"),"lastLangs") Then
+	If File.Exists(File.DirData("Silhouette"),"lastLangs") Then
 		Dim map1 As Map
-		map1=File.ReadMap(File.DirData("ImageTrans"),"lastLangs")
+		map1=File.ReadMap(File.DirData("Silhouette"),"lastLangs")
 		If map1.ContainsKey("source") Then
 			sourceTextField.Text=map1.Get("source")
 		End If

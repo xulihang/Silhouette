@@ -31,6 +31,7 @@ Public Sub Initialize(engineName As String,preferencesMap As Map)
 		End If
 	End If
 	init(engineName)
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub showAndWait As Map

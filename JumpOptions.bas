@@ -19,6 +19,7 @@ Public Sub Initialize
 	frm.Initialize("frm",400,300)
 	frm.RootPane.LoadLayout("JumpOptions")
 	options.Initialize
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub ShowAndWait As Map

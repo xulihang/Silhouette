@@ -64,17 +64,18 @@ FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
 Library1=abplugin
-Library10=jrandomaccessfile
-Library11=jreflection
-Library12=jshell
-Library13=json
-Library14=jxui
-Library15=okhttp
-Library16=threading
-Library17=xcustomlistview
-Library18=xui views
-Library19=jpoi
+Library10=jpoi
+Library11=jrandomaccessfile
+Library12=jreflection
+Library13=jshell
+Library14=json
+Library15=jxui
+Library16=okhttp
+Library17=threading
+Library18=xcustomlistview
+Library19=xui views
 Library2=b4xcollections
+Library20=xlutils
 Library3=b4xtable
 Library4=byteconverter
 Library5=encryption
@@ -113,7 +114,7 @@ Module7=ExportOptions
 Module8=FFMpeg
 Module9=InputBox
 NumberOfFiles=31
-NumberOfLibraries=19
+NumberOfLibraries=20
 NumberOfModules=30
 Version=10
 @EndOfDesignText@
@@ -217,7 +218,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	TopRightSplitPane.Vertical = True
 	BottomSplitPane.LoadLayout("ListView")
 	BottomSplitPane.LoadLayout("TranslationAssist")
-	AssistTabPane.LoadLayout("TranslationMemory","Translation")
+	AssistTabPane.LoadLayout("TranslationMemory",loc.Localize("Translation"))
 	TMTableView.SetColumnWidth(0,50)
 	TMTableView.SetColumnWidth(1,50)
 	TMTableView.SetColumnWidth(2,200)
@@ -228,7 +229,12 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressTimer.Initialize("ProgressTimer",100)
 	ProgressTimer.Enabled = False
 	tableCM.Initialize("tableCM")
-	For Each text As String In Array("Play this line","Delete this line","Prepend a line","Append a line","Merge with the next line","Recognize this line")
+	For Each text As String In Array(loc.Localize("Play this line"), _ 
+		                             loc.Localize("Delete this line"), _ 
+									 loc.Localize("Prepend a line"), _ 
+									 loc.Localize("Append a line"), _ 
+									 loc.Localize("Merge with the Next line"), _ 
+									 loc.Localize("Recognize this line"))
 		Dim mi As MenuItem
 		mi.Initialize(text,"tableMenuItem")
 		tableCM.MenuItems.Add(mi)
@@ -247,6 +253,8 @@ Sub AppStart (Form1 As Form, Args() As String)
 	SetTable
 	loadPlugins
 	AddWaveFormControls
+	loc.LocalizeForm(MainForm)
+	LocalizationHelper.Export
 End Sub
 
 Private Sub AddWaveFormControls
@@ -261,7 +269,7 @@ End Sub
 'Return true to allow the default exceptions handler to handle the uncaught exception.
 Sub Application_Error (Error As Exception, StackTrace As String) As Boolean
 	If StackTrace.Contains("Unable to load library 'libvlc'") Then
-		fx.Msgbox(MainForm,"Please install VLC first.","")
+		fx.Msgbox(MainForm,loc.Localize("Please install VLC first."),"")
 	Else
 		Dim reporter As ErrorReporter
 		reporter.Initialize
@@ -314,7 +322,7 @@ End Sub
 
 Private Sub MenuBar1_Action
 	Dim mi As MenuItem = Sender
-	Select mi.Text
+	Select loc.FindSource(mi.Text)
 		Case "_Open Media File"
 			OpenFile
 		Case "_Save"
@@ -374,13 +382,13 @@ Private Sub MenuBar1_Action
 			Dim path As String = fc.ShowOpen(MainForm)
 			ImportFromSRT(path)
 			LoadLinesToTable
-			fx.Msgbox(MainForm,"Done","")
+			fx.Msgbox(MainForm,loc.Localize("Done"),"")
 		Case "export to _srt"
 			Dim fc As FileChooser
 			fc.Initialize
 			Dim path As String = fc.ShowSave(MainForm)
 			Exporter.ExportToSRT(currentProject.lines,path)
-			fx.Msgbox(MainForm,"Done","")
+			fx.Msgbox(MainForm,loc.Localize("Done"),"")
 		Case "_Exit"
 			ExitApp
 		Case "_About"
@@ -460,8 +468,8 @@ End Sub
 
 Private Sub ConvertToWav(parent As String,filename As String, tmpDir As String) As ResumableSub
 	If File.Exists(tmpDir,"audio.wav") = False Then
-		progressDialog.Show("Converting to audio...")
-		progressDialog.update2("Processing...")
+		progressDialog.Show(loc.Localize("Converting to audio..."))
+		progressDialog.update2(loc.Localize("Processing..."))
 		Dim outpath As String = File.Combine(tmpDir,"audio.wav")
 		Log("convert video to wav...")
 		Wait For (FFMpeg.Video2Wav(parent,filename,outpath)) Complete (done As Object)
@@ -469,7 +477,7 @@ Private Sub ConvertToWav(parent As String,filename As String, tmpDir As String) 
 		progressDialog.close
 	End If
 	If File.Exists(tmpDir,"segment-00000.wav") = False Then
-		progressDialog.Show("Splitting audio...")
+		progressDialog.Show(loc.Localize("Splitting audio..."))
 		Log("split wav...")
 		Wait For (FFMpeg.SplitWav(segmentLength,tmpDir,"audio.wav")) Complete (done As Object)
 		Log("split wav done")
@@ -498,7 +506,8 @@ End Sub
 
 Private Sub RecognizeExistingLines
 	If HasValidateModel=False Then
-		Dim response As Int = fx.Msgbox2(MainForm,"No models found","","Go to perferences","","Close",fx.MSGBOX_CONFIRMATION)
+		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
+		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
 			ShowPreferences.SwitchTab(2)
 		End If
@@ -508,7 +517,7 @@ Private Sub RecognizeExistingLines
 	Dim filename As String = currentProject.GetMediaFilename
 	Dim tmpDir As String = currentProject.GetTmpFolder
 	wait for (ConvertToWav(parent,filename,tmpDir)) complete (done As Object)
-	progressDialog.Show("Recognizing audio...")
+	progressDialog.Show(loc.Localize("Recognizing audio..."))
 	Dim index As Int = 0
 	For Each line As Map In currentProject.lines
 		progressDialog.update(index,currentProject.lines.Size)
@@ -531,7 +540,8 @@ End Sub
 
 Private Sub RecognizeSpeechByFixedSpan
 	If HasValidateModel=False Then
-		Dim response As Int = fx.Msgbox2(MainForm,"No models found","","Go to perferences","","Close",fx.MSGBOX_CONFIRMATION)
+		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
+		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
 			ShowPreferences.SwitchTab(2)
 		End If
@@ -552,7 +562,7 @@ Private Sub RecognizeSpeechByFixedSpan
 		End If
 	Next
 	wavFiles = SortedWavFiles(wavFiles)
-	progressDialog.Show("Recognizing audio...")
+	progressDialog.Show(loc.Localize("Recognizing audio..."))
 	Dim index As Int = 1
 	For Each filename As String In wavFiles
 		Log(index & "/" & wavFiles.Size)
@@ -947,7 +957,7 @@ Sub pretranslate(options As Map) As ResumableSub
 			sourceLang=currentProject.SourceLang
 			targetLang=currentProject.TargetLang
 			Dim interval As Int=options.GetDefault("interval",0)
-			progressDialog.Show("translating...")
+			progressDialog.Show(loc.Localize("translating..."))
 			Dim index As Int = 0
 			For Each line As Map In currentProject.lines
 				index = index + 1
@@ -965,7 +975,7 @@ Sub pretranslate(options As Map) As ResumableSub
 			Next
 			progressDialog.close
 		Else
-			fx.Msgbox(MainForm,"Not supported now","")
+			fx.Msgbox(MainForm,loc.Localize("Not supported now"),"")
 		End If
 	End If
 	LoadLinesToTable
@@ -1039,7 +1049,7 @@ Sub Progress_MouseClicked_Event (MethodName As String, Args() As Object) As Resu
 		Return Null
 	End If
 	If vlc.IsSeekable = False Then
-		fx.Msgbox(MainForm,"Not seekable","")
+		fx.Msgbox(MainForm,loc.Localize("Not seekable"),"")
 		Return Null
 	End If
 	Dim e As MouseEvent = Args(0)
@@ -1227,27 +1237,27 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 	WaveFormContextMenu.MenuItems.Clear
 	If isTimestampRange Then
 		Dim playMi As MenuItem
-		playMi.Initialize("Play the selection","playSelectionMI")
+		playMi.Initialize(loc.Localize("Play the selection"),"playSelectionMI")
 		WaveFormContextMenu.MenuItems.Add(playMi)
 		Dim playSelectionHereMi As MenuItem
-		playSelectionHereMi.Initialize("Play the selection from here","playSelectionHereMI")
+		playSelectionHereMi.Initialize(loc.Localize("Play the selection from here"),"playSelectionHereMI")
 		WaveFormContextMenu.MenuItems.Add(playSelectionHereMi)
 	End If
 	Dim playHereMi As MenuItem
-	playHereMi.Initialize("Play from here","playHereMI")
+	playHereMi.Initialize(loc.Localize("Play from here"),"playHereMI")
 	WaveFormContextMenu.MenuItems.Add(playHereMi)
 	If isTimestampRange Then
 		Dim splitHereMI As MenuItem
-		splitHereMI.Initialize("Split here","splitHereMI")
+		splitHereMI.Initialize(loc.Localize("Split here"),"splitHereMI")
 		WaveFormContextMenu.MenuItems.Add(splitHereMI)
 		Dim setStopPointMi As MenuItem
-		setStopPointMi.Initialize("Set stop point","setStopPointMI")
+		setStopPointMi.Initialize(loc.Localize("Set stop point"),"setStopPointMI")
 		WaveFormContextMenu.MenuItems.Add(setStopPointMi)
 		Dim clearStopPointMi As MenuItem
-		clearStopPointMi.Initialize("Clear stop point","clearStopPointMI")
+		clearStopPointMi.Initialize(loc.Localize("Clear stop point"),"clearStopPointMI")
 		WaveFormContextMenu.MenuItems.Add(clearStopPointMi)
 		Dim newLineHereMI As MenuItem
-		newLineHereMI.Initialize("Create a new line here","newLineHereMI")
+		newLineHereMI.Initialize(loc.Localize("Create a new line here"),"newLineHereMI")
 		WaveFormContextMenu.MenuItems.Add(newLineHereMI)
 	End If
 End Sub
@@ -1333,7 +1343,7 @@ End Sub
 
 Private Sub tableMenuItem_Action
 	Dim mi As MenuItem = Sender
-	Select mi.Text
+	Select loc.FindSource(mi.Text)
 	    Case "Play this line"
 			PlayTheSelectedLine
 		Case "Prepend a line"
@@ -1361,14 +1371,15 @@ End Sub
 
 Private Sub RecognizeTheSelectedLine
 	If HasValidateModel=False Then
-		Dim response As Int = fx.Msgbox2(MainForm,"No models found","","Go to perferences","","Close",fx.MSGBOX_CONFIRMATION)
+		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
+		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
 			ShowPreferences.SwitchTab(2)
 		End If
 		Return
 	End If
-	progressDialog.Show("Recognizing...")
-	progressDialog.update2("Processing...")
+	progressDialog.Show(loc.Localize("Recognizing..."))
+	progressDialog.update2(loc.Localize("Processing..."))
 	Dim currentLine As Map = currentProject.GetLine(selectedRowID - 1)
 	Dim startTime As String = currentLine.Get("startTime")
 	Dim endTime As String = currentLine.Get("endTime")
@@ -1614,7 +1625,7 @@ Private Sub VLCImageView_MouseClicked (EventData As MouseEvent)
 		Dim cm As ContextMenu
 		cm.Initialize("")
 		Dim playControlMi As MenuItem
-		playControlMi.Initialize("Play control","playControlMi")
+		playControlMi.Initialize(loc.Localize("Play control"),"playControlMi")
 		cm.MenuItems.Add(playControlMi)
 		Dim map1 As Map
 		map1=Utils.GetScreenPosition(view)
@@ -1634,13 +1645,6 @@ private Sub DetectVoiceActivity
 	If currentProject.IsInitialized=False Then
 		Return
 	End If
-	If HasValidateModel=False Then
-		Dim response As Int = fx.Msgbox2(MainForm,"No models found","","Go to perferences","","Close",fx.MSGBOX_CONFIRMATION)
-		If response = fx.DialogResponse.POSITIVE Then
-			ShowPreferences.SwitchTab(2)
-		End If
-		Return
-	End If
 	Dim parent As String = currentProject.GetMediaFolder
 	Dim filename As String = currentProject.GetMediaFilename
 	Dim tmpDir As String = currentProject.GetTmpFolder
@@ -1648,7 +1652,7 @@ private Sub DetectVoiceActivity
 	wait for (ConvertToWav(parent,filename,tmpDir)) complete (done As Object)
 	Dim vad As SileroVad
 	vad.Initialize
-	progressDialog.Show("Detecting...")
+	progressDialog.Show(loc.Localize("Detecting..."))
 	Dim length As Long = vlc.GetLength
 	Dim segLength As Int = 30
 	Dim segments As Int = length/1000/segLength
@@ -1674,7 +1678,7 @@ private Sub DetectVoiceActivity
 	Next
 	LoadLinesToTable
 	progressDialog.close
-	fx.Msgbox(MainForm,"Done","")
+	fx.Msgbox(MainForm,loc.Localize("Done"),"")
 End Sub
 
 Private Sub SetStartPointButton_MouseClicked (EventData As MouseEvent)

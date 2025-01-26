@@ -16,10 +16,11 @@ End Sub
 Public Sub Initialize
 	frm.Initialize("frm",500,250)
 	frm.RootPane.LoadLayout("ExportOptions")
-	ComboBox1.items.Add("Source only")
-	ComboBox1.items.Add("Target only")
-	ComboBox1.items.Add("Source + target")
+	ComboBox1.items.Add(Main.loc.Localize("Source only"))
+	ComboBox1.items.Add(Main.loc.Localize("Target only"))
+	ComboBox1.items.Add(Main.loc.Localize("Source + target"))
 	ComboBox1.SelectedIndex = 1
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub ShowAndWait As Int

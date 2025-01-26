@@ -18,6 +18,7 @@ Public Sub Initialize
 	frm.RootPane.LoadLayout("ASROptions")
 	options.Initialize
 	options.Put("split_method",-1)
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub ShowAndWait As Map

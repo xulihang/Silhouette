@@ -20,6 +20,7 @@ Public Sub Initialize(pLines As List)
 	lines=pLines
 	frm.Initialize("frm",600,300)
 	frm.RootPane.LoadLayout("searchandreplace")
+	main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub show
