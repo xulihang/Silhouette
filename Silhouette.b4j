@@ -1290,7 +1290,7 @@ End Sub
 Private Sub GetCurrentVideoTime As Long
 	Dim currentVideoTime As Long 
 	If playbackStartDate <> -1 Then
-		currentVideoTime = playbackStartTime + DateTime.Now - playbackStartDate
+		currentVideoTime = playbackStartTime + (DateTime.Now - playbackStartDate)*vlc.Rate
 	Else
 		currentVideoTime = vlc.GetTime
 	End If

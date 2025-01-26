@@ -11,6 +11,7 @@ Sub Class_Globals
 	Private jo As JavaObject = Me
 	Private surface As JavaObject
 	Private mStopped As Boolean = True
+	Private mRate as Float = 1.0
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -38,7 +39,12 @@ Public Sub Pause
 End Sub
 
 Public Sub setRate(value As Float)
+	mRate = value
 	embeddedMediaPlayer.RunMethodJO("controls",Null).RunMethod("setRate",Array(value))
+End Sub
+
+Public Sub getRate As Float
+	Return mRate
 End Sub
 
 Public Sub Stop
