@@ -1729,9 +1729,6 @@ Private Sub UpdateTime(isStartTime As Boolean,new As String)
 		LinesTable.sql1.ExecNonQuery2($"UPDATE data SET ${EndColumn.SQLID} = ? WHERE rowid = ?"$, Array As String(new, selectedRowID))
 	End If
 	LinesTable.Refresh
-	If ReadyToDrawWaveForm Then
-		SetTheRangeForTheSelectedRow
-	End If
 End Sub
 
 Private Sub UpdateText(isSource As Boolean,new As String)
@@ -1775,6 +1772,10 @@ End Sub
 Private Sub UseCurrentTimeButton_MouseClicked (EventData As MouseEvent)
 	If focusedTimeTextField.IsInitialized Then
 		focusedTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
+		Sleep(0)
+		If ReadyToDrawWaveForm Then
+			SetTheRangeForTheSelectedRow
+		End If
 	End If
 End Sub
 
@@ -1868,12 +1869,20 @@ End Sub
 Private Sub SetStartPointButton_MouseClicked (EventData As MouseEvent)
 	If selectedRowID <> -1 Then
 		StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
+		Sleep(0)
+		If ReadyToDrawWaveForm Then
+			SetTheRangeForTheSelectedRow
+		End If
 	End If
 End Sub
 
 Private Sub SetEndPointButton_MouseClicked (EventData As MouseEvent)
 	If selectedRowID <> -1 Then
 		EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
+		Sleep(0)
+		If ReadyToDrawWaveForm Then
+			SetTheRangeForTheSelectedRow
+		End If
 	End If
 End Sub
 
