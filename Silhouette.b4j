@@ -377,6 +377,14 @@ Private Sub MenuBar1_Action
 			JumpToLine
 		Case "Jump to the Line of the Current _Time"
 			JumpToLineOfCurrentTime
+		Case "Jump to the _Next Line"
+			If selectedRowID <> -1 Then
+				JumpToRow(selectedRowID + 1)
+			End If
+		Case "Jump to the _Previous Line"
+			If selectedRowID <> -1 Then
+				JumpToRow(selectedRowID - 1)
+			End If
 		Case "Jump _Forward"
 			Forward(500)
 		Case "Jump _Backward"
