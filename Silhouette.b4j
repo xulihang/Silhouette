@@ -336,6 +336,14 @@ Private Sub MenuBar1_Action
 			Backward(500)
 		Case "Pause/Resume"
 			TogglePlaying
+		Case "Play the _previous line"
+			If selectedRowID <> -1 Then
+				PlayLineByID(selectedRowID - 1)
+			End If
+		Case "Play the _next line"
+			If selectedRowID <> -1 Then
+				PlayLineByID(selectedRowID + 1)
+			End If
 		Case "_Settings"
 			Dim ps As ProjectSettings
 			ps.Initialize(currentProject)
@@ -1403,14 +1411,22 @@ Private Sub AppendLine
 End Sub
 
 Private Sub PlayTheSelectedLine
-	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
-	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
-	expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
-	playbackStartDate = DateTime.Now
-	playbackStartTime = startTime
-	vlc.Resume
-	vlc.SetTime(startTime)
-	TogglePlayingStatus(True)
+	PlayLineByID(selectedRowID)
+End Sub
+
+Private Sub PlayLineByID(rowID As Int)
+	Try
+		Dim line As Map = currentProject.GetLine(rowID - 1)
+		Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+		expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
+		playbackStartDate = DateTime.Now
+		playbackStartTime = startTime
+		vlc.Resume
+		vlc.SetTime(startTime)
+		TogglePlayingStatus(True)
+	Catch
+		Log(LastException)
+	End Try
 End Sub
 
 Private Sub LoadLineToEditor(fromLongClick As Boolean)
