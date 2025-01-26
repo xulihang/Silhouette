@@ -1349,13 +1349,17 @@ Private Sub tableMenuItem_Action
 			PlayTheSelectedLine
 		Case "Prepend a line"
 			PrependLine
+			SelectRow(selectedRowID,True)
 		Case "Append a line"
 			AppendLine
+			SelectRow(selectedRowID+1,True)
 		Case "Delete this line"
 			currentProject.DeleteLine(selectedRowID - 1)
 			LoadLinesToTable
+			SelectRow(selectedRowID,True)
 		Case "Merge with the next line"
 			MergeWithTheNextLine
+			SelectRow(selectedRowID,True)
 		Case "Recognize this line"
 			RecognizeTheSelectedLine
 	End Select
