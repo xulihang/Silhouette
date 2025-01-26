@@ -233,7 +233,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 		                             loc.Localize("Delete this line"), _ 
 									 loc.Localize("Prepend a line"), _ 
 									 loc.Localize("Append a line"), _ 
-									 loc.Localize("Merge with the Next line"), _ 
+									 loc.Localize("Merge with the next line"), _ 
 									 loc.Localize("Recognize this line"))
 		Dim mi As MenuItem
 		mi.Initialize(text,"tableMenuItem")
@@ -254,7 +254,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	loadPlugins
 	AddWaveFormControls
 	loc.LocalizeForm(MainForm)
-	LocalizationHelper.Export
+	'LocalizationHelper.Export
 End Sub
 
 Private Sub AddWaveFormControls
