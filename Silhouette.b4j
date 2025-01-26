@@ -1088,7 +1088,7 @@ Private Sub PlayFile(path As String)
 	Do While vlc.IsPlaying == False
 		Sleep(100)
 	Loop
-	TogglePlayingStatus(True)
+	TogglePlayingStatus(True,vlc.GetTime)
 	Dim time As Long = vlc.GetLength / 1000
 	Dim minutes As Int =  Floor(time / 60)
 	Dim seconds As Int = time - minutes*60
@@ -1113,6 +1113,7 @@ Sub Progress_MouseClicked_Event (MethodName As String, Args() As Object) As Resu
 	ProgressSlider.Enabled = False
 	ProgressSlider.Value = percent * 100
 	vlc.SetPosition(percent)
+	TogglePlayingStatus(True,-1)
 	ProgressContextMenu.MenuItems.Clear
 	e.Consume
 	Sleep(0)
@@ -1180,7 +1181,7 @@ End Sub
 
 Private Sub StopPlaying
 	vlc.Stop
-	TogglePlayingStatus(False)
+	TogglePlayingStatus(False,-1)
 End Sub
 
 Private Sub PlayButton_MouseClicked (EventData As MouseEvent)
@@ -1190,26 +1191,34 @@ End Sub
 Private Sub TogglePlaying
 	If vlc.IsPlaying Then
 		vlc.Pause
-		TogglePlayingStatus(False)
+		TogglePlayingStatus(False,-1)
 	Else
 		vlc.Resume
 		Do While vlc.IsPlaying = False
 			Sleep(100)
 		Loop
-		TogglePlayingStatus(True)
+		TogglePlayingStatus(True,vlc.GetTime)
 	End If
 End Sub
 
-Private Sub TogglePlayingStatus(isPlaying As Boolean)
+Private Sub TogglePlayingStatus(isPlaying As Boolean,startTime As Long)
 	If isPlaying Then
 		vlc.SetVolume(VolSlider.Value)
 		VLCPane.PrefWidth  = VLCPane.Width + 1
 		VLCPane.PrefWidth  = VLCPane.Width - 1
 		PlayButton.Text = ""
 		ProgressTimer.Enabled = True
+		playbackStartDate = DateTime.Now
+		If startTime = -1 Then
+			playbackStartTime = vlc.GetTime
+		Else
+			playbackStartTime = startTime
+		End If
 	Else
 		PlayButton.Text = ""
 		ProgressTimer.Enabled = False
+		playbackStartDate = -1
+		playbackStartTime = -1
 	End If
 End Sub
 
@@ -1226,7 +1235,7 @@ Private Sub ProgressTimer_Tick
 			playbackStartTime = -1
 			playbackStartDate = -1
 			vlc.Pause
-			TogglePlayingStatus(False)
+			TogglePlayingStatus(False,-1)
 		End If
 		ProgressSlider.Tag = False
 		DrawPositionLineInWaveForm(currentVideoTime)
@@ -1246,7 +1255,7 @@ Private Sub ProgressTimer_Tick
 		End If
 	Else
 		vlc.Stopped = True
-		TogglePlayingStatus(False)
+		TogglePlayingStatus(False,-1)
 	End If
 End Sub
 
@@ -1264,7 +1273,7 @@ Private Sub DrawPositionLineInWaveForm(time As Long)
 			If timestampRange.StopProgress <> -1 Then
 				If timestampRange.PlayTimeProgress > timestampRange.StopProgress Then
 					vlc.Pause
-					TogglePlayingStatus(False)
+					TogglePlayingStatus(False,-1)
 				End If
 			End If
 		End If
@@ -1341,7 +1350,7 @@ Private Sub playHereMI_Action
 	vlc.SetTime(time)
 	If vlc.IsPlaying = False Then
 		vlc.Resume
-		TogglePlayingStatus(True)
+		TogglePlayingStatus(True,time)
 	End If
 End Sub
 
@@ -1375,21 +1384,17 @@ End Sub
 Private Sub playSelectionMI_Action
 	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(StartTimeTextField.Text)
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
-	playbackStartDate = DateTime.Now
-	playbackStartTime = startTime
 	vlc.Resume
 	vlc.SetTime(startTime)
-	TogglePlayingStatus(True)
+	TogglePlayingStatus(True,startTime)
 End Sub
 
 Private Sub playSelectionHereMI_Action
 	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
-	playbackStartDate = DateTime.Now
-	playbackStartTime = startTime
 	vlc.Resume
 	vlc.SetTime(startTime)
-	TogglePlayingStatus(True)
+	TogglePlayingStatus(True,startTime)
 End Sub
 
 
@@ -1516,11 +1521,9 @@ Private Sub PlayLineByID(rowID As Int)
 		Dim line As Map = currentProject.GetLine(rowID - 1)
 		Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
 		expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
-		playbackStartDate = DateTime.Now
-		playbackStartTime = startTime
 		vlc.Resume
 		vlc.SetTime(startTime)
-		TogglePlayingStatus(True)
+		TogglePlayingStatus(True,startTime)
 	Catch
 		Log(LastException)
 	End Try
