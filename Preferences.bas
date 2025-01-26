@@ -44,8 +44,8 @@ Public Sub Initialize(mb As MenuBar)
 		End If
 		WhisperModelPathTextField.Text = preferencesMap.GetDefault("whisper_model_path","")
     End If
-	EnableMultipleSentenceMTCheckBox.Checked = preferencesMap.GetDefault("multiple_sentence_mt",True)
-	MaxLengthForMTSpinner.Value = preferencesMap.GetDefault("multiple_sentence_mt_char_length",2000)
+	EnableMultipleSentenceMTCheckBox.Checked = preferencesMap.GetDefault("multiple_sentences_mt",True)
+	MaxLengthForMTSpinner.Value = preferencesMap.GetDefault("multiple_sentences_mt_char_length",2000)
 	loadAPI
 	loadMT
 	LoadLanaugesList
@@ -154,8 +154,8 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("mt",mtPreferences)
 	preferencesMap.Put("api",apiPreferences)
 	preferencesMap.Put("whisper_model_path",WhisperModelPathTextField.Text)
-	preferencesMap.Put("multiple_sentence_mt_char_length",MaxLengthForMTSpinner.Value)
-	preferencesMap.Put("multiple_sentence_mt",EnableMultipleSentenceMTCheckBox.Checked)
+	preferencesMap.Put("multiple_sentences_mt_char_length",MaxLengthForMTSpinner.Value)
+	preferencesMap.Put("multiple_sentences_mt",EnableMultipleSentenceMTCheckBox.Checked)
 	Dim lang As String
 	If LanguageComboBox.SelectedIndex<>-1 Then
 		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)
