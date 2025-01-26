@@ -98,6 +98,7 @@ Sub loadAPI
 	items.Initialize
 	items.AddAll(Array("tencent","microsoft","baidu","youdao","mymemory"))
 	items.AddAll(MT.getMTPluginList)
+	items.AddAll(ASR.getASRPluginList)
 	
 	Dim set As B4XSet
 	set.Initialize

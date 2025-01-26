@@ -9,43 +9,45 @@ Sub Process_Globals
 	Private fx As JFX
 End Sub
 
-Public Sub ExportToSRT(lines As List,path As String)
-	Dim optionsForm As ExportOptions
-	optionsForm.Initialize
-	Dim option As Int = optionsForm.ShowAndWait
-	If option = -1 Then
-		Return
-	Else
-		Dim sb As StringBuilder
-		sb.Initialize
-		Dim index As Int = 0
-		For Each line As Map In lines
-			sb.Append(index+1)
-			sb.Append(Chr(13))
-			sb.Append(Chr(10))
-			sb.Append(line.Get("startTime"))
-			sb.Append(" --> ")
-			sb.Append(line.Get("endTime"))
-			sb.Append(Chr(13))
-			sb.Append(Chr(10))
-			If option = 0 Then
-				sb.Append(line.Get("source"))
-			else if option = 1 Then
-				sb.Append(line.Get("target"))
-			Else
-				sb.Append(line.Get("source"))
-				sb.Append(Chr(13))
-				sb.Append(Chr(10))
-				sb.Append(line.Get("target"))
-			End If
-			sb.Append(Chr(13))
-			sb.Append(Chr(10))
-			sb.Append(Chr(13))
-			sb.Append(Chr(10))
-			index = index + 1
-		Next
-		File.WriteString(path,"",sb.ToString)
+Public Sub ExportToSRT(lines As List,path As String,askOption As Boolean)
+	Dim option As Int = 0
+	If askOption Then
+		Dim optionsForm As ExportOptions
+		optionsForm.Initialize
+		option = optionsForm.ShowAndWait
+		If option = -1 Then
+			Return
+		End If
 	End If
+	Dim sb As StringBuilder
+	sb.Initialize
+	Dim index As Int = 0
+	For Each line As Map In lines
+		sb.Append(index+1)
+		sb.Append(Chr(13))
+		sb.Append(Chr(10))
+		sb.Append(line.Get("startTime"))
+		sb.Append(" --> ")
+		sb.Append(line.Get("endTime"))
+		sb.Append(Chr(13))
+		sb.Append(Chr(10))
+		If option = 0 Then
+			sb.Append(line.Get("source"))
+		else if option = 1 Then
+			sb.Append(line.Get("target"))
+		Else
+			sb.Append(line.Get("source"))
+			sb.Append(Chr(13))
+			sb.Append(Chr(10))
+			sb.Append(line.Get("target"))
+		End If
+		sb.Append(Chr(13))
+		sb.Append(Chr(10))
+		sb.Append(Chr(13))
+		sb.Append(Chr(10))
+		index = index + 1
+	Next
+	File.WriteString(path,"",sb.ToString)
 End Sub
 
 

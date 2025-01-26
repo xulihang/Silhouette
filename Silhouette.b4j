@@ -427,7 +427,7 @@ Private Sub MenuBar1_Action
 			fc.SetExtensionFilter("SRT",Array As String("*.srt"))
 			Dim path As String = fc.ShowSave(MainForm)
 			If path <> "" Then
-				Exporter.ExportToSRT(currentProject.lines,path)
+				Exporter.ExportToSRT(currentProject.lines,path,True)
 				fx.Msgbox(MainForm,loc.Localize("Done"),"")
 			End If
 		Case "export to tab-delimited _txt"
@@ -557,7 +557,8 @@ Private Sub RecognizeSpeech
 End Sub
 
 Private Sub RecognizeExistingLines
-	If HasValidateModel=False Then
+	Dim engine As String = currentProject.settings.GetDefault("engine","whisper")
+	If HasValidateModel=False And engine = "whisper" Then
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
 		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
@@ -583,7 +584,7 @@ Private Sub RecognizeExistingLines
 		Dim startTime As String = line.Get("startTime")
 		Dim endTime As String = line.Get("endTime")
 		Dim tmpDir As String = currentProject.GetTmpFolder
-		wait for (ASR.RecognizeCut(tmpDir,"audio.wav",startTime,endTime,currentProject.SourceLang)) complete (str As String)
+		wait for (ASR.RecognizeCut(tmpDir,"audio.wav",startTime,endTime,currentProject.SourceLang,engine)) complete (str As String)
 		line.Put("source",str)
 	Next
 	LoadLinesToTable
@@ -591,7 +592,8 @@ Private Sub RecognizeExistingLines
 End Sub
 
 Private Sub RecognizeSpeechByFixedSpan
-	If HasValidateModel=False Then
+	Dim engine As String = currentProject.settings.GetDefault("engine","whisper")
+	If HasValidateModel=False And engine = "whisper" Then
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
 		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
@@ -623,7 +625,8 @@ Private Sub RecognizeSpeechByFixedSpan
 		If File.Exists(tmpDir,purename&".srt") = False And File.Exists(tmpDir,filename&".srt") = False Then
 			progressDialog.update(index,wavFiles.Size)
 			Dim wavpath As String = File.Combine(tmpDir,filename)
-			Wait For (ASR.RecognizeWav(wavpath,currentProject.SourceLang)) Complete (done As Object)
+			
+			Wait For (ASR.RecognizeWav(wavpath,currentProject.SourceLang,engine)) Complete (done As Object)
 		End If
 		If progressDialog.isShowing = False Then
 			Exit
@@ -1475,7 +1478,8 @@ Private Sub HasValidateModel As Boolean
 End Sub
 
 Private Sub RecognizeTheSelectedLine
-	If HasValidateModel=False Then
+	Dim engine As String = currentProject.settings.GetDefault("engine","whisper")
+	If HasValidateModel=False And engine = "whisper" Then
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
 		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
@@ -1498,8 +1502,8 @@ Private Sub RecognizeTheSelectedLine
 		Wait For (FFMpeg.Video2Wav(parent,filename,outpath)) Complete (done As Object)
 		Log("convert video to wav done")
 	End If
-	
-	wait for (ASR.RecognizeCut(tmpDir,"audio.wav",startTime,endTime,currentProject.SourceLang)) complete (str As String)
+
+	wait for (ASR.RecognizeCut(tmpDir,"audio.wav",startTime,endTime,currentProject.SourceLang,engine)) complete (str As String)
 	
 	SourceTextArea.Text = str
 	progressDialog.close

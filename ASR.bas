@@ -10,17 +10,19 @@ Sub Process_Globals
 	Private sh As Shell
 End Sub
 
-Public Sub RecognizeCut(dir As String,filename As String,startTime As String,endTime As String,lang As String) As ResumableSub
+Public Sub RecognizeCut(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
 	wait for (FFMpeg.CutWav(dir,filename,"cut.wav",startTime,endTime)) Complete (done As Object)
 	File.Copy(dir,"cut.wav",dir,"cut-o.wav")
 	wait for (FFMpeg.AddPadding(dir,"cut-o.wav","cut.wav",2)) complete (done As Object)
 	File.Delete(dir,"cut-o.wav")
-	Wait For (RecognizeWavAsText(File.Combine(dir,"cut.wav"),lang)) Complete (str As String)
+	Wait For (RecognizeWavAsText(File.Combine(dir,"cut.wav"),lang,engine)) Complete (str As String)
+	File.Delete(dir,"cut.wav.srt")
+	File.Delete(dir,"cut.srt")
 	Return str
 End Sub
 
-Public Sub RecognizeWavAsText(filepath As String,lang As String) As ResumableSub
-	wait for (RecognizeWav(filepath,lang)) complete (done As Object)
+Public Sub RecognizeWavAsText(filepath As String,lang As String,engine As String) As ResumableSub
+	wait for (RecognizeWav(filepath,lang,engine)) complete (done As Object)
 	Dim filename As String = File.GetName(filepath)
 	Dim dir As String = File.GetFileParent(filepath)
 	Dim content As String
@@ -42,20 +44,44 @@ Public Sub RecognizeWavAsText(filepath As String,lang As String) As ResumableSub
 	Return sb.ToString
 End Sub
 
-Public Sub RecognizeWav(filepath As String,lang As String) As ResumableSub
-	Dim args As List
-	args = Array("-m",GetModelPath,"-f",filepath,"-osrt","-l",lang)
-	Dim sh As Shell
-	sh.Initialize("sh",GetWhisperPath,args)
-	sh.WorkingDirectory = File.DirApp
-	sh.Run(-1)
-	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
-	Log(StdOut)
-	Log(StdErr)
-	If ExitCode <> 0 Then
-		Utils.ReportError(StdOut)
+Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As ResumableSub
+	If engine = "whisper" Then
+		Dim args As List
+		args = Array("-m",GetModelPath,"-f",filepath,"-osrt","-l",lang)
+		Dim sh As Shell
+		sh.Initialize("sh",GetWhisperPath,args)
+		sh.WorkingDirectory = File.DirApp
+		sh.Run(-1)
+		wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+		Log(StdOut)
+		Log(StdErr)
+		If ExitCode <> 0 Then
+			Utils.ReportError(StdOut)
+		End If
+		Return Success
+	Else
+		If getASRPluginList.IndexOf(engine)<>-1 Then
+			Dim params As Map
+			params.Initialize
+			params.Put("path",filepath)
+			params.Put("lang",lang)
+			params.Put("preferencesMap",Utils.getPrefMap)
+			wait for (Main.plugin.RunPlugin(engine&"ASR","recognize",params)) complete (lines As List)
+			Dim convertedLines As List
+			convertedLines.Initialize
+			For Each line As Map In lines
+				Dim converted As Map
+				converted.Initialize
+				converted.Put("startTime",Utils.GetTimeStringFromMilliseconds(line.Get("start")*1000))
+				converted.Put("endTime",Utils.GetTimeStringFromMilliseconds(line.Get("end")*1000))
+				converted.Put("source",line.Get("text"))
+				converted.Put("target","")
+				convertedLines.Add(converted)
+			Next
+			Exporter.ExportToSRT(convertedLines,filepath&".srt",False)
+		End If
 	End If
-	Return Success
+	Return False
 End Sub
 
 Public Sub GetWhisperPath As String
@@ -91,4 +117,15 @@ Public Sub KillCurrentShell
 	If sh.IsInitialized Then
 		sh.KillProcess
 	End If
+End Sub
+
+Sub getASRPluginList As List
+	Dim asrList As List
+	asrList.Initialize
+	For Each name As String In Main.plugin.GetAvailablePlugins
+		If name.EndsWith("ASR") Then
+			asrList.Add(name.Replace("ASR",""))
+		End If
+	Next
+	Return asrList
 End Sub

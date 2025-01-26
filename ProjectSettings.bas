@@ -11,6 +11,7 @@ Sub Class_Globals
 	Private mProject As Project
 	Private TabPane1 As TabPane
 	Private LangPairLabel As Label
+	Private EngineComboBox As ComboBox
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -32,6 +33,14 @@ Public Sub Initialize(p As Project)
 	langmap.Put("source",sourceLang)
 	langmap.Put("target",targetLang)
 	LangPairLabel.Tag=langmap
+	EngineComboBox.Items.Add("whisper")
+	EngineComboBox.Items.AddAll(ASR.getASRPluginList)
+	If settings.ContainsKey("engine") Then
+		EngineComboBox.SelectedIndex = EngineComboBox.Items.IndexOf(settings.GetDefault("engine","whisper"))
+	End If
+	If EngineComboBox.SelectedIndex = -1 Then
+		EngineComboBox.SelectedIndex = 0
+	End If
 	Main.loc.LocalizeForm(frm)
 End Sub
 
@@ -59,6 +68,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	Dim targetLang As String = langmap.Get("target")
 	settings.Put("sourceLang",sourceLang)
 	settings.Put("targetLang",targetLang)
+	settings.Put("engine",EngineComboBox.Items.Get(EngineComboBox.SelectedIndex))
 	mProject.save
 	frm.Close
 End Sub

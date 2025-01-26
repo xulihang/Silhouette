@@ -54,6 +54,18 @@ Sub init(engineName As String)
 		setTableView(result,DefaultParamValues)
 		Return
 	End If
+	If ASR.getASRPluginList.IndexOf(engineName)<>-1 Then
+		wait for (Main.plugin.RunPlugin(engineName&"ASR","getParams",Null)) complete (result As List)
+		Dim DefaultParamValues As Map
+		Try
+			wait for (Main.plugin.RunPlugin(engineName&"ASR","getDefaultParamValues",Null)) complete (DefaultParamValues As Map)
+		Catch
+			DefaultParamValues=emptyMap
+			Log(LastException)
+		End Try
+		setTableView(result,DefaultParamValues)
+		Return
+	End If
 	Select engineName
 		Case "baidu"
 			setTableView(Array As String("appid","key"), emptyMap)
