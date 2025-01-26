@@ -1281,6 +1281,7 @@ Private Sub TogglePlayingStatus(isPlaying As Boolean,startTime As Long)
 	Else
 		PlayButton.Text = ""
 		ProgressTimer.Enabled = False
+		expectedEndTime = -1
 		playbackStartDate = -1
 		playbackStartTime = -1
 	End If
