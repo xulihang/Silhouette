@@ -1268,6 +1268,7 @@ private Sub splitHereMI_Action
 		currentProject.AppendLineWithTime(selectedRowID - 1,AudioProgressLabel.Text,line.get("endTime"))
 		line.Put("endTime",AudioProgressLabel.Text)
 		LoadLinesToTable
+		SelectRow(selectedRowID,True)
 	End If
 End Sub
 
