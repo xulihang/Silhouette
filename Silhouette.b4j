@@ -16,14 +16,15 @@ File20=PlayControl.bjl
 File21=pretranslate.bjl
 File22=progress.bjl
 File23=projectSetting.bjl
-File24=silhouette.png
-File25=TopRightSplitPane.bjl
-File26=TopSplitPane.bjl
-File27=TranslationAssist.bjl
-File28=TranslationMemory.bjl
-File29=VideoPlayer.bjl
+File24=searchandreplace.bjl
+File25=silhouette.png
+File26=TopRightSplitPane.bjl
+File27=TopSplitPane.bjl
+File28=TranslationAssist.bjl
+File29=TranslationMemory.bjl
 File3=ASROptions.bjl
-File30=WaveForm.bjl
+File30=VideoPlayer.bjl
+File31=WaveForm.bjl
 File4=BottomSplitPane.bjl
 File5=Editor.bjl
 File6=ErrorReporter.bjl
@@ -54,6 +55,7 @@ FileGroup28=Default Group
 FileGroup29=Default Group
 FileGroup3=Default Group
 FileGroup30=Default Group
+FileGroup31=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
@@ -68,9 +70,10 @@ Library12=jshell
 Library13=json
 Library14=jxui
 Library15=okhttp
-Library16=xcustomlistview
-Library17=xui views
-Library18=threading
+Library16=threading
+Library17=xcustomlistview
+Library18=xui views
+Library19=jpoi
 Library2=b4xcollections
 Library3=b4xtable
 Library4=byteconverter
@@ -83,20 +86,24 @@ Module1=APIParamsFiller
 Module10=JumpOptions
 Module11=jVLC
 Module12=LanguagePairSelector
-Module13=MT
-Module14=NativeHook
-Module15=PlayControlForm
-Module16=Preferences
-Module17=preTranslateDialog
-Module18=progressDialog
-Module19=Project
+Module13=LocalizationHelper
+Module14=Localizator
+Module15=MT
+Module16=NativeHook
+Module17=PlayControlForm
+Module18=Preferences
+Module19=preTranslateDialog
 Module2=ASR
-Module20=ProjectSettings
-Module21=SileroVad
-Module22=SrtParser
-Module23=Utils
-Module24=WaveFormBitmapCreator
-Module25=WavRandomAccessFile
+Module20=progressDialog
+Module21=Project
+Module22=ProjectSettings
+Module23=SearchAndReplaceDialog
+Module24=SileroVad
+Module25=SrtParser
+Module26=TextFlow
+Module27=Utils
+Module28=WaveFormBitmapCreator
+Module29=WavRandomAccessFile
 Module3=ASROptions
 Module4=DraggableRange
 Module5=ErrorReporter
@@ -104,9 +111,9 @@ Module6=Exporter
 Module7=ExportOptions
 Module8=FFMpeg
 Module9=InputBox
-NumberOfFiles=30
-NumberOfLibraries=18
-NumberOfModules=25
+NumberOfFiles=31
+NumberOfLibraries=19
+NumberOfModules=29
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -186,9 +193,11 @@ Sub Process_Globals
 	Private FollowProgressCheckBox As CheckBox
 	Private KeepRatioCheckBox As CheckBox
 	Private hook As NativeHook
+	Public loc As Localizator
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
+	loc.Initialize(File.DirApp,"strings.db")
 	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
 	hook.Initialize(Me,"Hook")
 	MainForm = Form1
@@ -326,6 +335,10 @@ Private Sub MenuBar1_Action
 			NewLine
 		Case "_Clear Lines"
 			ClearLines
+		Case "_Search and replace"
+			Dim snr As SearchAndReplaceDialog
+			snr.Initialize(currentProject.lines)
+			snr.show
 		Case "_Jump to Line"
 			JumpToLine
 		Case "Jump to the Line of the Current _Time"
@@ -427,7 +440,7 @@ Private Sub JumpToLine
 	JumpToRow(index)
 End Sub
 
-Private Sub JumpToRow(rowID As Int)
+Public Sub JumpToRow(rowID As Int)
 	If rowID = -1 Then
 		Return
 	End If
@@ -630,7 +643,7 @@ Private Sub ImportFromSRT(path As String)
 	Next
 End Sub
 
-Private Sub LoadLinesToTable
+public Sub LoadLinesToTable
 	Dim data As List
 	data.Initialize
 	Dim index As Int = 0
