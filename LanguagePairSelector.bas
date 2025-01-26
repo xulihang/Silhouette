@@ -22,9 +22,6 @@ Public Sub Initialize
 	frm.RootPane.LoadLayout("LangaugePairSelector")
 	result.Initialize
 	LanguageNames.Initialize
-	If File.Exists(File.DirApp,"langcodes.txt")=False Then
-		File.Copy(File.DirAssets,"langcodes.txt",File.DirApp,"langcodes.txt")
-	End If
 	langcodes=Utils.readLanguageCode(File.Combine(File.DirApp,"langcodes.txt"))
 	fillComboBox
 	ReadLastLangs
@@ -36,6 +33,7 @@ Sub fillComboBox
 		Dim codesMap As Map
 		codesMap=langcodes.Get(key)
 		Dim langName As String=codesMap.Get("language name")
+		langName = Main.loc.Localize(langName)
 		LanguageNames.Put(langName,key)
 		sourceComboBox.Items.Add(langName)
 		targetComboBox.Items.Add(langName)

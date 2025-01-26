@@ -19,7 +19,7 @@ Public Sub Initialize(p As Project)
 	frm.RootPane.LoadLayout("projectSetting")
 	settings=p.settings
 	mProject=p
-	TabPane1.LoadLayout("generalSettings", main.loc.Localize("General"))
+	TabPane1.LoadLayout("generalSettings", Main.loc.Localize("General"))
 	Dim langmap As Map
 	langmap.Initialize
 	Dim sourceLang As String

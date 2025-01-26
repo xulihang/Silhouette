@@ -14,7 +14,23 @@ Sub Export
 	map1.Initialize
 	ExportLayoutText(map1)
 	ExportInCodeString(map1)
+	ExportLanguageCodes(map1)
 	ExportMaptoXLSX(map1)
+End Sub
+
+Private Sub ExportLanguageCodes(map1 As Map)
+	Dim langcodes As Map=Utils.readLanguageCode(File.Combine(File.DirApp,"langcodes.txt"))
+	For Each key As String In langcodes.Keys
+		Dim codesMap As Map
+		codesMap=langcodes.Get(key)
+		Dim langName As String=codesMap.Get("language name")
+		Dim transUnit As Map
+		transUnit.Initialize
+		transUnit.Put("type","code")
+		transUnit.Put("note","langName")
+		transUnit.Put("text",langName)
+		map1.Put(langName.ToLowerCase,transUnit)
+	Next
 End Sub
 
 Sub ExportLayoutText(map1 As Map)
