@@ -211,6 +211,7 @@ Sub Process_Globals
 	Private DisplaySubtitleCheckBox As CheckBox
 	Public version As String = "v1.0.0"
 	Public limitedMode As Boolean = False
+	private loopMode as Boolean = False
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -1292,6 +1293,7 @@ Private Sub TogglePlaying
 End Sub
 
 Private Sub TogglePlayingStatus(isPlaying As Boolean,startTime As Long)
+	loopMode = False
 	If isPlaying Then
 		vlc.SetVolume(VolSlider.Value)
 		VLCPane.PrefWidth  = VLCPane.Width + 1
@@ -1328,11 +1330,15 @@ Private Sub ProgressTimer_Tick
 		Dim currentVideoTime As Long = GetCurrentVideoTime
 		'currentVideoTime = currentVideoTime + 100
 		If currentVideoTime > expectedEndTime And expectedEndTime <> -1 And playbackStartDate <> -1 Then
-			expectedEndTime = -1
-			playbackStartTime = -1
-			playbackStartDate = -1
-			vlc.Pause
-			TogglePlayingStatus(False,-1)
+			If loopMode Then
+				loopMI_Action
+			Else
+				expectedEndTime = -1
+				playbackStartTime = -1
+				playbackStartDate = -1
+				vlc.Pause
+				TogglePlayingStatus(False,-1)
+			End If
 		End If
 		If FollowProgressCheckBox.Checked Then
 			Dim rowID As Int = FindTheRowIDOfTime(currentVideoTime)
@@ -1426,6 +1432,9 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 		Dim newLineHereMI As MenuItem
 		newLineHereMI.Initialize(loc.Localize("Create a new line here"),"newLineHereMI")
 		WaveFormContextMenu.MenuItems.Add(newLineHereMI)
+		Dim loopMI As MenuItem
+		loopMI.Initialize(loc.Localize("Loop the selection"),"loopMI")
+		WaveFormContextMenu.MenuItems.Add(loopMI)
 	End If
 End Sub
 
@@ -1489,6 +1498,11 @@ Private Sub playSelectionMI_Action
 	vlc.Resume
 	vlc.SetTime(startTime)
 	TogglePlayingStatus(True,startTime)
+End Sub
+
+private Sub loopMI_Action
+	playSelectionMI_Action
+	loopMode = True
 End Sub
 
 Private Sub playSelectionHereMI_Action
