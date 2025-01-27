@@ -140,6 +140,7 @@ Version=10
 #AdditionalJar: vlcj-javafx-1.2.0
 #AdditionalJar: vlcj-natives-4.8.3
 #AdditionalJar: sqlite-jdbc-3.43.0.0
+#AdditionalJar: bcprov-jdk15on-154
 #AdditionalJar: silero-vad
 #AdditionalJar: onnxruntime-1.20.0
 #AdditionalJar: jnativehook-2.2.2
