@@ -272,7 +272,9 @@ Sub AppStart (Form1 As Form, Args() As String)
 	LocalizeMainFrom
 	Dim v As Validator
 	v.Initialize
-	v.showAndWait
+	If v.VerifyInSilence = False Then
+		v.showAndWait
+	End If
 End Sub
 
 Public Sub initLoc
