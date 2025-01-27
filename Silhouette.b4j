@@ -209,9 +209,9 @@ Sub Process_Globals
 	Type SortCriteria (o As Object,value As Long)
 	Private SubtitleLabel As Label
 	Private DisplaySubtitleCheckBox As CheckBox
-	Public version As String = "v1.0.0"
+	Public version As String = "1.0.0"
 	Public limitedMode As Boolean = False
-	private loopMode as Boolean = False
+	Private loopMode As Boolean = False
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
