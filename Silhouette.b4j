@@ -217,7 +217,9 @@ End Sub
 Sub AppStart (Form1 As Form, Args() As String)
 	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
 	initLoc
-	hook.Initialize(Me,"Hook")
+	If Utils.DetectOS = "windows" Then
+		hook.Initialize(Me,"Hook")
+	End If
 	MainForm = Form1
 	MainForm.RootPane.LoadLayout("main")
 	MainForm.WindowWidth = 800
