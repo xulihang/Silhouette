@@ -611,7 +611,7 @@ Private Sub RecognizeExistingLines
 		If progressDialog.isShowing = False Then
 			Exit
 		End If
-		If line.Get("source") <> "" Then
+		If line.Get("source") <> "" And Utils.getPref("skip_recognized",True) Then
 			Continue
 		End If
 		Dim startTime As String = line.Get("startTime")
@@ -655,10 +655,9 @@ Private Sub RecognizeSpeechByFixedSpan
 		Log(index & "/" & wavFiles.Size)
 		Dim purename As String = Utils.GetFilenameWithoutExtension(filename)
 		'stored as "segment-00000.srt" or "segment-00000.wav.srt"
-		If File.Exists(tmpDir,purename&".srt") = False And File.Exists(tmpDir,filename&".srt") = False Then
+		If (File.Exists(tmpDir,purename&".srt") = False And File.Exists(tmpDir,filename&".srt") = False) Or Utils.getPref("skip_recognized",True) = False Then
 			progressDialog.update(index,wavFiles.Size)
 			Dim wavpath As String = File.Combine(tmpDir,filename)
-			
 			Wait For (ASR.RecognizeWav(wavpath,currentProject.SourceLang,engine)) Complete (done As Object)
 		End If
 		If progressDialog.isShowing = False Then

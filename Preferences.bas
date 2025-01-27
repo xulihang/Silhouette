@@ -17,6 +17,7 @@ Sub Class_Globals
 	Private LanguageComboBox As ComboBox
 	Private EnableMultipleSentenceMTCheckBox As CheckBox
 	Private MaxLengthForMTSpinner As Spinner
+	Private SkipRecognizedCheckBox As CheckBox
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -46,6 +47,7 @@ Public Sub Initialize(mb As MenuBar)
     End If
 	EnableMultipleSentenceMTCheckBox.Checked = preferencesMap.GetDefault("multiple_sentences_mt",True)
 	MaxLengthForMTSpinner.Value = preferencesMap.GetDefault("multiple_sentences_mt_char_length",2000)
+	SkipRecognizedCheckBox.Checked = preferencesMap.GetDefault("skip_recognized",True)
 	loadAPI
 	loadMT
 	LoadLanaugesList
@@ -157,6 +159,8 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("whisper_model_path",WhisperModelPathTextField.Text)
 	preferencesMap.Put("multiple_sentences_mt_char_length",MaxLengthForMTSpinner.Value)
 	preferencesMap.Put("multiple_sentences_mt",EnableMultipleSentenceMTCheckBox.Checked)
+	preferencesMap.Put("skip_recognized",SkipRecognizedCheckBox.Checked)
+	
 	Dim lang As String
 	If LanguageComboBox.SelectedIndex<>-1 Then
 		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)
