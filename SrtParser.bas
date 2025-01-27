@@ -56,7 +56,7 @@ Public Sub Parse(content As String) As List
 			sb.Append(CRLF)
 		End If
 	Next
-	Dim textLeft As String = sb.ToString
+	Dim textLeft As String = sb.ToString.trim
 	If textLeft <> "" Then
 		If lines.Size > 0 Then
 			Dim speech As SpeechLine = lines.Get(lines.Size - 1)
