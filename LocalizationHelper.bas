@@ -174,18 +174,23 @@ End Sub
 
 Sub ExportInCodeString(map1 As Map)
 	Dim projectDir As String = File.GetFileParent(File.DirApp)
-	For Each filename As String In File.ListFiles(projectDir)
-		If filename.EndsWith(".bas") Or filename.EndsWith(".b4j") Then
-		    Dim strings As List
-			strings.Initialize
-			Dim content As String = File.ReadString(projectDir,filename)
-			Dim matcher1 As Matcher=Regex.Matcher($"\.Localize(Params)*\("(.*?)"[\),]"$,content)
-			Do While matcher1.Find
-				strings.Add(matcher1.Group(2))
-			Loop
-			stringsToMap(strings,map1)
+	Dim validatorDir As String = File.Combine(File.GetFileParent(projectDir),"Validator")
+	For Each dir As String In Array(projectDir,validatorDir)
+		If File.Exists(dir,"") Then
+			For Each filename As String In File.ListFiles(dir)
+				If filename.EndsWith(".bas") Or filename.EndsWith(".b4j") Then
+					Dim strings As List
+					strings.Initialize
+					Dim content As String = File.ReadString(dir,filename)
+					Dim matcher1 As Matcher=Regex.Matcher($"\.Localize(Params)*\("(.*?)"[\),]"$,content)
+					Do While matcher1.Find
+						strings.Add(matcher1.Group(2))
+					Loop
+					stringsToMap(strings,map1)
+				End If
+			Next
 		End If
-	Next
+	Next	
 End Sub
 
 Sub stringsToMap(strings As List,map1 As Map)
