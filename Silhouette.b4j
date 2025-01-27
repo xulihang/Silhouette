@@ -1,37 +1,39 @@
 ﻿AppType=JavaFX
 Build1=Default,org.xulihang.silhouette
 File1=apiparamfiller.bjl
-File10=icon.png
-File11=inputbox.bjl
-File12=JumpOptions.bjl
-File13=LangaugePairSelector.bjl
-File14=langcodes.txt
-File15=LeftSplitPane.bjl
-File16=LineEditor.bjl
-File17=ListView.bjl
-File18=main.bjl
-File19=modelPreference.bjl
+File10=generalSettings.bjl
+File11=icon.png
+File12=inputbox.bjl
+File13=JumpOptions.bjl
+File14=LangaugePairSelector.bjl
+File15=langcodes.txt
+File16=LeftSplitPane.bjl
+File17=LineEditor.bjl
+File18=ListView.bjl
+File19=main.bjl
 File2=APISetting.bjl
-File20=MTSetting.bjl
-File21=PlayControl.bjl
-File22=pretranslate.bjl
-File23=progress.bjl
-File24=projectSetting.bjl
-File25=searchandreplace.bjl
-File26=silhouette.png
-File27=TopRightSplitPane.bjl
-File28=TopSplitPane.bjl
-File29=TranslationAssist.bjl
+File20=modelPreference.bjl
+File21=MTSetting.bjl
+File22=PlayControl.bjl
+File23=pretranslate.bjl
+File24=progress.bjl
+File25=projectSetting.bjl
+File26=searchandreplace.bjl
+File27=silhouette.png
+File28=TopRightSplitPane.bjl
+File29=TopSplitPane.bjl
 File3=ASROptions.bjl
-File30=TranslationMemory.bjl
-File31=VideoPlayer.bjl
-File32=WaveForm.bjl
+File30=TranslationAssist.bjl
+File31=TranslationMemory.bjl
+File32=validator.bjl
+File33=VideoPlayer.bjl
+File34=WaveForm.bjl
 File4=BottomSplitPane.bjl
 File5=Editor.bjl
-File6=ErrorReporter.bjl
-File7=ExportOptions.bjl
-File8=generalPreference.bjl
-File9=generalSettings.bjl
+File6=EmailReset.bjl
+File7=ErrorReporter.bjl
+File8=ExportOptions.bjl
+File9=generalPreference.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -58,6 +60,8 @@ FileGroup3=Default Group
 FileGroup30=Default Group
 FileGroup31=Default Group
 FileGroup32=Default Group
+FileGroup33=Default Group
+FileGroup34=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
@@ -75,9 +79,10 @@ Library15=jxui
 Library16=okhttp
 Library17=threading
 Library18=xcustomlistview
-Library19=xui views
+Library19=xlutils
 Library2=b4xcollections
-Library20=xlutils
+Library20=xui views
+Library21=jb4xencryption
 Library3=b4xtable
 Library4=byteconverter
 Library5=encryption
@@ -86,38 +91,40 @@ Library7=jcore
 Library8=jfx
 Library9=jokhttputils2
 Module1=APIParamsFiller
-Module10=JumpOptions
-Module11=jVLC
-Module12=LanguagePairSelector
-Module13=LocalizationHelper
-Module14=Localizator
-Module15=MT
-Module16=NativeHook
-Module17=PlayControlForm
-Module18=Preferences
-Module19=preTranslateDialog
+Module10=InputBox
+Module11=JumpOptions
+Module12=jVLC
+Module13=LanguagePairSelector
+Module14=LocalizationHelper
+Module15=Localizator
+Module16=MT
+Module17=NativeHook
+Module18=PlayControlForm
+Module19=Preferences
 Module2=ASR
-Module20=progressDialog
-Module21=Project
-Module22=ProjectSettings
-Module23=SearchAndReplaceDialog
-Module24=SileroVad
-Module25=SrtParser
-Module26=TextFlow
-Module27=UndoManager
-Module28=Utils
-Module29=WaveFormBitmapCreator
+Module20=preTranslateDialog
+Module21=progressDialog
+Module22=Project
+Module23=ProjectSettings
+Module24=SearchAndReplaceDialog
+Module25=SileroVad
+Module26=SrtParser
+Module27=TextFlow
+Module28=UndoManager
+Module29=Utils
 Module3=ASROptions
-Module30=WavRandomAccessFile
+Module30=|relative|..\Validator\Validator
+Module31=WaveFormBitmapCreator
+Module32=WavRandomAccessFile
 Module4=DraggableRange
-Module5=ErrorReporter
-Module6=Exporter
-Module7=ExportOptions
-Module8=FFMpeg
-Module9=InputBox
-NumberOfFiles=32
-NumberOfLibraries=20
-NumberOfModules=30
+Module5=|relative|..\Validator\EmailReset
+Module6=ErrorReporter
+Module7=Exporter
+Module8=ExportOptions
+Module9=FFMpeg
+NumberOfFiles=34
+NumberOfLibraries=21
+NumberOfModules=32
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -201,7 +208,8 @@ Sub Process_Globals
 	Type SortCriteria (o As Object,value As Long)
 	Private SubtitleLabel As Label
 	Private DisplaySubtitleCheckBox As CheckBox
-	private version as string = "v1.0.0" 
+	Public version As String = "v1.0.0"
+	Public limitedMode As Boolean = False
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -409,6 +417,10 @@ Private Sub MenuBar1_Action
 			ps.Initialize(currentProject)
 			ps.show
 		Case "import from _srt"
+			If limitedMode Then
+				fx.Msgbox(MainForm,loc.Localize("Limited mode cannot import files"),"")
+				Return
+			End If
 			Dim fc As FileChooser
 			fc.Initialize
 			Dim path As String = fc.ShowOpen(MainForm)
@@ -418,6 +430,10 @@ Private Sub MenuBar1_Action
 				fx.Msgbox(MainForm,loc.Localize("Done"),"")
 			End If
 		Case "import from tab-delimited _txt"
+			If limitedMode Then
+				fx.Msgbox(MainForm,loc.Localize("Limited mode cannot import files"),"")
+				Return
+			End If
 			Dim fc As FileChooser
 			fc.Initialize
 			Dim path As String = fc.ShowOpen(MainForm)
@@ -546,6 +562,10 @@ End Sub
 
 Private Sub RecognizeSpeech
 	If currentProject.IsInitialized=False Then
+		Return
+	End If
+	If limitedMode And vlc.GetLength > 5 * 60 * 1000 Then
+		fx.Msgbox(MainForm,loc.Localize("Limited mode can only recognize a media file shorter than 5 minutes."),"")
 		Return
 	End If
 	Dim optionsForm As ASROptions
@@ -1794,6 +1814,11 @@ End Sub
 
 Private Sub EnableWaveFormCheckBox_CheckedChange(Checked As Boolean)
 	If Checked Then
+		If limitedMode And vlc.GetLength > 2 * 60 * 1000 Then
+			fx.Msgbox(MainForm,loc.Localize("Limited mode can only display waveform for a media file shorter than 2 minutes."),"")
+			EnableWaveFormCheckBox.Checked = False
+			Return
+		End If
 		Dim parent As String = currentProject.GetMediaFolder
 		Dim filename As String = currentProject.GetMediaFilename
 		Dim tmpDir As String = currentProject.GetTmpFolder
@@ -1829,6 +1854,10 @@ End Sub
 
 private Sub DetectVoiceActivity
 	If currentProject.IsInitialized=False Then
+		Return
+	End If
+	If limitedMode And vlc.GetLength > 5 * 60 * 1000 Then
+		fx.Msgbox(MainForm,loc.Localize("Limited mode can only recognize a media file shorter than 5 minutes."),"")
 		Return
 	End If
 	Dim parent As String = currentProject.GetMediaFolder
