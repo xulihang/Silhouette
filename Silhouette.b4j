@@ -1791,6 +1791,7 @@ Private Sub UpdateText(isSource As Boolean,new As String)
 		LinesTable.sql1.ExecNonQuery2($"UPDATE data SET ${TargetColumn.SQLID} = ? WHERE rowid = ?"$, Array As String(new, selectedRowID))
 	End If
 	LinesTable.Refresh
+	UpdateSubtitleLabel
 End Sub
 
 Private Sub SourceTextArea_TextChanged (Old As String, New As String)
