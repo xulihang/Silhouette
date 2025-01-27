@@ -1621,11 +1621,13 @@ private Sub NewLine
 End Sub
 
 Private Sub SortLines
+	selectedRowID = -1
 	currentProject.Sort
 	LoadLinesToTable
 End Sub
 
 Private Sub ClearLines
+	selectedRowID = -1
 	currentProject.Clear
 	LoadLinesToTable
 End Sub
