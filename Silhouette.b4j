@@ -270,6 +270,9 @@ Sub AppStart (Form1 As Form, Args() As String)
 	AddWaveFormControls
 	SubtitleLabel.Visible = False
 	LocalizeMainFrom
+	Dim v As Validator
+	v.Initialize
+	v.showAndWait
 End Sub
 
 Public Sub initLoc
