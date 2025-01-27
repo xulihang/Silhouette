@@ -1139,6 +1139,10 @@ Private Sub OpenFile
 	Dim fc As FileChooser
 	fc.Initialize
 	Dim path As String = fc.ShowOpen(MainForm)
+	If path.Contains(" ") Then
+		fx.Msgbox(MainForm,loc.Localize("The path should not contain spaces"),"")
+		Return
+	End If
 	If File.Exists(path,"") Then
 		If currentProject.IsInitialized Then
 			Dim currentProject As Project
