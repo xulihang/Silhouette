@@ -2017,5 +2017,7 @@ Private Sub NewLineHereButton_MouseClicked (EventData As MouseEvent)
 End Sub
 
 Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
+	Dim jo As JavaObject = SubtitleLabel
+	jo.RunMethod("setTextAlignment", Array("CENTER"))
 	SubtitleLabel.Visible = Checked
 End Sub
