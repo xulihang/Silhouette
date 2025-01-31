@@ -258,7 +258,11 @@ Sub AppStart (Form1 As Form, Args() As String)
 		mi.Initialize(text,"tableMenuItem")
 		tableCM.MenuItems.Add(mi)
 	Next
-	robot = robot.InitializeStatic("com.sun.glass.ui.Application").RunMethodJO("GetApplication",Null).RunMethodJO("createRobot",Null)
+	Try
+		robot = robot.InitializeStatic("com.sun.glass.ui.Application").RunMethodJO("GetApplication",Null).RunMethodJO("createRobot",Null)
+	Catch
+		Log(LastException)
+	End Try
 	Dim jo As JavaObject = ProgressSlider
 	Dim e As Object = jo.CreateEventFromUI("javafx.event.EventHandler", "progress_mousemoved", Null)
 	jo.RunMethod("setOnMouseMoved", Array(e))
@@ -790,12 +794,15 @@ Sub LinesTable_CellLongClicked (ColumnId As String, RowId As Long)
 	Dim i As Int = LinesTable.VisibleRowIds.IndexOf(RowId)
 	Dim cell As B4XView = col.CellsLayouts.Get(i)
 	Dim jo As JavaObject = tableCM '<--------------------------- global ContextMenu object
-	Dim x As Double = robot.RunMethod("getMouseX",Null)' <----- global JavaObject object
-	Dim y As Double = robot.RunMethod("getMouseY",Null)
-	If Utils.DetectOS = "mac" Then
+	Dim x As Double' <----- global JavaObject object
+	Dim y As Double
+	If Utils.DetectOS = "mac" Or robot.IsInitialized = False Then
 		Dim m As Map = Utils.GetScreenPosition(cell)
 		x = m.Get("x") + cell.Width/2
 		y = m.Get("y") + cell.Height/2
+	Else
+		x = robot.RunMethod("getMouseX",Null)' <----- global JavaObject object
+		y = robot.RunMethod("getMouseY",Null)
 	End If
 	jo.RunMethod("show", Array(cell, x, y))
 End Sub
