@@ -129,7 +129,7 @@ Version=10
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
-	#MainFormHeight: 600 
+	#MainFormHeight: 600
 	#VirtualMachineArgs: --add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
 #End Region
 
@@ -218,7 +218,11 @@ Sub AppStart (Form1 As Form, Args() As String)
 	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
 	initLoc
 	If Utils.DetectOS = "windows" Then
-		hook.Initialize(Me,"Hook")
+		Try
+			hook.Initialize(Me,"Hook")
+		Catch
+			Log(LastException)
+		End Try
 	End If
 	MainForm = Form1
 	MainForm.RootPane.LoadLayout("main")
@@ -273,23 +277,27 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressSlider.tag = False
 	ProgressContextMenu.Initialize("ProgressContextMenu")
 	WaveFormContextMenu.Initialize("WaveFormContextMenu")
-	SetTable
-	loadPlugins
-	AddWaveFormControls
-	SubtitleLabel.Visible = False
-	LocalizeMainFrom
+	
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
 		v.showAndWait
 	End If
+	
+	SetTable
+	loadPlugins
+	AddWaveFormControls
+	SubtitleLabel.Visible = False
+	LocalizeMainFrom
 End Sub
 
 Public Sub initLoc
-	loc.Initialize(File.DirApp,"strings.db")
-	Dim preferencesMap As Map = Utils.getPrefMap
-	If preferencesMap.ContainsKey("lang") Then
-		loc.ForceLocale(preferencesMap.Get("lang"))
+	If File.Exists(File.DirApp,"strings.db") Then
+		loc.Initialize(File.DirApp,"strings.db")
+		Dim preferencesMap As Map = Utils.getPrefMap
+		If preferencesMap.ContainsKey("lang") Then
+			loc.ForceLocale(preferencesMap.Get("lang"))
+		End If
 	End If
 End Sub
 

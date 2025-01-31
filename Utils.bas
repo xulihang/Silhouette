@@ -40,8 +40,13 @@ Sub splitByFind(text As String,find As String,textSegments As List)
 End Sub
 
 Sub MeasureMultilineTextHeight (Font As Font, Width As Double, Text As String) As Double
-	Dim jo As JavaObject = Me
-	Return jo.RunMethod("MeasureMultilineTextHeight", Array(Font, Text, Width))
+	Try
+		Dim jo As JavaObject = Me
+		Return jo.RunMethod("MeasureMultilineTextHeight", Array(Font, Text, Width))
+	Catch
+		Log(LastException)
+		Return Font.Size
+	End Try
 End Sub
 
 
