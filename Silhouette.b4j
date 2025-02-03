@@ -142,7 +142,7 @@ Version=10
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 #AdditionalJar: bcprov-jdk15on-154
 #AdditionalJar: silero-vad
-#AdditionalJar: onnxruntime-1.20.0-full
+#AdditionalJar: onnxruntime-1.20.0
 #AdditionalJar: jnativehook-2.2.2
 
 Sub Process_Globals
@@ -401,6 +401,8 @@ Private Sub MenuBar1_Action
 			ClearLines
 		Case "Sor_t Lines"
 			SortLines
+		Case "Sh_ift Time"
+			ShiftTime
 		Case "_Search and Replace"
 			Dim snr As SearchAndReplaceDialog
 			snr.Initialize(currentProject.lines)
@@ -1643,6 +1645,15 @@ private Sub NewLine
 		currentProject.AppendLine(-1)
 		LoadLinesToTable
 	End If
+End Sub
+
+Private Sub ShiftTime
+	Dim inp As InputBox
+	inp.Initialize
+	inp.Title = loc.Localize("Please input the time offset in ms:")
+	Dim shift As Int = inp.showAndWait(0)
+	currentProject.Shift(shift)
+	LoadLinesToTable
 End Sub
 
 Private Sub SortLines

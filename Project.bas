@@ -104,6 +104,21 @@ Public Sub Sort
 	AddState
 End Sub
 
+Public Sub Shift(time As Int)
+	For Each line As Map In lines
+		Dim startTime As String = line.Get("startTime")
+		Dim endTime As String = line.Get("endTime")
+		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
+		Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(endTime)
+		Dim duration As Int = endTimeMs - startTimeMs
+		startTimeMs = Max(0,startTimeMs + time)
+		endTimeMs = startTimeMs + duration
+		line.Put("startTime",Utils.GetTimeStringFromMilliseconds(startTimeMs))
+		line.Put("endTime",Utils.GetTimeStringFromMilliseconds(endTimeMs))
+	Next
+	AddState
+End Sub
+
 
 Public Sub DeleteLine(index As Int)
 	lines.RemoveAt(index)
