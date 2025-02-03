@@ -2058,9 +2058,15 @@ Private Sub NewLineHereButton_MouseClicked (EventData As MouseEvent)
 	Dim currentStartTime As Long = GetCurrentVideoTime
 	Dim startTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime)
 	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime + 1000)
-	currentProject.AddLine(startTime,endTime,"","")
-	LoadLinesToTable
-	JumpToRow(currentProject.lines.Size,0)
+	If selectedRowID <> -1 Then
+		currentProject.AppendLineWithTime(selectedRowID - 1,startTime,endTime)
+		LoadLinesToTable
+		JumpToRow(selectedRowID+1,0)
+	Else
+		currentProject.AddLine(startTime,endTime,"","")
+		LoadLinesToTable
+		JumpToRow(currentProject.lines.Size,200)
+	End If
 End Sub
 
 Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
