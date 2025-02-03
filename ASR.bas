@@ -47,7 +47,13 @@ End Sub
 Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As ResumableSub
 	If engine = "whisper" Then
 		Dim args As List
-		args = Array("-m",GetModelPath,"-f",filepath,"-osrt","-l",lang)
+		args.Initialize
+		args.AddAll(Array("-m",GetModelPath,"-f",filepath,"-osrt","-l",lang))
+		Dim prompt As String =  Utils.getSetting("prompt","")
+		If prompt <> "" Then
+			args.Add("--prompt")
+			args.Add(prompt)
+		End If
 		Dim sh As Shell
 		sh.Initialize("sh",GetWhisperPath,args)
 		sh.WorkingDirectory = File.DirApp

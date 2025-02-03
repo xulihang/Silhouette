@@ -9,6 +9,22 @@ Sub Process_Globals
 	Private mPref As Map
 End Sub
 
+Sub projectSetting As Map
+	If Main.currentProject.IsInitialized Then
+		Return Main.currentProject.settings
+	End If
+	Dim settings As Map
+	settings.Initialize
+	Return settings
+End Sub
+
+Sub getSetting(key As String,default As Object) As Object
+	Dim settings As Map = projectSetting
+	If settings.ContainsKey(key) Then
+		Return settings.Get(key)
+	End If
+	Return default
+End Sub
 
 'find is the text within a whole text
 Sub splitByFind(text As String,find As String,textSegments As List)

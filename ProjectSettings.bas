@@ -12,6 +12,7 @@ Sub Class_Globals
 	Private TabPane1 As TabPane
 	Private LangPairLabel As Label
 	Private EngineComboBox As ComboBox
+	Private PromptTextField As TextField
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -41,6 +42,7 @@ Public Sub Initialize(p As Project)
 	If EngineComboBox.SelectedIndex = -1 Then
 		EngineComboBox.SelectedIndex = 0
 	End If
+	PromptTextField.Text = settings.GetDefault("prompt","")
 	Main.loc.LocalizeForm(frm)
 End Sub
 
@@ -69,6 +71,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	settings.Put("sourceLang",sourceLang)
 	settings.Put("targetLang",targetLang)
 	settings.Put("engine",EngineComboBox.Items.Get(EngineComboBox.SelectedIndex))
+	settings.Put("prompt",PromptTextField.Text)
 	mProject.save
 	frm.Close
 End Sub

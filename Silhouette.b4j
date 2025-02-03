@@ -170,7 +170,7 @@ Sub Process_Globals
 	Private SourceTextArea As TextArea
 	Private TargetTextArea As TextArea
 	Private LinesTable As B4XTable
-	Private currentProject As Project
+	Public currentProject As Project
 	Private tableCM As ContextMenu
 	Private robot As JavaObject
 	Private selectedRowID As Int = -1
