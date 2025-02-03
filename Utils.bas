@@ -157,6 +157,23 @@ Public Sub GetTimeStringFromMilliseconds(ms As Long) As String
 	Return sb.ToString
 End Sub
 
+'00:00:15
+Public Sub GetCompactTimeStringFromMilliseconds(ms As Long) As String
+	Dim totalSeconds As Int = ms / 1000
+	Dim hours As Int =  Floor(totalSeconds / 3600)
+	Dim secondsLeft As Int = totalSeconds - hours * 3600
+	Dim minutes As Int =  Floor(secondsLeft / 60)
+	Dim seconds As Int = secondsLeft - minutes*60
+	Dim sb As StringBuilder
+	sb.Initialize
+	sb.Append(NumberFormat(hours,2,0))
+	sb.Append(":")
+	sb.Append(NumberFormat(minutes,2,0))
+	sb.Append(":")
+	sb.Append(NumberFormat(seconds,2,0))
+	Return sb.ToString
+End Sub
+
 Public Sub GetScreenPosition(n As Node) As Map
 	Dim m As Map = CreateMap("x": 0, "y": 0)
 	Dim x = 0, y = 0 As Double
