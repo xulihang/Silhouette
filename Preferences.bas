@@ -19,6 +19,7 @@ Sub Class_Globals
 	Private MaxLengthForMTSpinner As Spinner
 	Private SkipRecognizedCheckBox As CheckBox
 	Private UseGPUCheckBox As CheckBox
+	Private SubtitleFontSizeSpinner As Spinner
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -50,6 +51,7 @@ Public Sub Initialize(mb As MenuBar)
 	MaxLengthForMTSpinner.Value = preferencesMap.GetDefault("multiple_sentences_mt_char_length",2000)
 	SkipRecognizedCheckBox.Checked = preferencesMap.GetDefault("skip_recognized",True)
 	UseGPUCheckBox.Checked = preferencesMap.GetDefault("use_gpu",True)
+	SubtitleFontSizeSpinner.Value = preferencesMap.GetDefault("subtitle_font_size",16)
 	loadAPI
 	loadMT
 	LoadLanaugesList
@@ -163,6 +165,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("multiple_sentences_mt",EnableMultipleSentenceMTCheckBox.Checked)
 	preferencesMap.Put("skip_recognized",SkipRecognizedCheckBox.Checked)
 	preferencesMap.Put("use_gpu",UseGPUCheckBox.Checked)
+	preferencesMap.Put("subtitle_font_size",SubtitleFontSizeSpinner.Value)
 	Dim lang As String
 	If LanguageComboBox.SelectedIndex<>-1 Then
 		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)

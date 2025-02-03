@@ -2020,4 +2020,7 @@ Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
 	Dim jo As JavaObject = SubtitleLabel
 	jo.RunMethod("setTextAlignment", Array("CENTER"))
 	SubtitleLabel.Visible = Checked
+	If Utils.getPrefMap.ContainsKey("subtitle_font_size") Then
+		SubtitleLabel.Font = fx.DefaultFont(Utils.getPref("subtitle_font_size",16))
+	End If
 End Sub
