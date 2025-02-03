@@ -282,6 +282,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	loadPlugins
 	AddWaveFormControls
 	SubtitleLabel.Visible = False
+	
 	LocalizeMainFrom
 	Sleep(0)
 	Dim v As Validator
@@ -363,6 +364,7 @@ private Sub SetTable
 	TargetColumn.Sortable = False
 	LinesTable.SearchVisible = False
 	LinesTable.SelectionColor = xui.Color_Transparent
+	AddKeyEventListener(LinesTable.mBase)
 End Sub
 
 Private Sub GetTimeLabelText(totalSeconds As Long) As String
@@ -1568,15 +1570,21 @@ Private Sub tableMenuItem_Action
 			AppendLine
 			SelectRow(selectedRowID+1,True)
 		Case "Delete this line"
-			currentProject.DeleteLine(selectedRowID - 1)
-			LoadLinesToTable
-			SelectRow(selectedRowID,True)
+			DeleteThisLine
 		Case "Merge with the next line"
 			MergeWithTheNextLine
 			SelectRow(selectedRowID,True)
 		Case "Recognize this line"
 			RecognizeTheSelectedLine
 	End Select
+End Sub
+
+Private Sub DeleteThisLine
+	currentProject.DeleteLine(selectedRowID - 1)
+	LoadLinesToTable
+	If LinesTable.Size >= selectedRowID And LinesTable.Size > 0 Then
+		SelectRow(selectedRowID,True)
+	End If
 End Sub
 
 Private Sub HasValidateModel As Boolean
@@ -2022,5 +2030,27 @@ Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
 	SubtitleLabel.Visible = Checked
 	If Utils.getPrefMap.ContainsKey("subtitle_font_size") Then
 		SubtitleLabel.Font = fx.DefaultFont(Utils.getPref("subtitle_font_size",16))
+	End If
+End Sub
+
+
+private Sub AddKeyEventListener(n As Node)
+	Dim r As Reflector
+	r.Target = n
+	r.AddEventHandler("keypressed", "javafx.scene.input.KeyEvent.KEY_PRESSED")
+	r.AddEventHandler("keyreleased", "javafx.scene.input.KeyEvent.KEY_RELEASED")
+End Sub
+
+private Sub KeyPressed_Event (e As Event)
+
+End Sub
+
+private Sub KeyReleased_Event (e As Event)
+	Dim jo As JavaObject = e
+	Dim keycode As String = jo.RunMethod("getCode", Null)
+	If keycode = "DELETE" Then
+		If selectedRowID <> -1 Then
+			DeleteThisLine
+		End If
 	End If
 End Sub
