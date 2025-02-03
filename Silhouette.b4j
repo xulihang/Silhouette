@@ -349,22 +349,24 @@ private Sub SetTable
 	LinesTable.HeaderFont = xui.CreateFont(fx.DefaultFont(15),15)
 	LinesTable.HeadersHeight = 30dip
 	LinesTable.RowHeight = 30dip
-	Dim NumberColumn As B4XTableColumn = LinesTable.AddColumn("No.", LinesTable.COLUMN_TYPE_TEXT)
+	Dim NumberColumn As B4XTableColumn = LinesTable.AddColumn(loc.Localize("No."), LinesTable.COLUMN_TYPE_TEXT)
 	NumberColumn.Width = 80dip
 	NumberColumn.Sortable = False
-	StartColumn = LinesTable.AddColumn("Start", LinesTable.COLUMN_TYPE_TEXT)
+	StartColumn = LinesTable.AddColumn(loc.Localize("Start"), LinesTable.COLUMN_TYPE_TEXT)
 	StartColumn.Width = 105dip
 	StartColumn.Sortable = False
-	EndColumn = LinesTable.AddColumn("End", LinesTable.COLUMN_TYPE_TEXT)
+	EndColumn = LinesTable.AddColumn(loc.Localize("End"), LinesTable.COLUMN_TYPE_TEXT)
 	EndColumn.Width = 105dip
 	EndColumn.Sortable = False
-	SourceColumn = LinesTable.AddColumn("Source", LinesTable.COLUMN_TYPE_TEXT)
+	SourceColumn = LinesTable.AddColumn(loc.Localize("Source"), LinesTable.COLUMN_TYPE_TEXT)
 	SourceColumn.Sortable = False
-	TargetColumn = LinesTable.AddColumn("Target", LinesTable.COLUMN_TYPE_TEXT)
+	TargetColumn = LinesTable.AddColumn(loc.Localize("Target"), LinesTable.COLUMN_TYPE_TEXT)
 	TargetColumn.Sortable = False
 	LinesTable.SearchVisible = False
 	LinesTable.SelectionColor = xui.Color_Transparent
 	AddKeyEventListener(LinesTable.mBase)
+	LinesTable.StringTo = loc.Localize("to")
+	LinesTable.StringOutOf = loc.Localize("out of")
 End Sub
 
 Private Sub GetTimeLabelText(totalSeconds As Long) As String
