@@ -86,9 +86,17 @@ End Sub
 
 Public Sub GetWhisperPath As String
 	If Utils.DetectOS <> "windows" Then
-		Return File.Combine(File.Combine(File.DirApp,"whisper"),"whisper")
+		If Utils.getPref("use_gpu",True) Then
+			Return File.Combine(File.Combine(File.DirApp,"whisper"),"whisper")
+		Else
+			Return File.Combine(File.Combine(File.DirApp,"whisper"),"whisper-cpu")
+		End If
 	Else
-		Return File.Combine(File.Combine(File.DirApp,"whisper"),"main.exe")
+		If Utils.getPref("use_gpu",True) Then
+			Return File.Combine(File.Combine(File.DirApp,"whisper"),"main.exe")
+		Else
+			Return File.Combine(File.Combine(File.Combine(File.DirApp,"whisper"),"cpp"),"whisper-cli.exe")
+		End If
 	End If
 	
 End Sub
