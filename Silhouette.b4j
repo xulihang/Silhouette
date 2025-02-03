@@ -12,22 +12,23 @@ File17=LineEditor.bjl
 File18=ListView.bjl
 File19=main.bjl
 File2=APISetting.bjl
-File20=modelPreference.bjl
-File21=MTSetting.bjl
-File22=PlayControl.bjl
-File23=pretranslate.bjl
-File24=progress.bjl
-File25=projectSetting.bjl
-File26=searchandreplace.bjl
-File27=silhouette.png
-File28=TopRightSplitPane.bjl
-File29=TopSplitPane.bjl
+File20=main_mac.bjl
+File21=modelPreference.bjl
+File22=MTSetting.bjl
+File23=PlayControl.bjl
+File24=pretranslate.bjl
+File25=progress.bjl
+File26=projectSetting.bjl
+File27=searchandreplace.bjl
+File28=silhouette.png
+File29=TopRightSplitPane.bjl
 File3=ASROptions.bjl
-File30=TranslationAssist.bjl
-File31=TranslationMemory.bjl
-File32=validator.bjl
-File33=VideoPlayer.bjl
-File34=WaveForm.bjl
+File30=TopSplitPane.bjl
+File31=TranslationAssist.bjl
+File32=TranslationMemory.bjl
+File33=validator.bjl
+File34=VideoPlayer.bjl
+File35=WaveForm.bjl
 File4=BottomSplitPane.bjl
 File5=Editor.bjl
 File6=EmailReset.bjl
@@ -62,6 +63,7 @@ FileGroup31=Default Group
 FileGroup32=Default Group
 FileGroup33=Default Group
 FileGroup34=Default Group
+FileGroup35=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
@@ -122,7 +124,7 @@ Module6=ErrorReporter
 Module7=Exporter
 Module8=ExportOptions
 Module9=FFMpeg
-NumberOfFiles=34
+NumberOfFiles=35
 NumberOfLibraries=21
 NumberOfModules=32
 Version=10
@@ -225,7 +227,11 @@ Sub AppStart (Form1 As Form, Args() As String)
 		End Try
 	End If
 	MainForm = Form1
-	MainForm.RootPane.LoadLayout("main")
+	If Utils.DetectOS = "mac" Then
+		MainForm.RootPane.LoadLayout("main_mac")
+	Else
+		MainForm.RootPane.LoadLayout("main")
+	End If
 	MainForm.WindowWidth = 800
 	MainForm.Show
 	MainPane.LoadLayout("Editor")
