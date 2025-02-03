@@ -104,6 +104,16 @@ Public Sub Sort
 	AddState
 End Sub
 
+Public Sub Switch(index1 As Int,index2 As Int)
+	Dim line1 As Map = lines.Get(index1)
+	Dim line2 As Map = lines.Get(index2)
+	lines.RemoveAt(index1)
+	lines.InsertAt(index1,line2)
+	lines.RemoveAt(index2)
+	lines.InsertAt(index2,line1)
+	AddState
+End Sub
+
 Public Sub Shift(time As Int)
 	For Each line As Map In lines
 		Dim startTime As String = line.Get("startTime")

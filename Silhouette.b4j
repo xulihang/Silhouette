@@ -403,6 +403,10 @@ Private Sub MenuBar1_Action
 			SortLines
 		Case "Sh_ift Time"
 			ShiftTime
+		Case "Move Up"
+			MoveUpCurrentLine
+		Case "Move Down"
+			MoveDownCurrentLine
 		Case "_Search and Replace"
 			Dim snr As SearchAndReplaceDialog
 			snr.Initialize(currentProject.lines)
@@ -1654,6 +1658,26 @@ Private Sub ShiftTime
 	Dim shift As Int = inp.showAndWait(0)
 	currentProject.Shift(shift)
 	LoadLinesToTable
+End Sub
+
+Private Sub MoveUpCurrentLine
+	Try
+		currentProject.Switch(selectedRowID - 2, selectedRowID - 1)
+		LoadLinesToTable
+		SelectRow(selectedRowID - 1,True)
+	Catch
+		Log(LastException)
+	End Try
+End Sub
+
+Private Sub MoveDownCurrentLine
+	Try
+		currentProject.Switch(selectedRowID - 1, selectedRowID)
+		LoadLinesToTable
+		SelectRow(selectedRowID + 1,True)
+	Catch
+		Log(LastException)
+	End Try
 End Sub
 
 Private Sub SortLines
