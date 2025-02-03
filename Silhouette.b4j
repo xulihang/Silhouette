@@ -1237,10 +1237,10 @@ Sub Progress_MouseMoved_Event (MethodName As String, Args() As Object) As Object
 	End If
 	Dim e As MouseEvent = Args(0)
 	Dim percent As Double = e.X / ProgressSlider.Width
-	Dim time As Long = percent * vlc.GetLength / 1000
+	Dim time As Long = percent * vlc.GetLength
 	ProgressContextMenu.MenuItems.Clear
 	Dim mi As MenuItem
-	mi.Initialize(GetTimeLabelText(time),"")
+	mi.Initialize(Utils.GetCompactTimeStringFromMilliseconds(time),"")
 	ProgressContextMenu.MenuItems.Add(mi)
 	Dim map1 As Map
 	map1=Utils.GetScreenPosition(ProgressSlider)
