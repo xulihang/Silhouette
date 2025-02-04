@@ -686,7 +686,7 @@ Private Sub RecognizeSpeechByFixedSpan As ResumableSub
 		Dim purename As String = Utils.GetFilenameWithoutExtension(filename)
 		'stored as "segment-00000.srt" or "segment-00000.wav.srt"
 		If (File.Exists(tmpDir,purename&".srt") = False And File.Exists(tmpDir,filename&".srt") = False) Or Utils.getPref("skip_recognized",True) = False Then
-			progressDialog.update(index,wavFiles.Size)
+			progressDialog.update(index-1,wavFiles.Size)
 			Dim wavpath As String = File.Combine(tmpDir,filename)
 			Wait For (ASR.RecognizeWav(wavpath,currentProject.SourceLang,engine)) Complete (done As Object)
 		End If
@@ -1109,7 +1109,7 @@ Sub pretranslate(options As Map) As ResumableSub
 				Dim segments As List = segmentationResult.Get("segments")
 				For Each sourceList As List In segments
 					index = index + 1
-					progressDialog.update(index,segments.Size)
+					progressDialog.update(index-1,segments.Size)
 					If progressDialog.isShowing = False Then
 						Exit
 					End If
@@ -1129,7 +1129,7 @@ Sub pretranslate(options As Map) As ResumableSub
 				Dim index As Int = 0
 				For Each line As Map In currentProject.lines
 					index = index + 1
-					progressDialog.update(index,currentProject.lines.Size)
+					progressDialog.update(index-1,currentProject.lines.Size)
 					If progressDialog.isShowing = False Then
 						Exit
 					End If
