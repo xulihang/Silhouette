@@ -71,3 +71,22 @@ End Sub
 Private Sub ClearButton_MouseClicked (EventData As MouseEvent)
 	ListView1.Items.Clear
 End Sub
+
+Private Sub ExportSRTButton_MouseClicked (EventData As MouseEvent)
+	Dim dc As DirectoryChooser
+	dc.Initialize
+	Dim path As String = dc.Show(frm)
+	If File.Exists(path,"") Then
+		Dim optionsForm As ExportOptions
+		optionsForm.Initialize
+		Dim option As Int = optionsForm.ShowAndWait
+		For Each filepath As String In ListView1.Items
+			Dim filename As String = File.GetName(filepath)
+			Dim srtname As String = Utils.GetFilenameWithoutExtension(filename) & ".srt"
+			Dim p As Project
+			p.Initialize(filepath,Me,"")
+			Exporter.ExportToSRT(p.lines,File.Combine(path,srtname),False,option)
+		Next
+		fx.Msgbox(frm,Main.loc.Localize("Done"),"")
+	End If
+End Sub

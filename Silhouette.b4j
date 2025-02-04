@@ -488,7 +488,7 @@ Private Sub MenuBar1_Action
 			fc.SetExtensionFilter("SRT",Array As String("*.srt"))
 			Dim path As String = fc.ShowSave(MainForm)
 			If path <> "" Then
-				Exporter.ExportToSRT(currentProject.lines,path,True)
+				Exporter.ExportToSRT(currentProject.lines,path,True,0)
 				fx.Msgbox(MainForm,loc.Localize("Done"),"")
 			End If
 		Case "export to tab-delimited _txt"

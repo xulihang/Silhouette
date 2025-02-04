@@ -9,8 +9,7 @@ Sub Process_Globals
 	Private fx As JFX
 End Sub
 
-Public Sub ExportToSRT(lines As List,path As String,askOption As Boolean)
-	Dim option As Int = 0
+Public Sub ExportToSRT(lines As List,path As String,askOption As Boolean,option As Int)
 	If askOption Then
 		Dim optionsForm As ExportOptions
 		optionsForm.Initialize
