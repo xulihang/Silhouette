@@ -1241,6 +1241,7 @@ Private Sub PlayFile(path As String)
 	Do While vlc.IsPlaying == False
 		Sleep(100)
 	Loop
+	ResizeVLCImageView(VLCPane.Width,VLCPane.Height)
 	TogglePlayingStatus(True,vlc.GetTime)
 	TotalTimeLabel.Text = Utils.GetCompactTimeStringFromMilliseconds(vlc.GetLength)
 End Sub
