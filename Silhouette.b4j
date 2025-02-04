@@ -1,40 +1,41 @@
 ﻿AppType=JavaFX
 Build1=Default,org.xulihang.silhouette
 File1=apiparamfiller.bjl
-File10=generalSettings.bjl
-File11=icon.png
-File12=inputbox.bjl
-File13=JumpOptions.bjl
-File14=LangaugePairSelector.bjl
-File15=langcodes.txt
-File16=LeftSplitPane.bjl
-File17=LineEditor.bjl
-File18=ListView.bjl
-File19=main.bjl
+File10=generalPreference.bjl
+File11=generalSettings.bjl
+File12=icon.png
+File13=inputbox.bjl
+File14=JumpOptions.bjl
+File15=LangaugePairSelector.bjl
+File16=langcodes.txt
+File17=LeftSplitPane.bjl
+File18=LineEditor.bjl
+File19=ListView.bjl
 File2=APISetting.bjl
-File20=main_mac.bjl
-File21=modelPreference.bjl
-File22=MTSetting.bjl
-File23=PlayControl.bjl
-File24=pretranslate.bjl
-File25=progress.bjl
-File26=projectSetting.bjl
-File27=searchandreplace.bjl
-File28=silhouette.png
-File29=TopRightSplitPane.bjl
+File20=main.bjl
+File21=main_mac.bjl
+File22=modelPreference.bjl
+File23=MTSetting.bjl
+File24=PlayControl.bjl
+File25=pretranslate.bjl
+File26=progress.bjl
+File27=projectSetting.bjl
+File28=searchandreplace.bjl
+File29=silhouette.png
 File3=ASROptions.bjl
-File30=TopSplitPane.bjl
-File31=TranslationAssist.bjl
-File32=TranslationMemory.bjl
-File33=validator.bjl
-File34=VideoPlayer.bjl
-File35=WaveForm.bjl
-File4=BottomSplitPane.bjl
-File5=Editor.bjl
-File6=EmailReset.bjl
-File7=ErrorReporter.bjl
-File8=ExportOptions.bjl
-File9=generalPreference.bjl
+File30=TopRightSplitPane.bjl
+File31=TopSplitPane.bjl
+File32=TranslationAssist.bjl
+File33=TranslationMemory.bjl
+File34=validator.bjl
+File35=VideoPlayer.bjl
+File36=WaveForm.bjl
+File4=BatchTranslator.bjl
+File5=BottomSplitPane.bjl
+File6=Editor.bjl
+File7=EmailReset.bjl
+File8=ErrorReporter.bjl
+File9=ExportOptions.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -64,6 +65,7 @@ FileGroup32=Default Group
 FileGroup33=Default Group
 FileGroup34=Default Group
 FileGroup35=Default Group
+FileGroup36=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
@@ -93,40 +95,41 @@ Library7=jcore
 Library8=jfx
 Library9=jokhttputils2
 Module1=APIParamsFiller
-Module10=InputBox
-Module11=JumpOptions
-Module12=jVLC
-Module13=LanguagePairSelector
-Module14=LocalizationHelper
-Module15=Localizator
-Module16=MT
-Module17=NativeHook
-Module18=PlayControlForm
-Module19=Preferences
+Module10=FFMpeg
+Module11=InputBox
+Module12=JumpOptions
+Module13=jVLC
+Module14=LanguagePairSelector
+Module15=LocalizationHelper
+Module16=Localizator
+Module17=MT
+Module18=NativeHook
+Module19=PlayControlForm
 Module2=ASR
-Module20=preTranslateDialog
-Module21=progressDialog
-Module22=Project
-Module23=ProjectSettings
-Module24=SearchAndReplaceDialog
-Module25=SileroVad
-Module26=SrtParser
-Module27=TextFlow
-Module28=UndoManager
-Module29=Utils
+Module20=Preferences
+Module21=preTranslateDialog
+Module22=progressDialog
+Module23=Project
+Module24=ProjectSettings
+Module25=SearchAndReplaceDialog
+Module26=SileroVad
+Module27=SrtParser
+Module28=TextFlow
+Module29=UndoManager
 Module3=ASROptions
-Module30=|relative|..\Validator\Validator
-Module31=WaveFormBitmapCreator
-Module32=WavRandomAccessFile
-Module4=DraggableRange
-Module5=|relative|..\Validator\EmailReset
-Module6=ErrorReporter
-Module7=Exporter
-Module8=ExportOptions
-Module9=FFMpeg
-NumberOfFiles=35
+Module30=Utils
+Module31=|relative|..\Validator\Validator
+Module32=WaveFormBitmapCreator
+Module33=WavRandomAccessFile
+Module4=BatchTranslator
+Module5=DraggableRange
+Module6=|relative|..\Validator\EmailReset
+Module7=ErrorReporter
+Module8=Exporter
+Module9=ExportOptions
+NumberOfFiles=36
 NumberOfLibraries=21
-NumberOfModules=32
+NumberOfModules=33
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -375,19 +378,15 @@ private Sub SetTable
 	LinesTable.StringOutOf = loc.Localize("out of")
 End Sub
 
-Private Sub GetTimeLabelText(totalSeconds As Long) As String
-	Dim minutes As Int =  Floor(totalSeconds / 60)
-	Dim seconds As Int = totalSeconds - minutes*60
-	Return NumberFormat(minutes,2,0) & ":" & NumberFormat(seconds,2,0)
-End Sub
-
 Private Sub MenuBar1_Action
 	Dim mi As MenuItem = Sender
 	Select loc.FindSource(mi.Text)
 		Case "_Open Media File"
-			OpenFile
+			SelectFile
 		Case "_Save"
 			Save
+		Case "translate _multiple files"
+			ShowBatchTranslator
 		Case "_Close"
 			Close
 		Case "_Preferences"
@@ -619,7 +618,7 @@ Private Sub RecognizeSpeech
 	End If
 End Sub
 
-Private Sub RecognizeExistingLines
+Private Sub RecognizeExistingLines As ResumableSub
 	Dim engine As String = currentProject.settings.GetDefault("engine","whisper")
 	If HasValidateModel=False And engine = "whisper" Then
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
@@ -627,7 +626,7 @@ Private Sub RecognizeExistingLines
 		If response = fx.DialogResponse.POSITIVE Then
 			ShowPreferences.SwitchTab(2)
 		End If
-		Return
+		Return ""
 	End If
 	Dim parent As String = currentProject.GetMediaFolder
 	Dim filename As String = currentProject.GetMediaFilename
@@ -652,9 +651,10 @@ Private Sub RecognizeExistingLines
 	Next
 	LoadLinesToTable
 	progressDialog.close
+	Return ""
 End Sub
 
-Private Sub RecognizeSpeechByFixedSpan
+Private Sub RecognizeSpeechByFixedSpan As ResumableSub
 	Dim engine As String = currentProject.settings.GetDefault("engine","whisper")
 	If HasValidateModel=False And engine = "whisper" Then
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
@@ -662,7 +662,7 @@ Private Sub RecognizeSpeechByFixedSpan
 		If response = fx.DialogResponse.POSITIVE Then
 			ShowPreferences.SwitchTab(2)
 		End If
-		Return
+		Return ""
 	End If
 	Dim parent As String = currentProject.GetMediaFolder
 	Dim filename As String = currentProject.GetMediaFilename
@@ -698,6 +698,7 @@ Private Sub RecognizeSpeechByFixedSpan
 	progressDialog.close
 	LoadSRTToProject
 	LoadLinesToTable
+	Return ""
 End Sub
 
 Private Sub LoadSRTToProject
@@ -1166,7 +1167,7 @@ Private Sub Close
 	Dim currentProject As Project
 End Sub
 
-Private Sub OpenFile
+Private Sub SelectFile
 	Dim fc As FileChooser
 	fc.Initialize
 	Dim path As String = fc.ShowOpen(MainForm)
@@ -1174,6 +1175,10 @@ Private Sub OpenFile
 		fx.Msgbox(MainForm,loc.Localize("The path should not contain spaces"),"")
 		Return
 	End If
+	OpenFile(path,True)
+End Sub
+
+Private Sub OpenFile(path As String,showLanguageSelector As Boolean)
 	If File.Exists(path,"") Then
 		If currentProject.IsInitialized Then
 			Dim currentProject As Project
@@ -1182,7 +1187,7 @@ Private Sub OpenFile
 			ClearWaveForm
 		End If
 		Dim isNew As Boolean = currentProject.Initialize(path,Me,"currentProject")
-		If isNew Then
+		If isNew And showLanguageSelector Then
 			Dim langSelector As LanguagePairSelector
 			langSelector.Initialize
 			Dim langpairMap As Map = langSelector.ShowAndWait
@@ -1192,6 +1197,29 @@ Private Sub OpenFile
 		PlayFile(path)
 		LoadLinesToTable
 	End If
+End Sub
+
+Private Sub ShowBatchTranslator
+	Dim translator As BatchTranslator
+	translator.Initialize(currentProject)
+    translator.Show
+End Sub
+
+public Sub TranslateOneFile(settings As Map,filepath As String,mtOptions As Map,ASRMethod As Int) As ResumableSub
+	OpenFile(filepath,False)
+	If vlc.IsPlaying Then
+		vlc.Pause
+		TogglePlayingStatus(False,-1)
+	End If
+	currentProject.settings = settings
+	If ASRMethod = 0 Then
+		wait for (RecognizeSpeechByFixedSpan) complete (done As Object)
+	Else
+		wait for (RecognizeExistingLines) complete (done As Object)
+	End If
+	wait for (pretranslate(mtOptions)) complete (done As Object)
+	currentProject.save
+	Return True
 End Sub
 
 Private Sub currentProject_Changed(changed As Boolean)

@@ -8,7 +8,7 @@ Sub Class_Globals
 	Public projectPath As String
 	Public projectFile As Map
 	Public lines As List
-	Public settings As Map
+	Private mSettings As Map
 	Private manager As UndoManager
 	Public changed As Boolean = False
 	Private mCallback As Object
@@ -30,14 +30,23 @@ Public Sub Initialize(mediaPath As String, Callback As Object, EventName As Stri
 	Else
 		projectFile.Initialize
 		lines.Initialize
-		settings.Initialize
+		mSettings.Initialize
 		projectFile.Put("mediaPath",mediaPath)
 		projectFile.Put("lines",lines)
-		projectFile.Put("settings",settings)
+		projectFile.Put("settings",mSettings)
 		CreateTempFolder
 		manager.Initialize(projectFile)
 		Return True
 	End If
+End Sub
+
+Public Sub getSettings As Map
+	Return mSettings
+End Sub
+
+Public Sub setSettings(new As Map)
+	mSettings = new
+	projectFile.Put("settings",mSettings)
 End Sub
 
 Public Sub AddState
@@ -56,7 +65,7 @@ Public Sub Undo
 			lines=projectFile.get("lines")
 		End If
 		If projectFile.ContainsKey("settings") Then
-			settings=projectFile.get("settings")
+			mSettings=projectFile.get("settings")
 		End If
 	End If
 End Sub
@@ -69,7 +78,7 @@ Public Sub Redo
 			lines=projectFile.get("lines")
 		End If
 		If projectFile.ContainsKey("settings") Then
-			settings=projectFile.get("settings")
+			mSettings=projectFile.get("settings")
 		End If
 	End If
 End Sub
@@ -209,7 +218,7 @@ Sub readProjectFile
 	json.Initialize(File.ReadString(projectPath,""))
 	projectFile=json.NextObject
 	lines = projectFile.get("lines")
-	settings = projectFile.get("settings")
+	mSettings = projectFile.get("settings")
 End Sub
 
 Public Sub save
@@ -249,17 +258,17 @@ Public Sub GetTmpFolder As String
 End Sub
 
 Public Sub setSourceLang(lang As String)
-	settings.Put("sourceLang",lang)
+	mSettings.Put("sourceLang",lang)
 End Sub
 
 Public Sub getSourceLang As String
-	Return settings.GetDefault("sourceLang","ja")
+	Return mSettings.GetDefault("sourceLang","ja")
 End Sub
 
 Public Sub setTargetLang(lang As String)
-	settings.Put("targetLang",lang)
+	mSettings.Put("targetLang",lang)
 End Sub
 
 Public Sub getTargetLang As String
-	Return settings.GetDefault("targetLang","zh")
+	Return mSettings.GetDefault("targetLang","zh")
 End Sub
