@@ -299,6 +299,10 @@ Sub AppStart (Form1 As Form, Args() As String)
 	If v.VerifyInSilence = False Then
 		v.showAndWait
 	End If
+	If Args.Length = 1 Then
+		Dim projectPath As String = Args(0)
+		OpenFile(Utils.GetFilenameWithoutExtension(projectPath),False)
+	End If
 End Sub
 
 Public Sub initLoc
