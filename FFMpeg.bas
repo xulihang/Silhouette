@@ -9,6 +9,26 @@ Sub Process_Globals
 	
 End Sub
 
+Public Sub PlayCut(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
+	wait for (CutWav(dir,filename,"cut.wav",startTime,endTime)) Complete (done As Object)
+	wait for (PlayAudio(dir,"cut.wav")) Complete (done As Object)
+	Return ""
+End Sub
+
+Public Sub PlayAudio(dir As String,filename As String) As ResumableSub
+	Dim args As List
+	args = Array As String("-i",filename,"-showmode",0)
+	Dim sh As Shell
+	sh.Initialize("sh",GetFFPlayPath,args)
+	sh.WorkingDirectory = dir
+	sh.Run(-1)
+	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	Log(StdOut)
+	Log(StdErr)
+	Return Success
+End Sub
+
+
 Public Sub GetFFMpegPath As String
 	Dim ffmpegPath As String
 	If Utils.DetectOS = "windows" Then
@@ -22,8 +42,23 @@ Public Sub GetFFMpegPath As String
 	If Utils.DetectOS <> "windows" Then
 		ffmpegPath = "ffmpeg"
 	End If
-	Log(ffmpegPath)
 	Return ffmpegPath
+End Sub
+
+Public Sub GetFFPlayPath As String
+	Dim path As String
+	If Utils.DetectOS = "windows" Then
+		path = File.Combine(File.Combine(File.DirApp,"ffmpeg"),"ffplay.exe")
+	Else
+		path = File.Combine(File.Combine(File.DirApp,"ffmpeg"),"ffplay")
+	End If
+	If File.Exists(path,"") Then
+		Return path
+	End If
+	If Utils.DetectOS <> "windows" Then
+		path = "ffplay"
+	End If
+	Return path
 End Sub
 
 Public Sub CutWav(dir As String,filename As String,outName As String,startTime As String,endTime As String) As ResumableSub

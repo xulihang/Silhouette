@@ -1771,11 +1771,22 @@ End Sub
 Private Sub PlayLineByID(rowID As Int)
 	Try
 		Dim line As Map = currentProject.GetLine(rowID - 1)
-		Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
-		expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
+		Dim startTime As String = line.Get("startTime")
+		Dim endTime As String = line.Get("endTime")
+		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
+		expectedEndTime = Utils.GetMillisecondsFromTimeString(endTime)
+		Dim dir As String = currentProject.GetTmpFolder
+		wait for (FFMpeg.CutWav(dir,"audio.wav","cut.wav",startTime,endTime)) Complete (done As Object)
+		vlc.SetVolume(0)
+		Sleep(0)
 		vlc.Resume
-		vlc.SetTime(startTime)
-		TogglePlayingStatus(True,startTime)
+		Do While vlc.IsPlaying = False
+			Sleep(50)
+		Loop
+		vlc.SetTime(startTimeMs)
+		TogglePlayingStatus(True,startTimeMs)
+		wait for (FFMpeg.PlayAudio(dir,"cut.wav")) complete (done As Object)
+		vlc.SetVolume(VolSlider.Value)
 	Catch
 		Log(LastException)
 	End Try
