@@ -217,6 +217,7 @@ Sub Process_Globals
 	Public version As String = "1.1.0"
 	Public limitedMode As Boolean = False
 	Private loopMode As Boolean = False
+	Private player As MediaPlayer
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -1198,6 +1199,10 @@ Private Sub OpenFile(path As String,showLanguageSelector As Boolean)
 			currentProject.SourceLang=langpairMap.Get("source")
 			currentProject.TargetLang=langpairMap.Get("target")
 		End If
+		Dim parent As String = currentProject.GetMediaFolder
+		Dim filename As String = currentProject.GetMediaFilename
+		Dim tmpDir As String = currentProject.GetTmpFolder
+		wait for (ConvertToWav(parent,filename,tmpDir)) complete (done As Object)
 		PlayFile(path)
 		LoadLinesToTable
 	End If
@@ -1240,7 +1245,9 @@ Private Sub PlayFile(path As String)
 	End If
 	ProgressSlider.tag = False
 	ProgressSlider.Value = 0
+	'vlc.PlayWithOptions(path,Array As String(":file-caching=10000"))
 	vlc.Play(path)
+	player.Initialize("player",File.GetUri(currentProject.GetTmpFolder,"audio.wav"))
 	ProgressSlider.tag = True
 	Do While vlc.IsPlaying == False
 		Sleep(100)
@@ -1401,6 +1408,8 @@ Private Sub ProgressTimer_Tick
 				playbackStartTime = -1
 				playbackStartDate = -1
 				vlc.Pause
+				player.Pause
+				vlc.SetMute(False)
 				TogglePlayingStatus(False,-1)
 			End If
 		End If
@@ -1770,23 +1779,16 @@ End Sub
 
 Private Sub PlayLineByID(rowID As Int)
 	Try
+		vlc.SetMute(True)
 		Dim line As Map = currentProject.GetLine(rowID - 1)
-		Dim startTime As String = line.Get("startTime")
-		Dim endTime As String = line.Get("endTime")
-		Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
-		expectedEndTime = Utils.GetMillisecondsFromTimeString(endTime)
-		Dim dir As String = currentProject.GetTmpFolder
-		wait for (FFMpeg.CutWav(dir,"audio.wav","cut.wav",startTime,endTime)) Complete (done As Object)
-		vlc.SetVolume(0)
-		Sleep(0)
+		Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+		expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
 		vlc.Resume
-		Do While vlc.IsPlaying = False
-			Sleep(50)
-		Loop
-		vlc.SetTime(startTimeMs)
-		TogglePlayingStatus(True,startTimeMs)
-		wait for (FFMpeg.PlayAudio(dir,"cut.wav")) complete (done As Object)
-		vlc.SetVolume(VolSlider.Value)
+		vlc.SetTime(startTime)
+		player.Volume = VolSlider.Value/100
+		player.Position = startTime
+		player.Play
+		TogglePlayingStatus(True,startTime)
 	Catch
 		Log(LastException)
 	End Try

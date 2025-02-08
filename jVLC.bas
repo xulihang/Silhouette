@@ -75,6 +75,10 @@ Public Sub PlayWithOptions(mrl As String,options() As String)
 	embeddedMediaPlayer.RunMethodJO("media",Null).RunMethod("play",Array(mrl,options))
 End Sub
 
+Public Sub SetMute(mute As Boolean)
+	embeddedMediaPlayer.RunMethodJO("audio",Null).RunMethod("setMute",Array(mute))
+End Sub
+
 Public Sub SetVolume(Volume As Int)
 	embeddedMediaPlayer.RunMethodJO("audio",Null).RunMethod("setVolume",Array(Volume))
 End Sub
