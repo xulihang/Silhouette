@@ -1335,6 +1335,7 @@ End Sub
 Private Sub VolSlider_ValueChange (Value As Double)
 	Log(Value)
 	vlc.SetVolume(Value)
+	player.Volume = Value / 100
 End Sub
 
 Private Sub StopButton_MouseClicked (EventData As MouseEvent)
