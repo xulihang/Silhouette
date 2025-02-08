@@ -1343,6 +1343,7 @@ End Sub
 
 Private Sub StopPlaying
 	vlc.Stop
+	player.Stop
 	TogglePlayingStatus(False,-1)
 End Sub
 
@@ -1353,6 +1354,7 @@ End Sub
 Private Sub TogglePlaying
 	If vlc.IsPlaying Then
 		vlc.Pause
+		player.Pause
 		TogglePlayingStatus(False,-1)
 	Else
 		vlc.Resume
@@ -1367,6 +1369,7 @@ Private Sub TogglePlayingStatus(isPlaying As Boolean,startTime As Long)
 	loopMode = False
 	If isPlaying Then
 		vlc.SetVolume(VolSlider.Value)
+		player.Volume = VolSlider.Value / 100
 		VLCPane.PrefWidth  = VLCPane.Width + 1
 		VLCPane.PrefWidth  = VLCPane.Width - 1
 		PlayButton.Text = ""
@@ -1563,11 +1566,7 @@ Private Sub newLineHereMI_Action
 End Sub
 
 Private Sub playSelectionMI_Action
-	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(StartTimeTextField.Text)
-	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
-	vlc.Resume
-	vlc.SetTime(startTime)
-	TogglePlayingStatus(True,startTime)
+	PlayLineByID(selectedRowID)
 End Sub
 
 private Sub loopMI_Action
