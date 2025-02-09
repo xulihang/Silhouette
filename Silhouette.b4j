@@ -1278,13 +1278,13 @@ Private Sub PlayFile(path As String)
 	vlc.Play(path)
 	player.Initialize("player",File.GetUri(currentProject.GetTmpFolder,"audio.wav"))
 	ProgressSlider.tag = True
-	
 	TogglePlayingStatus(True,vlc.GetTime)
 	TotalTimeLabel.Text = Utils.GetCompactTimeStringFromMilliseconds(vlc.GetLength)
 	Sleep(0)
 	Do While VLCImageView.GetImage.IsInitialized == False
 		Sleep(100)
 	Loop
+	vlc.SetMute(False)
 	ResizeVLCImageView(VLCPane.Width,VLCPane.Height)
 End Sub
 
@@ -1393,6 +1393,7 @@ Private Sub TogglePlaying
 		Do While vlc.IsPlaying = False
 			Sleep(100)
 		Loop
+		vlc.SetMute(False)
 		TogglePlayingStatus(True,vlc.GetTime)
 	End If
 End Sub
@@ -1413,6 +1414,7 @@ Private Sub TogglePlayingStatus(isPlaying As Boolean,startTime As Long)
 			playbackStartTime = startTime
 		End If
 	Else
+		vlc.SetMute(False)
 		PlayButton.Text = ""
 		ProgressTimer.Enabled = False
 		expectedEndTime = -1
@@ -1444,7 +1446,6 @@ Private Sub ProgressTimer_Tick
 				playbackStartDate = -1
 				vlc.Pause
 				player.Pause
-				vlc.SetMute(False)
 				TogglePlayingStatus(False,-1)
 			End If
 		End If
@@ -1859,11 +1860,19 @@ Private Sub PlayLineByID(rowID As Int)
 		Dim precise As Boolean = Utils.getPref("precise_play_of_selection",False)
 		If precise Then
 			vlc.SetMute(True)
+		Else
+			vlc.SetMute(False)
 		End If
 		Dim line As Map = currentProject.GetLine(rowID - 1)
 		Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
 		expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
 		vlc.Resume
+		If precise Then
+			Do While vlc.IsPlaying = False
+				Sleep(100)
+			Loop
+			vlc.SetMute(True)
+		End If
 		vlc.SetTime(startTime)
 		If precise Then
 			player.Volume = VolSlider.Value/100
