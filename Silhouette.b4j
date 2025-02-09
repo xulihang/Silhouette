@@ -871,7 +871,7 @@ Sub SelectRow(targetRowId As Int,fromLongClick As Boolean)    'rowid-1
 	LoadLineToEditor(fromLongClick)
 	UpdateSubtitleLabel
 	If ReadyToDrawWaveForm Then
-		DrawWaveForm
+		wait for (DrawWaveForm) complete (done As Object)
 		SetTheRangeForTheSelectedRow
 	End If
 End Sub
@@ -984,12 +984,13 @@ Private Sub GetWaveFilesToDraw As List
 	Return waveFilesToDraw
 End Sub
 
-Private Sub DrawWaveForm
+Private Sub DrawWaveForm As ResumableSub
 	Log("DrawWaveForm")
-	InitializeWaveFormCreatorIfNeeded
+	wait for (InitializeWaveFormCreatorIfNeeded) complete (done As Object)
 	waveFormCreator.StartIndex = 0
 	waveFormCreator.EndIndex = waveFormCreator.SampleLength - 1
 	OverviewWaveFormImageView.SetImage(waveFormCreator.Draw(OverviewWaveFormImageView.Width,OverviewWaveFormImageView.Height))
+	Return ""
 End Sub
 
 Private Sub ClearWaveForm
@@ -998,7 +999,7 @@ Private Sub ClearWaveForm
 	WaveFormImageView.SetImage(Null)
 End Sub
 
-Private Sub InitializeWaveFormCreatorIfNeeded
+Private Sub InitializeWaveFormCreatorIfNeeded As ResumableSub
 	Dim waveFiles As List = GetWaveFilesToDraw
 	If waveFormCreator.IsInitialized Then
 		Log("waveform creator initialized")
@@ -1011,30 +1012,43 @@ Private Sub InitializeWaveFormCreatorIfNeeded
 		End If
 		If needReload Then
 			Log("reinit waveform creator")
-			waveFormCreator.Initialize(LoadDataFromWaveFiles(waveFiles))
+			wait for (LoadDataFromWaveFiles(waveFiles)) complete (data() As Short)
+			waveFormCreator.Initialize(data)
 			waveFormCreator.Tag = waveFiles
 		End If
 	Else
-		waveFormCreator.Initialize(LoadDataFromWaveFiles(waveFiles))
+		wait for (LoadDataFromWaveFiles(waveFiles)) complete (data() As Short)
+		waveFormCreator.Initialize(data)
 		waveFormCreator.Tag = waveFiles
 	End If
+	Return ""
 End Sub
 
-Private Sub LoadDataFromWaveFiles(waveFiles As List) As Short()
+Private Sub LoadDataFromWaveFiles(waveFiles As List) As ResumableSub
 	Dim totalDuration As Int = 0
-	Dim bytesArray As List
-	bytesArray.Initialize
 	For Each filename As String In waveFiles
-		Log(filename)
 		Dim wavRaf As WavRandomAccessFile
 		wavRaf.Initialize(currentProject.GetTmpFolder,filename)
 		totalDuration = totalDuration + wavRaf.Duration_ms
-		bytesArray.Add(wavRaf.DataBytes)
 	Next
-	Dim jointBytes() As Byte = Utils.JoinBytes(bytesArray)
-	Dim jointShorts() As Short = Utils.getDataShortsFromBytes(jointBytes)
 	cutDurationMs = totalDuration
-	Return jointShorts
+	
+	Dim shortsArray As List
+	shortsArray.Initialize
+	wait for (FFMpeg.CutWav(currentProject.GetTmpFolder,"audio.wav","cut.wav", _ 
+	                                                    Utils.GetTimeStringFromMilliseconds(cutStartTimeMs), _ 
+	                                                    Utils.GetTimeStringFromMilliseconds(cutStartTimeMs+cutDurationMs))) complete (done As Object)
+	Dim wavRaf As WavRandomAccessFile
+	wavRaf.Initialize(currentProject.GetTmpFolder,"cut.wav")
+	shortsArray.AddAll(wavRaf.Read16bitAsShort(wavRaf.DataChunkEnd - wavRaf.DataChunkStart,44))
+	Dim shorts(shortsArray.Size) As Short
+	Dim index As Int = 0
+	For Each value As Short In shortsArray
+		shorts(index) = value
+		index = index + 1
+	Next
+	
+	Return shorts
 End Sub
 
 Private Sub overviewRange_RangeChanged(startProgress As Double,endProgress As Double)
@@ -1779,15 +1793,20 @@ End Sub
 
 Private Sub PlayLineByID(rowID As Int)
 	Try
-		vlc.SetMute(True)
+		Dim precise As Boolean = Utils.getPref("precise_play_of_selection",False)
+		If precise Then
+			vlc.SetMute(True)
+		End If
 		Dim line As Map = currentProject.GetLine(rowID - 1)
 		Dim startTime As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
 		expectedEndTime = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
 		vlc.Resume
 		vlc.SetTime(startTime)
-		player.Volume = VolSlider.Value/100
-		player.Position = startTime
-		player.Play
+		If precise Then
+			player.Volume = VolSlider.Value/100
+			player.Position = startTime
+			player.Play
+		End If
 		TogglePlayingStatus(True,startTime)
 	Catch
 		Log(LastException)
@@ -1958,7 +1977,7 @@ Private Sub EnableWaveFormCheckBox_CheckedChange(Checked As Boolean)
 		Dim tmpDir As String = currentProject.GetTmpFolder
 		wait for (ConvertToWav(parent,filename,tmpDir)) Complete (done As Object)
 		If ReadyToDrawWaveForm Then
-			DrawWaveForm
+			wait for (DrawWaveForm) complete (done As Object)
 			SetTheRangeForTheSelectedRow
 		End If
 	End If
