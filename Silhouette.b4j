@@ -21,16 +21,17 @@ File25=pretranslate.bjl
 File26=progress.bjl
 File27=projectSetting.bjl
 File28=searchandreplace.bjl
-File29=silhouette.png
+File29=sentenceSplitter.bjl
 File3=ASROptions.bjl
-File30=TopRightSplitPane.bjl
-File31=TopSplitPane.bjl
-File32=TranslationAssist.bjl
-File33=TranslationMemory.bjl
-File34=validator.bjl
-File35=VideoPlayer.bjl
-File36=VoiceInput.bjl
-File37=WaveForm.bjl
+File30=silhouette.png
+File31=TopRightSplitPane.bjl
+File32=TopSplitPane.bjl
+File33=TranslationAssist.bjl
+File34=TranslationMemory.bjl
+File35=validator.bjl
+File36=VideoPlayer.bjl
+File37=VoiceInput.bjl
+File38=WaveForm.bjl
 File4=BatchTranslator.bjl
 File5=BottomSplitPane.bjl
 File6=Editor.bjl
@@ -68,6 +69,7 @@ FileGroup34=Default Group
 FileGroup35=Default Group
 FileGroup36=Default Group
 FileGroup37=Default Group
+FileGroup38=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
@@ -115,25 +117,26 @@ Module22=progressDialog
 Module23=Project
 Module24=ProjectSettings
 Module25=SearchAndReplaceDialog
-Module26=SileroVad
-Module27=SrtParser
-Module28=TextFlow
-Module29=UndoManager
+Module26=SentenceSplitter
+Module27=SileroVad
+Module28=SrtParser
+Module29=TextFlow
 Module3=ASROptions
-Module30=Utils
-Module31=|relative|..\Validator\Validator
-Module32=VoiceInput
-Module33=WaveFormBitmapCreator
-Module34=WavRandomAccessFile
+Module30=UndoManager
+Module31=Utils
+Module32=|relative|..\Validator\Validator
+Module33=VoiceInput
+Module34=WaveFormBitmapCreator
+Module35=WavRandomAccessFile
 Module4=BatchTranslator
 Module5=DraggableRange
 Module6=|relative|..\Validator\EmailReset
 Module7=ErrorReporter
 Module8=Exporter
 Module9=ExportOptions
-NumberOfFiles=37
+NumberOfFiles=38
 NumberOfLibraries=22
-NumberOfModules=34
+NumberOfModules=35
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -413,6 +416,8 @@ Private Sub MenuBar1_Action
 			NewLine
 		Case "_Clear Lines"
 			ClearLines
+		Case "Clear Empty Lines"
+			ClearEmptyLines
 		Case "Sor_t Lines"
 			SortLines
 		Case "Sh_ift Time"
@@ -1539,8 +1544,30 @@ End Sub
 private Sub splitHereMI_Action
 	If selectedRowID <> -1 Then
 		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
-		currentProject.AppendLineWithTime(selectedRowID - 1,AudioProgressLabel.Text,line.get("endTime"))
+		Dim source As String = line.Get("source")
+		Dim target As String = line.Get("target")
+		Dim appendedLine As Map = currentProject.AppendLineWithTime(selectedRowID - 1,AudioProgressLabel.Text,line.get("endTime"))
 		line.Put("endTime",AudioProgressLabel.Text)
+		If source <> "" Or target <> "" Then
+			Dim splitter As SentenceSplitter
+			splitter.Initialize
+			splitter.SetCheckboxVisibility(False)
+			splitter.SetText(source,target)
+			Dim result As Map
+			result = splitter.ShowAndWait
+			Dim adjustedSource As String = result.Get("source")
+			Dim adjustedTarget As String = result.Get("target")
+			Dim splittedSource() As String = Regex.Split(CRLF,adjustedSource)
+			Dim splittedTarget() As String = Regex.Split(CRLF,adjustedTarget)
+			If splittedSource.Length = 2 Then
+				line.Put("source",splittedSource(0))
+				appendedLine.Put("source",splittedSource(1))
+			End If
+			If splittedTarget.Length = 2 Then
+				line.Put("target",splittedSource(0))
+				appendedLine.Put("target",splittedSource(1))
+			End If
+		End If
 		LoadLinesToTable
 		SelectRow(selectedRowID,True)
 	End If
@@ -1761,6 +1788,12 @@ End Sub
 Private Sub ClearLines
 	selectedRowID = -1
 	currentProject.Clear
+	LoadLinesToTable
+End Sub
+
+Private Sub ClearEmptyLines
+	selectedRowID = -1
+	currentProject.ClearEmptyLines
 	LoadLinesToTable
 End Sub
 
