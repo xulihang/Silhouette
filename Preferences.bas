@@ -20,6 +20,7 @@ Sub Class_Globals
 	Private SkipRecognizedCheckBox As CheckBox
 	Private UseGPUCheckBox As CheckBox
 	Private SubtitleFontSizeSpinner As Spinner
+	Private PrecisePlayOfSelectionCheckBox As CheckBox
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -52,6 +53,7 @@ Public Sub Initialize(mb As MenuBar)
 	SkipRecognizedCheckBox.Checked = preferencesMap.GetDefault("skip_recognized",True)
 	UseGPUCheckBox.Checked = preferencesMap.GetDefault("use_gpu",True)
 	SubtitleFontSizeSpinner.Value = preferencesMap.GetDefault("subtitle_font_size",16)
+	PrecisePlayOfSelectionCheckBox.Checked = preferencesMap.GetDefault("precise_play_of_selection",False)
 	loadAPI
 	loadMT
 	LoadLanaugesList
@@ -166,6 +168,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("skip_recognized",SkipRecognizedCheckBox.Checked)
 	preferencesMap.Put("use_gpu",UseGPUCheckBox.Checked)
 	preferencesMap.Put("subtitle_font_size",SubtitleFontSizeSpinner.Value)
+	preferencesMap.Put("precise_play_of_selection",PrecisePlayOfSelectionCheckBox.Checked)
 	Dim lang As String
 	If LanguageComboBox.SelectedIndex<>-1 Then
 		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)
