@@ -101,6 +101,7 @@ Private Sub GetSyllablesLength(lang As String,text As String) As Int
 	End If
 End Sub
 
+'https://www.zhangxinxu.com/wordpress/2024/12/js-word-speach-split-time-calc/
 Sub getPhonemeCount(s As String) As Int
 	Dim totalSyllables As Int = 0
 	' qu to tq
