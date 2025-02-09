@@ -92,6 +92,17 @@ Public Sub Clear
 	AddState
 End Sub
 
+Public Sub ClearEmptyLines
+	For i = lines.Size - 1 To 0 Step -1 
+		Dim line As Map = lines.Get(i)
+		If line.Get("source") = "" Then
+			lines.RemoveAt(i)
+		End If
+	Next
+	AddState
+End Sub
+
+
 Public Sub Sort
 	Dim newLines As List
 	newLines.Initialize
