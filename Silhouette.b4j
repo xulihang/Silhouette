@@ -20,18 +20,19 @@ File24=PlayControl.bjl
 File25=pretranslate.bjl
 File26=progress.bjl
 File27=projectSetting.bjl
-File28=searchandreplace.bjl
-File29=sentenceSplitter.bjl
+File28=RangeSelector.bjl
+File29=searchandreplace.bjl
 File3=ASROptions.bjl
-File30=silhouette.png
-File31=TopRightSplitPane.bjl
-File32=TopSplitPane.bjl
-File33=TranslationAssist.bjl
-File34=TranslationMemory.bjl
-File35=validator.bjl
-File36=VideoPlayer.bjl
-File37=VoiceInput.bjl
-File38=WaveForm.bjl
+File30=sentenceSplitter.bjl
+File31=silhouette.png
+File32=TopRightSplitPane.bjl
+File33=TopSplitPane.bjl
+File34=TranslationAssist.bjl
+File35=TranslationMemory.bjl
+File36=validator.bjl
+File37=VideoPlayer.bjl
+File38=VoiceInput.bjl
+File39=WaveForm.bjl
 File4=BatchTranslator.bjl
 File5=BottomSplitPane.bjl
 File6=Editor.bjl
@@ -70,6 +71,7 @@ FileGroup35=Default Group
 FileGroup36=Default Group
 FileGroup37=Default Group
 FileGroup38=Default Group
+FileGroup39=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
@@ -116,27 +118,28 @@ Module21=preTranslateDialog
 Module22=progressDialog
 Module23=Project
 Module24=ProjectSettings
-Module25=SearchAndReplaceDialog
-Module26=SentenceSplitter
-Module27=SileroVad
-Module28=SrtParser
-Module29=TextFlow
+Module25=RangeSelector
+Module26=SearchAndReplaceDialog
+Module27=SentenceSplitter
+Module28=SileroVad
+Module29=SrtParser
 Module3=ASROptions
-Module30=UndoManager
-Module31=Utils
-Module32=|relative|..\Validator\Validator
-Module33=VoiceInput
-Module34=WaveFormBitmapCreator
-Module35=WavRandomAccessFile
+Module30=TextFlow
+Module31=UndoManager
+Module32=Utils
+Module33=|relative|..\Validator\Validator
+Module34=VoiceInput
+Module35=WaveFormBitmapCreator
+Module36=WavRandomAccessFile
 Module4=BatchTranslator
 Module5=DraggableRange
 Module6=|relative|..\Validator\EmailReset
 Module7=ErrorReporter
 Module8=Exporter
 Module9=ExportOptions
-NumberOfFiles=38
+NumberOfFiles=39
 NumberOfLibraries=22
-NumberOfModules=35
+NumberOfModules=36
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -1772,11 +1775,17 @@ Private Sub InsertLines(index As Int,lines As List)
 End Sub
 
 Private Sub ShiftTime
+	Dim selector As RangeSelector
+	selector.Initialize
+	selector.SetRange(1,currentProject.lines.Size)
+	Dim rangeResult As Map = selector.ShowAndWait
+	Dim startIndex As Int = rangeResult.Get("startIndex")
+	Dim endIndex As Int = rangeResult.Get("endIndex")
 	Dim inp As InputBox
 	inp.Initialize
 	inp.Title = loc.Localize("Please input the time offset in ms:")
 	Dim shift As Int = inp.showAndWait(0)
-	currentProject.Shift(shift)
+	currentProject.ShiftInRange(shift,startIndex,endIndex)
 	LoadLinesToTable
 End Sub
 

@@ -149,6 +149,25 @@ Public Sub Shift(time As Int)
 	AddState
 End Sub
 
+Public Sub ShiftInRange(time As Int,startIndex As Int,endIndex As Int)
+	Dim index As Int
+	For Each line As Map In lines
+		If index >= startIndex And index <= endIndex Then
+			Dim startTime As String = line.Get("startTime")
+			Dim endTime As String = line.Get("endTime")
+			Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
+			Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(endTime)
+			Dim duration As Int = endTimeMs - startTimeMs
+			startTimeMs = Max(0,startTimeMs + time)
+			endTimeMs = startTimeMs + duration
+			line.Put("startTime",Utils.GetTimeStringFromMilliseconds(startTimeMs))
+			line.Put("endTime",Utils.GetTimeStringFromMilliseconds(endTimeMs))
+		End If
+		index = index + 1
+	Next
+	AddState
+End Sub
+
 
 Public Sub DeleteLine(index As Int)
 	lines.RemoveAt(index)
