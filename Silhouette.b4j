@@ -29,7 +29,8 @@ File32=TranslationAssist.bjl
 File33=TranslationMemory.bjl
 File34=validator.bjl
 File35=VideoPlayer.bjl
-File36=WaveForm.bjl
+File36=VoiceInput.bjl
+File37=WaveForm.bjl
 File4=BatchTranslator.bjl
 File5=BottomSplitPane.bjl
 File6=Editor.bjl
@@ -66,6 +67,7 @@ FileGroup33=Default Group
 FileGroup34=Default Group
 FileGroup35=Default Group
 FileGroup36=Default Group
+FileGroup37=Default Group
 FileGroup4=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
@@ -74,26 +76,27 @@ FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
 Library1=abplugin
-Library10=jpoi
-Library11=jrandomaccessfile
-Library12=jreflection
-Library13=jshell
-Library14=json
-Library15=jxui
-Library16=okhttp
-Library17=threading
-Library18=xcustomlistview
-Library19=xlutils
+Library10=jokhttputils2
+Library11=jpoi
+Library12=jrandomaccessfile
+Library13=jreflection
+Library14=jshell
+Library15=json
+Library16=jxui
+Library17=okhttp
+Library18=threading
+Library19=xcustomlistview
 Library2=b4xcollections
-Library20=xui views
-Library21=jb4xencryption
+Library20=xlutils
+Library21=xui views
+Library22=jaudiorecord2-b4xlib
 Library3=b4xtable
 Library4=byteconverter
 Library5=encryption
 Library6=javaobject
-Library7=jcore
-Library8=jfx
-Library9=jokhttputils2
+Library7=jb4xencryption
+Library8=jcore
+Library9=jfx
 Module1=APIParamsFiller
 Module10=FFMpeg
 Module11=InputBox
@@ -119,17 +122,18 @@ Module29=UndoManager
 Module3=ASROptions
 Module30=Utils
 Module31=|relative|..\Validator\Validator
-Module32=WaveFormBitmapCreator
-Module33=WavRandomAccessFile
+Module32=VoiceInput
+Module33=WaveFormBitmapCreator
+Module34=WavRandomAccessFile
 Module4=BatchTranslator
 Module5=DraggableRange
 Module6=|relative|..\Validator\EmailReset
 Module7=ErrorReporter
 Module8=Exporter
 Module9=ExportOptions
-NumberOfFiles=36
-NumberOfLibraries=21
-NumberOfModules=33
+NumberOfFiles=37
+NumberOfLibraries=22
+NumberOfModules=34
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -503,6 +507,10 @@ Private Sub MenuBar1_Action
 			End If
 		Case "_Exit"
 			ExitApp
+		Case "_Voice Input"
+			Dim vi As VoiceInput
+			vi.Initialize(currentProject)
+			vi.Show
 		Case "Export UI strings"
 			LocalizationHelper.Export
 		Case "_About"
@@ -2164,5 +2172,13 @@ private Sub KeyReleased_Event (e As Event)
 		If selectedRowID <> -1 Then
 			DeleteThisLine
 		End If
+	End If
+End Sub
+
+public Sub FillText(text As String,isTarget As Boolean)
+	If isTarget Then
+		TargetTextArea.Text = text
+	Else
+		SourceTextArea.Text = text
 	End If
 End Sub
