@@ -422,6 +422,8 @@ Private Sub MenuBar1_Action
 			SortLines
 		Case "Sh_ift Time"
 			ShiftTime
+		Case "Split"
+			SplitCurrentLine
 		Case "Move Up"
 			MoveUpCurrentLine
 		Case "Move Down"
@@ -1748,6 +1750,24 @@ private Sub NewLine
 		currentProject.AppendLine(-1)
 		LoadLinesToTable
 	End If
+End Sub
+
+Private Sub SplitCurrentLine
+	If selectedRowID <> -1 Then
+		Dim line As Map = currentProject.GetLine(selectedRowID-1)
+		Dim splitter As SentenceSplitter
+		splitter.Initialize
+		splitter.SetText(line.Get("source"),line.Get("target"))
+		Dim result As Map = splitter.ShowAndWait
+		Dim lines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,result.Get("source"),result.Get("target"),result.Get("calculateByWords"))
+		currentProject.DeleteLine(selectedRowID - 1)
+		InsertLines(selectedRowID - 1,lines)	
+	End If
+End Sub
+
+Private Sub InsertLines(index As Int,lines As List)
+	currentProject.InsertLines(index,lines)
+	LoadLinesToTable
 End Sub
 
 Private Sub ShiftTime

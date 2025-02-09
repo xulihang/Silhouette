@@ -166,6 +166,24 @@ Public Sub AddLine(startTime As String,endTime As String,source As String,target
 	AddState
 End Sub
 
+Public Sub InsertLine(index As Int,startTime As String,endTime As String,source As String,target As String)
+	Dim line As Map
+	line.Initialize
+	line.Put("startTime",startTime)
+	line.Put("endTime",endTime)
+	line.Put("source",source)
+	line.Put("target",target)
+	lines.InsertAt(index,line)
+	AddState
+End Sub
+
+Public Sub InsertLines(index As Int,newLines As List)
+	For i = newLines.Size - 1 To 0 Step - 1
+		lines.InsertAt(index,newLines.Get(i))
+	Next
+	AddState
+End Sub
+
 Private Sub DefaultLine As Map
 	Dim line As Map
 	line.Initialize
