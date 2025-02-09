@@ -47,6 +47,11 @@ Public Sub getEndIndex As Int
 	Return mEndIndex
 End Sub
 
+Public Sub DrawWithFFMpeg(dir As String,filename As String,width As Int,height As Int) As ResumableSub
+	wait for (FFMpeg.DrawWaveForm(dir,filename,width&"x"&height,File.Combine(dir,"wave.png"))) complete (done As Object)
+	Return fx.LoadImage(dir,"wave.png")
+End Sub
+
 Public Sub Draw(width As Int,height As Int) As B4XBitmap
 	Dim ratio As Double = width/height
 	Dim data() As Short

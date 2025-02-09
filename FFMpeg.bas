@@ -137,5 +137,21 @@ Public Sub SplitWav(duration As Int,dir As String,filename As String) As Resumab
 	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
 	Log(StdOut)
 	Log(StdErr)
+	Return Success
+End Sub
+
+Public Sub DrawWaveForm(dir As String,filename As String,res As String,out As String) As ResumableSub
+	'FFMpeg -i in.flac -f lavfi -i color=c=black:s=640x320 -filter_complex \
+	'"[0:a]showwavespic=s=640x320:colors=white[fg];[1:v][fg]overlay=format=auto" \
+	'-frames:v 1 out.png
+	Dim args As List
+	args = Array As String("-i",filename,"-f","lavfi","-i",$"color=c=black:s=${res}"$,"-filter_complex",$""[0:a]showwavespic=s=${res}:colors=white[fg];[1:v][fg]overlay=format=auto""$,"-frames:v","1",out)
+	Dim sh As Shell
+	sh.Initialize("sh",GetFFMpegPath,args)
+	sh.WorkingDirectory = dir
+	sh.Run(-1)
+	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	Log(StdOut)
+	Log(StdErr)
     Return Success
 End Sub
