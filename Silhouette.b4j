@@ -2125,7 +2125,7 @@ Private Sub NewLineHereButton_MouseClicked (EventData As MouseEvent)
 	Dim currentStartTime As Long = GetCurrentVideoTime
 	Dim startTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime)
 	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime + 1000)
-	If selectedRowID <> -1 Then
+	If selectedRowID <> -1 And selectedRowID <> currentProject.lines.Size Then
 		currentProject.AppendLineWithTime(selectedRowID - 1,startTime,endTime)
 		LoadLinesToTable
 		JumpToRow(selectedRowID+1,0)
