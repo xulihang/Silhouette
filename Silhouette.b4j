@@ -1275,6 +1275,7 @@ Private Sub PlayFile(path As String)
 	If vlc.IsPlaying Then
 		vlc.Stop
 	End If
+	VLCImageView.SetImage(Null)
 	ProgressSlider.tag = False
 	ProgressSlider.Value = 0
 	'vlc.PlayWithOptions(path,Array As String(":file-caching=10000"))
