@@ -23,6 +23,7 @@ End Sub
 Public Sub Initialize(p As Project)
 	frm.Initialize("frm",500,250)
 	frm.RootPane.LoadLayout("VoiceInput")
+	Main.loc.LocalizeForm(frm)
 	mProject = p
 	LoadDevices
 	Dim SampleRateHz As Float = 16000

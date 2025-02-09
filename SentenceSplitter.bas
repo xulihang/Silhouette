@@ -16,6 +16,7 @@ End Sub
 Public Sub Initialize
 	frm.Initialize("frm",600,500)
 	frm.RootPane.LoadLayout("sentenceSplitter")
+	Main.loc.LocalizeForm(frm)
 End Sub
 
 Public Sub SetText(source As String,target As String)
