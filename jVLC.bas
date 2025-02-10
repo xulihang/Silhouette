@@ -92,6 +92,7 @@ Public Sub CanPause As Boolean
 End Sub
 
 Public Sub IsPlayable As Boolean
+	Return True
 	Return embeddedMediaPlayer.RunMethodJO("status",Null).RunMethod("isPlayable",Null)
 End Sub
 
