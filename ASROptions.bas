@@ -29,9 +29,9 @@ End Sub
 
 Private Sub OkayButton_MouseClicked (EventData As MouseEvent)
 	If SplitRadioButton.Selected Then
-		options.Put("split_method",1)
-	Else if ExistingSegmentsRadioButton.Selected Then
 		options.Put("split_method",0)
+	Else if ExistingSegmentsRadioButton.Selected Then
+		options.Put("split_method",1)
 	Else
 		options.Put("split_method",2)
 	End If
