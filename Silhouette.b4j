@@ -1346,13 +1346,13 @@ Private Sub PlayFile(path As String)
 	player.Initialize("player",File.GetUri(currentProject.GetTmpFolder,"audio.wav"))
 	ProgressSlider.tag = True
 	TogglePlayingStatus(True,vlc.GetTime)
-	TotalTimeLabel.Text = Utils.GetCompactTimeStringFromMilliseconds(vlc.GetLength)
 	Sleep(0)
 	Do While VLCImageView.GetImage.IsInitialized == False
 		Sleep(100)
 	Loop
 	vlc.SetMute(False)
 	ResizeVLCImageView(VLCPane.Width,VLCPane.Height)
+	TotalTimeLabel.Text = Utils.GetCompactTimeStringFromMilliseconds(vlc.GetLength)
 End Sub
 
 Sub Progress_MouseExited_Event (MethodName As String, Args() As Object) As Object
