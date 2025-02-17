@@ -15,7 +15,7 @@ End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
 Public Sub Initialize
-	frm.Initialize("frm",500,250)
+	frm.Initialize("frm",500,270)
 	frm.RootPane.LoadLayout("ASROptions")
 	options.Initialize
 	options.Put("split_method",-1)
