@@ -10,6 +10,7 @@ Sub Class_Globals
 	Private ExistingSegmentsRadioButton As RadioButton
 	Private SplitRadioButton As RadioButton
 	Private options As Map
+	Private WholeRadioButton As RadioButton
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -28,9 +29,11 @@ End Sub
 
 Private Sub OkayButton_MouseClicked (EventData As MouseEvent)
 	If SplitRadioButton.Selected Then
+		options.Put("split_method",1)
+	Else if ExistingSegmentsRadioButton.Selected Then
 		options.Put("split_method",0)
 	Else
-		options.Put("split_method",1)
+		options.Put("split_method",2)
 	End If
 	frm.Close
 End Sub

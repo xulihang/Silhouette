@@ -157,7 +157,7 @@ Version=10
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 #AdditionalJar: bcprov-jdk15on-154
 #AdditionalJar: silero-vad
-#AdditionalJar: onnxruntime-1.20.0-full
+#AdditionalJar: onnxruntime-1.20.0
 #AdditionalJar: jnativehook-2.2.2
 
 Sub Process_Globals
@@ -308,7 +308,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		v.showAndWait
+		'v.showAndWait
 	End If
 	If Args.Length = 1 Then
 		Dim projectPath As String = Args(0)
@@ -636,8 +636,10 @@ Private Sub RecognizeSpeech
 	End If
 	If method = 0 Then
 		RecognizeSpeechByFixedSpan
-	Else
+	Else if method = 1 Then
 		RecognizeExistingLines
+	Else
+		RecognizeWholeSpeech
 	End If
 End Sub
 
@@ -675,6 +677,59 @@ Private Sub RecognizeExistingLines As ResumableSub
 	LoadLinesToTable
 	progressDialog.close
 	Return ""
+End Sub
+
+Private Sub RecognizeWholeSpeech As ResumableSub
+	Dim engine As String = currentProject.settings.GetDefault("engine","whisper")
+	If HasValidateModel=False And engine = "whisper" Then
+		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _
+		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
+		If response = fx.DialogResponse.POSITIVE Then
+			ShowPreferences.SwitchTab(2)
+		End If
+		Return ""
+	End If
+	Dim parent As String = currentProject.GetMediaFolder
+	Dim filename As String = currentProject.GetMediaFilename
+	Dim tmpDir As String = currentProject.GetTmpFolder
+	
+	wait for (ConvertToWav(parent,filename,tmpDir)) complete (done As Object)
+	
+	Dim files As List = File.ListFiles(tmpDir)
+	Dim wavFiles As List
+	wavFiles.Initialize
+	For Each filename As String In files
+		If filename.StartsWith("segment") And filename.EndsWith(".wav") Then
+			wavFiles.Add(filename)
+		End If
+	Next
+	progressDialog.Show(loc.Localize("Recognizing audio..."))
+	Dim wavPath As String = File.Combine(tmpDir,"audio.wav")
+	Wait For (ASR.RecognizeWavWithProgressInfo(Me,"ASR",wavPath,currentProject.SourceLang,engine,wavFiles.Size)) Complete (done As Object)
+	progressDialog.close
+	Dim filename As String
+	If File.Exists(tmpDir,"audio.srt") Then
+		filename = "audio.srt"
+	End If
+	If File.Exists(tmpDir,"audio.wav.srt") Then
+		filename = "audio.wav.srt"
+	End If
+	Dim parser As SrtParser
+	parser.Initialize
+	Dim content As String = File.ReadString(tmpDir,filename)
+	content = Utils.RemoveBOM(content)
+	Dim lines As List = parser.Parse(content)
+	For Each line As SpeechLine In lines
+		Dim startTime As String = line.startTime
+		Dim endTime As String = line.endTime
+		currentProject.AddLine(startTime,endTime,line.text,"")
+	Next
+	LoadLinesToTable
+	Return ""
+End Sub
+
+Private Sub ASR_ProgressChanged(completed As Double,size As Int)
+	progressDialog.update(completed,size)
 End Sub
 
 Private Sub RecognizeSpeechByFixedSpan As ResumableSub

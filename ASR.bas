@@ -8,6 +8,10 @@ Version=8.9
 Sub Process_Globals
 	Private fx As JFX
 	Private sh As Shell
+	Private mCallback As Object
+	Private mEventName As String
+	Private mSize As Int
+	Private mCurrentIndex As Double
 End Sub
 
 Public Sub RecognizeCut(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
@@ -88,6 +92,69 @@ Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As R
 		End If
 	End If
 	Return False
+End Sub
+
+Public Sub RecognizeWavWithProgressInfo(callback As Object, eventname As String, filepath As String,lang As String,engine As String,size As Int) As ResumableSub
+	mCallback = callback
+	mEventName = eventname
+	mCurrentIndex = 0
+	mSize = size
+	If engine = "whisper" Then
+		Dim args As List
+		args.Initialize
+		args.AddAll(Array("-m",GetModelPath,"-f",filepath,"-osrt","-l",lang))
+		Dim prompt As String =  Utils.getSetting("prompt","")
+		If prompt <> "" Then
+			args.Add("--prompt")
+			args.Add(prompt)
+		End If
+		Dim sh As Shell
+		sh.Initialize("sh",GetWhisperPath,args)
+		sh.WorkingDirectory = File.DirApp
+		sh.RunWithOutputEvents(-1)
+		wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+		Log(StdOut)
+		Log(StdErr)
+		If ExitCode <> 0 Then
+			Utils.ReportError(StdOut)
+		End If
+		Return Success
+	Else
+		If getASRPluginList.IndexOf(engine)<>-1 Then
+			Dim params As Map
+			params.Initialize
+			params.Put("path",filepath)
+			params.Put("lang",lang)
+			params.Put("preferencesMap",Utils.getPrefMap)
+			wait for (Main.plugin.RunPlugin(engine&"ASR","recognize",params)) complete (lines As List)
+			Dim convertedLines As List
+			convertedLines.Initialize
+			For Each line As Map In lines
+				Dim converted As Map
+				converted.Initialize
+				converted.Put("startTime",Utils.GetTimeStringFromMilliseconds(line.Get("start")*1000))
+				converted.Put("endTime",Utils.GetTimeStringFromMilliseconds(line.Get("end")*1000))
+				converted.Put("source",line.Get("text"))
+				converted.Put("target","")
+				convertedLines.Add(converted)
+			Next
+			Exporter.ExportToSRT(convertedLines,filepath&".srt",False,0)
+		End If
+	End If
+	Return False
+End Sub
+
+Private Sub sh_StdOut (Buffer() As Byte, Length As Int)
+	Log("StdOut")
+	Log(Length)
+	Dim bc As ByteConverter
+	Dim s As String = bc.StringFromBytes(Buffer,"UTF-8")
+	Log(s)
+	mCurrentIndex = mCurrentIndex + 0.5
+	File.WriteString(File.DirApp,"progress",s)
+	If SubExists(mCallback,mEventName&"_ProgressChanged") Then
+		CallSubDelayed3(mCallback,mEventName&"_ProgressChanged", mCurrentIndex, mSize)
+	End If
 End Sub
 
 Public Sub GetWhisperPath As String
