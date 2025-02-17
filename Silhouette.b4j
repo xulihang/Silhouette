@@ -314,6 +314,23 @@ Sub AppStart (Form1 As Form, Args() As String)
 		Dim projectPath As String = Args(0)
 		OpenFile(Utils.GetFilenameWithoutExtension(projectPath),False)
 	End If
+	AskAboutGPU
+End Sub
+
+Public Sub AskAboutGPU
+	If Utils.DetectOS = "windows" Or File.Exists(File.DirData("Silhouette"),"gpuAsked") Then
+		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("Enable GPU for speech recognition? If your GPU power is weak, you'd better use CPU."),"",loc.Localize("Yes"),"",loc.Localize("No"),fx.MSGBOX_CONFIRMATION)
+		Dim preferencesMap As Map = Utils.getPrefMap
+		If response = fx.DialogResponse.POSITIVE Then
+			preferencesMap.Put("use_gpu",True)
+		Else
+			preferencesMap.Put("use_gpu",False)
+		End If
+		Dim json As JSONGenerator
+		json.Initialize(preferencesMap)
+		File.WriteString(prefPath,"",json.ToPrettyString(4))
+		File.WriteString(File.DirData("Silhouette"),"gpuAsked","")
+	End If
 End Sub
 
 Public Sub initLoc
