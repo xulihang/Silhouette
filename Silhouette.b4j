@@ -318,7 +318,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 End Sub
 
 Public Sub AskAboutGPU
-	If Utils.DetectOS = "windows" Or File.Exists(File.DirData("Silhouette"),"gpuAsked") Then
+	If Utils.DetectOS = "windows" And File.Exists(File.DirData("Silhouette"),"gpuAsked") = False Then
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("Enable GPU for speech recognition? If your GPU power is weak, you'd better use CPU."),"",loc.Localize("Yes"),"",loc.Localize("No"),fx.MSGBOX_CONFIRMATION)
 		Dim preferencesMap As Map = Utils.getPrefMap
 		If response = fx.DialogResponse.POSITIVE Then
