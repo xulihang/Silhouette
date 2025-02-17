@@ -12,6 +12,7 @@ Sub Process_Globals
 	Private mEventName As String
 	Private mSize As Int
 	Private mCurrentIndex As Double
+	Private stdOutStep as Double = 0.5
 End Sub
 
 Public Sub RecognizeCut(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
@@ -150,7 +151,8 @@ Private Sub sh_StdOut (Buffer() As Byte, Length As Int)
 	Dim bc As ByteConverter
 	Dim s As String = bc.StringFromBytes(Buffer,"UTF-8")
 	Log(s)
-	mCurrentIndex = mCurrentIndex + 0.5
+	mCurrentIndex = mCurrentIndex + stdOutStep
+	mCurrentIndex = Min(mSize,mCurrentIndex)
 	File.WriteString(File.DirApp,"progress",s)
 	If SubExists(mCallback,mEventName&"_ProgressChanged") Then
 		CallSubDelayed3(mCallback,mEventName&"_ProgressChanged", mCurrentIndex, mSize)
@@ -158,6 +160,7 @@ Private Sub sh_StdOut (Buffer() As Byte, Length As Int)
 End Sub
 
 Public Sub GetWhisperPath As String
+	stdOutStep = 0.5
 	If Utils.DetectOS <> "windows" Then
 		If Utils.getPref("use_gpu",True) Then
 			Return File.Combine(File.Combine(File.DirApp,"whisper"),"whisper")
@@ -166,6 +169,7 @@ Public Sub GetWhisperPath As String
 		End If
 	Else
 		If Utils.getPref("use_gpu",True) Then
+			stdOutStep = 1
 			Return File.Combine(File.Combine(File.DirApp,"whisper"),"main.exe")
 		Else
 			Return File.Combine(File.Combine(File.Combine(File.DirApp,"whisper"),"cpp"),"whisper-cli.exe")
