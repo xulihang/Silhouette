@@ -100,6 +100,7 @@ Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As R
 				convertedLines.Add(converted)
 			Next
 			Exporter.ExportToSRT(convertedLines,filepath&".srt",False,0)
+			return True
 		End If
 	End If
 	Return False

@@ -728,28 +728,29 @@ Private Sub RecognizeWholeSpeech As ResumableSub
 	End If
 	If needRecognition Then
 		Dim wavPath As String = File.Combine(tmpDir,"audio.wav")
-		Wait For (ASR.RecognizeWavWithProgressInfo(Me,"ASR",wavPath,currentProject.SourceLang,engine,wavFiles.Size)) Complete (done As Object)
+		Wait For (ASR.RecognizeWavWithProgressInfo(Me,"ASR",wavPath,currentProject.SourceLang,engine,wavFiles.Size)) Complete (success As Boolean)
 	End If
 	progressDialog.close
+	If success Then
+		Dim filename As String
+		If File.Exists(tmpDir,"audio.srt") Then
+			filename = "audio.srt"
+		else if File.Exists(tmpDir,"audio.wav.srt") Then
+			filename = "audio.wav.srt"
+		End If
 	
-	Dim filename As String
-	If File.Exists(tmpDir,"audio.srt") Then
-		filename = "audio.srt"
-	else if File.Exists(tmpDir,"audio.wav.srt") Then
-		filename = "audio.wav.srt"
+		Dim parser As SrtParser
+		parser.Initialize
+		Dim content As String = File.ReadString(tmpDir,filename)
+		content = Utils.RemoveBOM(content)
+		Dim lines As List = parser.Parse(content)
+		For Each line As SpeechLine In lines
+			Dim startTime As String = line.startTime
+			Dim endTime As String = line.endTime
+			currentProject.AddLine(startTime,endTime,line.text,"")
+		Next
+		LoadLinesToTable
 	End If
-	
-	Dim parser As SrtParser
-	parser.Initialize
-	Dim content As String = File.ReadString(tmpDir,filename)
-	content = Utils.RemoveBOM(content)
-	Dim lines As List = parser.Parse(content)
-	For Each line As SpeechLine In lines
-		Dim startTime As String = line.startTime
-		Dim endTime As String = line.endTime
-		currentProject.AddLine(startTime,endTime,line.text,"")
-	Next
-	LoadLinesToTable
 	Return ""
 End Sub
 
