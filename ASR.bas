@@ -12,7 +12,7 @@ Sub Process_Globals
 	Private mEventName As String
 	Private mSize As Int
 	Private mCurrentIndex As Double
-	Private stdOutStep as Double = 0.5
+	Private stdOutStep As Double = 0.5
 End Sub
 
 Public Sub RecognizeCut(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
@@ -137,7 +137,28 @@ Public Sub RecognizeWavWithProgressInfo(callback As Object, eventname As String,
 			params.Put("path",filepath)
 			params.Put("lang",lang)
 			params.Put("preferencesMap",Utils.getPrefMap)
-			wait for (Main.plugin.RunPlugin(engine&"ASR","recognize",params)) complete (lines As List)
+			wait for (Main.plugin.RunPlugin(engine&"ASR","recognizeLongFile",params)) complete (done As Object)
+			Do While True
+				Sleep(1000)
+				Log("run get progress")
+				wait for (Main.plugin.RunPlugin(engine&"ASR","getProgress",params)) complete (progressMap As Map)
+				Log(progressMap)
+				If progressDialog.isShowing = False Then
+					wait for (Main.plugin.RunPlugin(engine&"ASR","stop",params)) complete (done As Object)
+					Return False
+				End If
+				Dim current As Double = progressMap.Get("current")
+				Dim total As Double = progressMap.Get("total")
+				Dim normalizedCurrent As Int = 100/total*current
+				If SubExists(mCallback,mEventName&"_ProgressChanged") Then
+					CallSubDelayed3(mCallback,mEventName&"_ProgressChanged", normalizedCurrent, 100)
+				End If
+				If current == total And current <> -1 Then
+					Exit
+				End If
+			Loop
+			wait for (Main.plugin.RunPlugin(engine&"ASR","getResult",params)) complete (lines As List)
+			Log(lines)
 			Dim convertedLines As List
 			convertedLines.Initialize
 			For Each line As Map In lines
@@ -150,6 +171,7 @@ Public Sub RecognizeWavWithProgressInfo(callback As Object, eventname As String,
 				convertedLines.Add(converted)
 			Next
 			Exporter.ExportToSRT(convertedLines,filepath&".srt",False,0)
+			Return True
 		End If
 	End If
 	Return False
