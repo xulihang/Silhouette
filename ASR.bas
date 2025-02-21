@@ -49,6 +49,15 @@ Public Sub RecognizeWavAsText(filepath As String,lang As String,engine As String
 	Return sb.ToString
 End Sub
 
+Public Sub RenameWavFile(filepath As String)
+	Dim pureFilepath As String = Utils.GetFilenameWithoutExtension(filepath)
+	Dim desiredSRTPath As String = filepath&".srt"
+	If File.Exists(pureFilepath&".srt","") Then
+		File.Copy(pureFilepath&".srt","",desiredSRTPath,"")
+		File.Delete(pureFilepath&".srt","")
+	End If
+End Sub
+
 Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As ResumableSub
 	If engine = "whisper" Then
 		Dim args As List
@@ -66,6 +75,7 @@ Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As R
 		wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
 		Log(StdOut)
 		Log(StdErr)
+		RenameWavFile(filepath)
 		If ExitCode <> 0 Then
 			Utils.ReportError(StdOut)
 		End If
