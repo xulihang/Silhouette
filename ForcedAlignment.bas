@@ -93,7 +93,7 @@ Public Sub AlignByText(lines As List,alignedSegments As List) As List
 			newLine.Put("target","")
 			newLine.Put("startTime",startTime)
 			'new start time
-			startTime = Utils.GetTimeStringFromMilliseconds(Utils.GetMillisecondsFromTimeString(lastLine.Get("endTime"))+1000)
+			startTime = Utils.GetTimeStringFromMilliseconds(Utils.GetMillisecondsFromTimeString(startTime)+1000)
 			newLine.Put("endTime",startTime)
 			newLines.Add(newLine)
 		Next
