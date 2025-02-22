@@ -15,6 +15,9 @@ Sub Class_Globals
 	Private currentIndex As Int
 	Private mEventName As String
 	Private mCallBack As Object
+	Private ProtectSourceCheckBox As CheckBox
+	Private MenuBar1 As MenuBar
+	Private path As String
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -622,6 +625,9 @@ Sub getTheOtherIndex(textIndex As Int) As Int
 End Sub
 
 Sub splitSegment(TextArea As TextArea,isSource As Boolean)
+	If ProtectSourceCheckBox.Checked And isSource Then
+		Return
+	End If
 	Dim index As Int
 	index=editorLV.Items.IndexOf(TextArea.Parent)
 	Dim textIndex As Int
@@ -655,8 +661,6 @@ Sub splitSegment(TextArea As TextArea,isSource As Boolean)
 		nextbitext.Put("id",bitext.Get("id"))
 	End If
 	
-
-	
 	Dim nextPane As Pane=createEmptyPane
 	
 	Dim nextSource,nextTarget As String
@@ -676,7 +680,9 @@ Sub splitSegment(TextArea As TextArea,isSource As Boolean)
 		addTextAreaToSegmentPane(nextPane,nextSource,nextTarget)
 		editorLV.Items.InsertAt(index+1,nextPane)
 	End If
-	
+	If ProtectSourceCheckBox.Checked Then
+		deleteCell(True,nextPane.GetNode(0))
+	End If
 	CallSubDelayed(Me,"ListViewParent_Resize")
 End Sub
 
@@ -851,4 +857,31 @@ Private Sub SplitButton_MouseClicked (EventData As MouseEvent)
 	Next
 	currentProject.loadItemsToSegments(CreateMap("source":sourceList,"target":targetList))
 	loadSegmentsToListView
+End Sub
+
+Private Sub MenuBar1_Action
+	Dim mi As MenuItem = Sender
+	Select Main.loc.FindSource(mi.Text)
+		Case "_Open"
+			Dim fc As FileChooser
+			fc.Initialize
+			fc.SetExtensionFilter("Aligner",Array As String("*.alp"))
+			Dim selectedPath As String = fc.ShowOpen(frm)
+			If File.Exists(selectedPath,"") Then
+				path = selectedPath
+				currentProject.Initialize(path)
+				currentProject.readProjectFile
+				loadSegmentsToListView
+			End If
+		Case "_Save"
+			If path = "" Then
+				Dim fc As FileChooser
+				fc.Initialize
+				fc.SetExtensionFilter("Aligner",Array As String("*.alp"))
+				Dim selectedPath As String = fc.ShowSave(frm)
+				path = selectedPath
+				currentProject.path = selectedPath
+			End If
+			currentProject.save
+	End Select
 End Sub

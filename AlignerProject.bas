@@ -9,7 +9,7 @@ Sub Class_Globals
 	Private ProjectFile As Map
 	Public segments As List
 	Public paragraphs As Map
-	Private path As String
+	Public path As String
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
