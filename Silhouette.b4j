@@ -517,6 +517,8 @@ Private Sub MenuBar1_Action
 			Dim ps As ProjectSettings
 			ps.Initialize(currentProject)
 			ps.show
+		Case "Switch Source and Target"
+			SwitchSourceAndTarget
 		Case "import from _srt"
 			If limitedMode Then
 				fx.Msgbox(MainForm,loc.Localize("Limited mode cannot import files"),"")
@@ -596,6 +598,16 @@ Private Sub MenuBar1_Action
 		Case "_About"
 			fx.Msgbox(MainForm,"@xulihang, 2025","Silhouette "&version)
 	End Select
+End Sub
+
+private Sub SwitchSourceAndTarget
+	For Each line As Map In currentProject.lines
+		Dim source As String = line.Get("source")
+		Dim target As String = line.Get("target")
+		line.Put("source",target)
+		line.Put("target",source)
+	Next
+	LoadLinesToTable
 End Sub
 
 Private Sub ShowAligner
