@@ -186,7 +186,7 @@ Version=10
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 #AdditionalJar: bcprov-jdk15on-154
 #AdditionalJar: silero-vad
-#AdditionalJar: onnxruntime-1.20.0
+#AdditionalJar: onnxruntime-1.20.0-full
 #AdditionalJar: jnativehook-2.2.2
 
 Sub Process_Globals
@@ -337,11 +337,19 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		'v.showAndWait
+		v.showAndWait
 	End If
 	If Args.Length = 1 Then
-		Dim projectPath As String = Args(0)
-		OpenFile(Utils.GetFilenameWithoutExtension(projectPath),False)
+		Dim filePath As String = Args(0)
+		If filePath.Contains("sip") Then
+			OpenFile(Utils.GetFilenameWithoutExtension(filePath),False)
+		Else
+			If File.Exists(filePath&".sip","") Then
+				OpenFile(filePath,False)
+			Else
+				OpenFile(filePath,True)
+			End If
+		End If
 	End If
 	AskAboutGPU
 End Sub
