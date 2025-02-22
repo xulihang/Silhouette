@@ -556,6 +556,9 @@ Public Sub setLayout(p As Pane,index As Int,h As Int)
 End Sub
 
 Sub mergeSegment(TextArea As TextArea,isSource As Boolean)
+	If ProtectSourceCheckBox.Checked And isSource Then
+		Return
+	End If
 	Dim index As Int
 	index=editorLV.Items.IndexOf(TextArea.Parent)
 	If index+1>currentProject.segments.Size-1 Then
