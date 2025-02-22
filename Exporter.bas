@@ -49,6 +49,10 @@ Public Sub ExportToSRT(lines As List,path As String,askOption As Boolean,option 
 	File.WriteString(path,"",sb.ToString)
 End Sub
 
+Public Sub ExportToXLIFF(lines As List,path As String,sourceLang As String,targetLang As String)
+    XLIFF.Export(lines,path,sourceLang,targetLang)
+End Sub
+
 
 Public Sub ExportToTXT(lines As List,path As String)
 	Dim sb As StringBuilder

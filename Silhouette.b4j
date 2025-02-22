@@ -155,19 +155,20 @@ Module43=|relative|..\Validator\Validator
 Module44=VoiceInput
 Module45=WaveFormBitmapCreator
 Module46=WavRandomAccessFile
-Module47=Xml2Map
-Module48=XMLBuilder2
-Module49=XmlNode
+Module47=XLIFF
+Module48=Xml2Map
+Module49=XMLBuilder2
 Module5=ASROptions
-Module50=XmlParser
-Module51=XMLUtils
+Module50=XmlNode
+Module51=XmlParser
+Module52=XMLUtils
 Module6=BatchTranslator
 Module7=DraggableRange
 Module8=editDistance
 Module9=|relative|..\Validator\EmailReset
 NumberOfFiles=44
 NumberOfLibraries=25
-NumberOfModules=51
+NumberOfModules=52
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -542,6 +543,19 @@ Private Sub MenuBar1_Action
 				LoadLinesToTable
 				fx.Msgbox(MainForm,loc.Localize("Done"),"")
 			End If
+		Case "import from XLIFF"
+			If limitedMode Then
+				fx.Msgbox(MainForm,loc.Localize("Limited mode cannot import files"),"")
+				Return
+			End If
+			Dim fc As FileChooser
+			fc.Initialize
+			Dim path As String = fc.ShowOpen(MainForm)
+			If File.Exists(path,"") Then
+				ImportFromXLIFF(path)
+				LoadLinesToTable
+				fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			End If
 		Case "export to _srt"
 			Dim fc As FileChooser
 			fc.Initialize
@@ -558,6 +572,15 @@ Private Sub MenuBar1_Action
 			Dim path As String = fc.ShowSave(MainForm)
 			If path <> "" Then
 				Exporter.ExportToTXT(currentProject.lines,path)
+				fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			End If
+		Case "export to XLIFF"
+			Dim fc As FileChooser
+			fc.Initialize
+			fc.SetExtensionFilter("XLIFF",Array As String("*.xlf"))
+			Dim path As String = fc.ShowSave(MainForm)
+			If path <> "" Then
+				Exporter.ExportToXLIFF(currentProject.lines,path,currentProject.SourceLang,currentProject.TargetLang)
 				fx.Msgbox(MainForm,loc.Localize("Done"),"")
 			End If
 		Case "_Exit"
@@ -927,6 +950,22 @@ Private Sub SortedWavFiles(wavfiles As List) As List
 		newFilesList.Add(sb.ToString)
 	Next
 	Return newFilesList
+End Sub
+
+Private Sub ImportFromXLIFF(path As String)
+	Dim segments As List = XLIFF.Import(path)
+	For i = 0 To currentProject.lines.Size - 1
+		Dim segment As List = segments.Get(i)
+		If i <= segments.Size - 1 Then
+			Dim source As String = segment.Get(0)
+			Dim target As String = segment.Get(1)
+			Dim line As Map = currentProject.lines.Get(i)
+			line.Put("source",source)
+			line.Put("target",target)
+		Else
+			Exit
+		End If
+	Next
 End Sub
 
 
