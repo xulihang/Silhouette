@@ -992,7 +992,13 @@ Private Sub ImportFromSRT(path As String)
 	For Each line As SpeechLine In lines
 		Dim startTime As String = line.startTime
 		Dim endTime As String = line.endTime
-		currentProject.AddLine(startTime,endTime,line.text,"")
+		Dim source As String = line.text
+		Dim target As String
+		If line.text.Contains(CRLF) Then
+			source = Regex.Split(CRLF,line.text)(0)
+			target = Regex.Split(CRLF,line.text)(1)
+		End If
+		currentProject.AddLine(startTime,endTime,source,target)
 	Next
 End Sub
 
