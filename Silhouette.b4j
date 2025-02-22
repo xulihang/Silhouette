@@ -913,6 +913,20 @@ public Sub LoadLinesToTable
 	LinesTable.SetData(data)
 End Sub
 
+private Sub SetWrapText
+	LinesTable.RowHeight = 50dip
+	LinesTable.BuildLayoutsCache(LinesTable.MaximumRowsPerPage)
+	Dim titles As List = Array(loc.Localize("Source"),loc.Localize("Target"))
+	For Each title As String In titles
+		Dim col As B4XTableColumn = LinesTable.GetColumn(title)
+		For i = 1 To col.CellsLayouts.Size - 1
+			Dim p As B4XView = col.CellsLayouts.Get(i)
+			Dim lbl As Label = p.GetView(col.LabelIndex)
+			lbl.WrapText = True
+		Next
+	Next
+End Sub
+
 Sub LinesTable_CellClicked (ColumnId As String, RowId As Long)
 	SelectRow(RowId,False)
 End Sub
