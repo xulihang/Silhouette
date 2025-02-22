@@ -19,38 +19,65 @@ Public Sub AlignByText(lines As List,alignedSegments As List) As List
 	Log(alignedSegments)
 	Dim newLines As List
 	newLines.Initialize
+
+	Dim previousStartTime As String
+	Dim appendedLineSource As String
 	For Each line As Map In lines
 		Dim source As String = line.Get("source")
-		Dim appendedSource As String
-		Dim appendedTarget As String
+		appendedLineSource = appendedLineSource & source
 		Dim index As Int
 		Dim indexList As List
 		indexList.Initialize
+		Dim appendedSource As String
+		Dim appendedTarget As String
 		For Each segment As Map In alignedSegments
-			indexList.Add(index)
 			Dim segmentSource As String = segment.Get("source")
 			Dim segmentTarget As String = segment.Get("target")
 			appendedSource = appendedSource & segmentSource
 			appendedTarget = appendedTarget & segmentTarget
+			Log(appendedLineSource)
+			Log(appendedSource)
 			If segmentSource == "" Then
+				Log("new line")
+				previousStartTime = ""
 				Dim newLine As Map
 				newLine.Initialize
 				newLine.Put("source",appendedTarget)
 				newLine.Put("target","")
-				newLine.Put("startTime",line.Get("endTime"))
-				newLine.Put("endTime",Utils.GetTimeStringFromMilliseconds(Utils.GetMillisecondsFromTimeString(line.Get("endTime"))+1000))
+				newLine.Put("startTime",line.Get("startTime"))
+				newLine.Put("endTime",Utils.GetTimeStringFromMilliseconds(Utils.GetMillisecondsFromTimeString(line.Get("startTime"))+1000))
 				newLines.Add(newLine)
+				appendedSource = ""
+				appendedTarget = ""
+				appendedLineSource = ""
 				Exit
 			Else
-				If GetRatio(source,appendedSource) > 0.9 Then
+				If appendedSource.Length / appendedLineSource.Length > 1.5 Then 'not match
+					Log("source not enough")
+					previousStartTime = line.Get("startTime")
+					Exit
+				End If
+				Dim ratio As Double = GetRatio(appendedLineSource,appendedSource)
+				If  ratio > 0.9 Then
+					Log("suitable")
+					If previousStartTime <> "" Then
+						line.Put("startTime",previousStartTime)
+					End If
 					line.Put("source",appendedTarget)
 					newLines.Add(line)
+					appendedSource = ""
+					appendedTarget = ""
+					appendedLineSource = ""
+					previousStartTime = ""
+					indexList.Add(index)
 					Exit
 				End If
 			End If
+			indexList.Add(index)
             index = index + 1
 		Next
 		For Each index As Int In indexList
+			Log("delete source: "&alignedSegments.Get(0))
 			alignedSegments.RemoveAt(0)
 		Next
 	Next
