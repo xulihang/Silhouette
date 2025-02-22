@@ -1392,9 +1392,11 @@ Sub Progress_MouseClicked_Event (MethodName As String, Args() As Object) As Resu
 	ProgressSlider.Value = percent * 100
 	vlc.SetPosition(percent)
 	ProgressLabel.Text = Utils.GetCompactTimeStringFromMilliseconds(vlc.GetLength*percent)
-	expectedEndTime = -1
-	playbackStartDate = -1
-	playbackStartTime = -1
+	If ProgressTimer.Enabled = True Then 'playing status
+		TogglePlayingStatus(True,vlc.GetLength*percent)
+	Else
+		TogglePlayingStatus(False,-1)
+	End If
 	ProgressContextMenu.MenuItems.Clear
 	e.Consume
 	Sleep(0)
