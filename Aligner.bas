@@ -845,6 +845,10 @@ Sub TextIsIncomplete(before As List,after As List) As Boolean
 End Sub
 
 Private Sub SplitButton_MouseClicked (EventData As MouseEvent)
+	Dim srxPath As String
+	If File.Exists(File.DirApp,"segmentationRules.srx") Then
+		srxPath = File.Combine(File.DirApp,"segmentationRules.srx")
+	End If
 	Dim sourceList As List
 	sourceList.Initialize
 	Dim targetList As List
@@ -854,7 +858,7 @@ Private Sub SplitButton_MouseClicked (EventData As MouseEvent)
 		sourceList.Add(source)
 		Dim target As String = segment.Get("target")
 		If target <> "" Then
-			Wait For (segmentation.segmentedTxt(target,True,currentProject.GetLangPair.Get("target"),"",False)) Complete (segmented As List)
+			Wait For (segmentation.segmentedTxt(target,True,currentProject.GetLangPair.Get("target"),srxPath,False)) Complete (segmented As List)
 			targetList.AddAll(segmented)
 		End If
 	Next
