@@ -4,7 +4,7 @@ A computer-aided translation tool for audios and videos
 
 [Homepage](https://www.basiccat.org/silhouette) [首页](https://www.basiccat.org/zh/silhouette/)
 
-![screenshot_en](https://github.com/user-attachments/assets/d0a2d7eb-7f4c-47e4-9163-472ed41fdbce)
+![screenshot_en](https://www.basiccat.org/album/silhouette/screenshot_en.webp)
 
 ## Features
 
