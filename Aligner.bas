@@ -834,3 +834,21 @@ Sub TextIsIncomplete(before As List,after As List) As Boolean
 	Next
 	Return False
 End Sub
+
+Private Sub SplitButton_MouseClicked (EventData As MouseEvent)
+	Dim sourceList As List
+	sourceList.Initialize
+	Dim targetList As List
+	targetList.Initialize
+	For Each segment As Map In currentProject.segments
+		Dim source As String = segment.Get("source")
+		sourceList.Add(source)
+		Dim target As String = segment.Get("target")
+		If target <> "" Then
+			Wait For (segmentation.segmentedTxt(target,True,currentProject.GetLangPair.Get("target"),"",False)) Complete (segmented As List)
+			targetList.AddAll(segmented)
+		End If
+	Next
+	currentProject.loadItemsToSegments(CreateMap("source":sourceList,"target":targetList))
+	loadSegmentsToListView
+End Sub

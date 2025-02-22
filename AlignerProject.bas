@@ -20,6 +20,10 @@ Public Sub Initialize(projectPath As String)
 	path=projectPath
 End Sub
 
+Public Sub GetLangPair As Map
+	Return ProjectFile.Get("langPair")
+End Sub
+
 ' segment paragraphs into sentences
 Public Sub loadSegmentsInSentenceLevel(srxPath As String) As ResumableSub
 	Log("segmenting...")
