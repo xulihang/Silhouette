@@ -9,6 +9,17 @@ Sub Process_Globals
 	Private mPref As Map
 End Sub
 
+Sub LanguageHasSpace(lang As String) As Boolean
+	Dim languagesWithoutSpaceList As List
+	languagesWithoutSpaceList=File.ReadList(File.DirAssets,"languagesWithoutSpace.txt")
+	For Each code As String In languagesWithoutSpaceList
+		If lang.ToLowerCase.StartsWith(code) Then
+			Return False
+		End If
+	Next
+	Return True
+End Sub
+
 Sub projectSetting As Map
 	If Main.currentProject.IsInitialized Then
 		Return Main.currentProject.settings

@@ -1,44 +1,49 @@
 ﻿AppType=JavaFX
 Build1=Default,org.xulihang.silhouette
-File1=apiparamfiller.bjl
-File10=generalPreference.bjl
-File11=generalSettings.bjl
-File12=icon.png
-File13=inputbox.bjl
-File14=JumpOptions.bjl
-File15=LangaugePairSelector.bjl
-File16=langcodes.txt
-File17=LeftSplitPane.bjl
-File18=LineEditor.bjl
-File19=ListView.bjl
-File2=APISetting.bjl
-File20=main.bjl
-File21=main_mac.bjl
-File22=modelPreference.bjl
-File23=MTSetting.bjl
-File24=PlayControl.bjl
-File25=pretranslate.bjl
-File26=progress.bjl
-File27=projectSetting.bjl
-File28=RangeSelector.bjl
-File29=searchandreplace.bjl
-File3=ASROptions.bjl
-File30=sentenceSplitter.bjl
-File31=silhouette.png
-File32=TopRightSplitPane.bjl
-File33=TopSplitPane.bjl
-File34=TranslationAssist.bjl
-File35=TranslationMemory.bjl
-File36=validator.bjl
-File37=VideoPlayer.bjl
-File38=VoiceInput.bjl
-File39=WaveForm.bjl
-File4=BatchTranslator.bjl
-File5=BottomSplitPane.bjl
-File6=Editor.bjl
-File7=EmailReset.bjl
-File8=ErrorReporter.bjl
-File9=ExportOptions.bjl
+File1=Aligner.bjl
+File10=ErrorReporter.bjl
+File11=ExportOptions.bjl
+File12=generalPreference.bjl
+File13=generalSettings.bjl
+File14=icon.png
+File15=inputbox.bjl
+File16=JumpOptions.bjl
+File17=LangaugePairSelector.bjl
+File18=langcodes.txt
+File19=languagesWithoutSpace.txt
+File2=apiparamfiller.bjl
+File20=LeftSplitPane.bjl
+File21=LineEditor.bjl
+File22=ListView.bjl
+File23=main.bjl
+File24=main_mac.bjl
+File25=modelPreference.bjl
+File26=MTSetting.bjl
+File27=PlayControl.bjl
+File28=pretranslate.bjl
+File29=progress.bjl
+File3=APISetting.bjl
+File30=projectSetting.bjl
+File31=RangeSelector.bjl
+File32=searchandreplace.bjl
+File33=segment.bjl
+File34=segmentationRules.srx
+File35=sentenceSplitter.bjl
+File36=silhouette.png
+File37=TopRightSplitPane.bjl
+File38=TopSplitPane.bjl
+File39=TranslationAssist.bjl
+File4=ASROptions.bjl
+File40=TranslationMemory.bjl
+File41=validator.bjl
+File42=VideoPlayer.bjl
+File43=VoiceInput.bjl
+File44=WaveForm.bjl
+File5=BatchTranslator.bjl
+File6=BottomSplitPane.bjl
+File7=Editor.bjl
+File8=editorLV.bjl
+File9=EmailReset.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -73,6 +78,11 @@ FileGroup37=Default Group
 FileGroup38=Default Group
 FileGroup39=Default Group
 FileGroup4=Default Group
+FileGroup40=Default Group
+FileGroup41=Default Group
+FileGroup42=Default Group
+FileGroup43=Default Group
+FileGroup44=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
 FileGroup7=Default Group
@@ -80,66 +90,84 @@ FileGroup8=Default Group
 FileGroup9=Default Group
 Group=Default Group
 Library1=abplugin
-Library10=jokhttputils2
-Library11=jpoi
-Library12=jrandomaccessfile
-Library13=jreflection
-Library14=jshell
-Library15=json
-Library16=jxui
-Library17=okhttp
-Library18=threading
-Library19=xcustomlistview
+Library10=jfx
+Library11=jokhttputils2
+Library12=jpoi
+Library13=jrandomaccessfile
+Library14=jreflection
+Library15=jshell
+Library16=json
+Library17=jxmlsaxenhanced
+Library18=jxui
+Library19=okhttp
 Library2=b4xcollections
-Library20=xlutils
-Library21=xui views
-Library22=jaudiorecord2-b4xlib
+Library20=threading
+Library21=xcustomlistview
+Library22=xlutils
+Library23=xmlbuilder
+Library24=xui views
+Library25=apachestringutilsb4j
 Library3=b4xtable
 Library4=byteconverter
 Library5=encryption
-Library6=javaobject
-Library7=jb4xencryption
-Library8=jcore
-Library9=jfx
-Module1=APIParamsFiller
-Module10=FFMpeg
-Module11=InputBox
-Module12=JumpOptions
-Module13=jVLC
-Module14=LanguagePairSelector
-Module15=LocalizationHelper
-Module16=Localizator
-Module17=MT
-Module18=NativeHook
-Module19=PlayControlForm
-Module2=ASR
-Module20=Preferences
-Module21=preTranslateDialog
-Module22=progressDialog
-Module23=Project
-Module24=ProjectSettings
-Module25=RangeSelector
-Module26=SearchAndReplaceDialog
-Module27=SentenceSplitter
-Module28=SileroVad
-Module29=SrtParser
-Module3=ASROptions
-Module30=TextFlow
-Module31=UndoManager
-Module32=Utils
-Module33=|relative|..\Validator\Validator
-Module34=VoiceInput
-Module35=WaveFormBitmapCreator
-Module36=WavRandomAccessFile
-Module4=BatchTranslator
-Module5=DraggableRange
-Module6=|relative|..\Validator\EmailReset
-Module7=ErrorReporter
-Module8=Exporter
-Module9=ExportOptions
-NumberOfFiles=39
-NumberOfLibraries=22
-NumberOfModules=36
+Library6=jaudiorecord2-b4xlib
+Library7=javaobject
+Library8=jb4xencryption
+Library9=jcore
+Module1=Aligner
+Module10=ErrorReporter
+Module11=Exporter
+Module12=ExportOptions
+Module13=FFMpeg
+Module14=ForcedAlignment
+Module15=InputBox
+Module16=JumpOptions
+Module17=jVLC
+Module18=LanguagePairSelector
+Module19=LFAlign
+Module2=AlignerProject
+Module20=LocalizationHelper
+Module21=Localizator
+Module22=Map2Xml
+Module23=MT
+Module24=NativeHook
+Module25=PlayControlForm
+Module26=Preferences
+Module27=preTranslateDialog
+Module28=progressDialog
+Module29=Project
+Module3=APIParamsFiller
+Module30=ProjectSettings
+Module31=RangeSelector
+Module32=SearchAndReplaceDialog
+Module33=segmentation
+Module34=SentenceSplitter
+Module35=SileroVad
+Module36=SimpleTag
+Module37=SrtParser
+Module38=SRX
+Module39=TagKind
+Module4=ASR
+Module40=TextFlow
+Module41=UndoManager
+Module42=Utils
+Module43=|relative|..\Validator\Validator
+Module44=VoiceInput
+Module45=WaveFormBitmapCreator
+Module46=WavRandomAccessFile
+Module47=Xml2Map
+Module48=XMLBuilder2
+Module49=XmlNode
+Module5=ASROptions
+Module50=XmlParser
+Module51=XMLUtils
+Module6=BatchTranslator
+Module7=DraggableRange
+Module8=editDistance
+Module9=|relative|..\Validator\EmailReset
+NumberOfFiles=44
+NumberOfLibraries=25
+NumberOfModules=51
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -538,11 +566,41 @@ Private Sub MenuBar1_Action
 			Dim vi As VoiceInput
 			vi.Initialize(currentProject)
 			vi.Show
+		Case "_Aligner"
+			ShowAligner
 		Case "Export UI strings"
 			LocalizationHelper.Export
 		Case "_About"
 			fx.Msgbox(MainForm,"@xulihang, 2025","Silhouette "&version)
 	End Select
+End Sub
+
+Private Sub ShowAligner
+	Dim inp As InputBox
+	inp.Initialize
+	inp.Title = loc.Localize("Please input the text to align.")
+	Dim target As String = inp.showAndWait("")
+	Dim targetList As List
+	targetList.Initialize
+	For Each line As String In Regex.Split(CRLF,target)
+		targetList.Add(line)
+	Next
+	Dim sourceList As List
+	sourceList.Initialize
+	For Each lineMap As Map In currentProject.lines
+		sourceList.Add(lineMap.Get("source"))
+	Next
+	Dim a As Aligner
+	a.Initialize
+	Dim aligned As List = a.ShowAndWait(sourceList,targetList,currentProject.SourceLang,currentProject.SourceLang)
+	Log(aligned)
+	If aligned.Size > 0 Then
+		Dim fa As ForcedAlignment
+		fa.Initialize
+		Dim newLines As List = fa.AlignByText(currentProject.lines,aligned)
+		currentProject.ReplaceLines(newLines)
+		LoadLinesToTable
+	End If
 End Sub
 
 Private Sub ShowPreferences As Preferences

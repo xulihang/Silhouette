@@ -174,6 +174,12 @@ Public Sub DeleteLine(index As Int)
 	AddState
 End Sub
 
+Public Sub ReplaceLines(newLines As List)
+	lines.Clear
+	lines.AddAll(newLines)
+	AddState
+End Sub
+
 Public Sub AddLine(startTime As String,endTime As String,source As String,target As String)
 	Dim line As Map
 	line.Initialize
