@@ -22,7 +22,8 @@ Public Sub AlignByText(lines As List,alignedSegments As List) As List
 
 	Dim previousStartTime As String
 	Dim appendedLineSource As String
-	For Each line As Map In lines
+	For i = 0 To lines.Size - 1
+		Dim line As Map = lines.Get(i)
 		Dim source As String = line.Get("source")
 		appendedLineSource = appendedLineSource & source
 		Dim index As Int
@@ -50,6 +51,8 @@ Public Sub AlignByText(lines As List,alignedSegments As List) As List
 				appendedSource = ""
 				appendedTarget = ""
 				appendedLineSource = ""
+				i = i - 1
+				indexList.Add(index)
 				Exit
 			Else
 				If appendedSource.Length / appendedLineSource.Length > 1.5 Then 'not match
