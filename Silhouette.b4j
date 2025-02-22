@@ -1363,11 +1363,11 @@ Private Sub PlayFile(path As String)
 	vlc.Play(path)
 	player.Initialize("player",File.GetUri(currentProject.GetTmpFolder,"audio.wav"))
 	ProgressSlider.tag = True
-	TogglePlayingStatus(True,vlc.GetTime)
 	Sleep(0)
 	Do While VLCImageView.GetImage.IsInitialized == False
 		Sleep(100)
 	Loop
+	TogglePlayingStatus(True,vlc.GetTime)
 	vlc.SetMute(False)
 	ResizeVLCImageView(VLCPane.Width,VLCPane.Height)
 	TotalTimeLabel.Text = Utils.GetCompactTimeStringFromMilliseconds(vlc.GetLength)
