@@ -2245,12 +2245,16 @@ End Sub
 
 Private Sub Backward(span As Int)
 	playbackStartTime = playbackStartTime - span
-	vlc.SetTime(Max(0, GetCurrentVideoTime - span))
+	Dim time As Double = Max(0, GetCurrentVideoTime - span)
+	vlc.SetTime(time)
+	player.Position = time
 End Sub
 
 Private Sub Forward(span As Int)
 	playbackStartTime = playbackStartTime + span
-	vlc.SetTime(Min(GetCurrentVideoTime + span,vlc.GetLength))
+	Dim time As Double = Min(GetCurrentVideoTime + span,vlc.GetLength)
+	vlc.SetTime(time)
+	player.Position = time
 End Sub
 
 Public Sub cleanupHook
