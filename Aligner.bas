@@ -13,23 +13,26 @@ Sub Class_Globals
 	Type Range(firstIndex As Int,lastIndex As Int)
 	Private SegmentsLabel As Label
 	Private currentIndex As Int
+	Private mEventName As String
+	Private mCallBack As Object
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
-Public Sub Initialize
+Public Sub Initialize(callback As Object,eventname As String)
+	mCallBack = callback
+	mEventName = eventname
 	frm.Initialize("frm",600,600)
 	frm.RootPane.LoadLayout("Aligner")
 	Main.loc.LocalizeForm(frm)
 	currentProject.Initialize(File.Combine(File.DirTemp,"1.alp"))
-	addScrollChangedEvent(editorLV)
 End Sub
 
-Public Sub ShowAndWait(sourceList As List,targetList As List,sourceLang As String,targetLang As String) As List
+Public Sub Show(sourceList As List,targetList As List,sourceLang As String,targetLang As String)
+	frm.Show
 	currentProject.setProjectFileValue("langPair",CreateMap("source":sourceLang,"target":targetLang))
 	currentProject.loadItemsToSegments(CreateMap("source":sourceList,"target":targetList))
 	loadSegmentsToListView
-	frm.ShowAndWait
-	Return currentProject.segments
+	addScrollChangedEvent
 End Sub
 
 Public Sub loadSegmentsToListView
@@ -47,11 +50,9 @@ End Sub
 
 Private Sub OkayButton_MouseClicked (EventData As MouseEvent)
 	frm.Close
-End Sub
-
-Sub frm_CloseRequest (EventData As Event)
-	currentProject.segments.Clear
-	frm.Close
+	If SubExists(mCallBack,mEventName&"_Completed") Then
+		CallSubDelayed2(mCallBack,mEventName&"_Completed", currentProject.segments)
+	End If
 End Sub
 
 
@@ -91,7 +92,6 @@ Sub addSelectionChangedEvent(textarea1 As TextArea,eventName As String)
 	Dim Obj As Reflector
 	Obj.Target = textarea1
 	Obj.AddChangeListener(eventName, "selectionProperty")
-	
 End Sub
 
 Sub addKeyEvent(textarea1 As TextArea,eventName As String)
@@ -255,9 +255,7 @@ End Sub
 
 '------------------------
 
-Sub ListView1_ScrollPosition_Changed(OldVal As Object,NewVal As Object)
-	CallSubDelayed(Me,"checkVisibleRange")
-End Sub
+
 
 Sub checkVisibleRange
 	Try
@@ -271,18 +269,20 @@ Sub checkVisibleRange
 	End Try
 End Sub
 
-Sub addScrollChangedEvent(lv As ListView)
-	Try
-		Dim jo As JavaObject
-		jo=lv
-		Dim ListViewScrollBar As JavaObject
-		ListViewScrollBar=jo.RunMethodJO("lookup",Array(".scroll-bar:vertical"))
-		Dim r As Reflector
-		r.Target=ListViewScrollBar
-		r.AddChangeListener("ListView1_ScrollPosition","valueProperty")
-	Catch
-		Log(LastException)
-	End Try
+Sub addScrollChangedEvent
+	Dim jo As JavaObject
+	jo=editorLV
+	Dim ListViewScrollBar As JavaObject
+	ListViewScrollBar=jo.RunMethodJO("lookup",Array(".scroll-bar:vertical"))
+	Log(ListViewScrollBar)
+	Dim r As Reflector
+	r.Target=ListViewScrollBar
+	r.AddChangeListener("scrollPosition","valueProperty")
+End Sub
+
+Sub scrollPosition_changed(old As Object,new As Object)
+	Log("ListView1_ScrollPosition_Changed")
+	CallSubDelayed(Me,"checkVisibleRange")
 End Sub
 
 Sub getVisibleRange(lv As ListView) As Range

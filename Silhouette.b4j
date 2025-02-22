@@ -591,10 +591,11 @@ Private Sub ShowAligner
 		sourceList.Add(lineMap.Get("source"))
 	Next
 	Dim a As Aligner
-	a.Initialize
-	Dim aligned As List = a.ShowAndWait(sourceList,targetList,currentProject.SourceLang,currentProject.SourceLang)
-	
-	Log(aligned)
+	a.Initialize(Me,"Aligner")
+	a.Show(sourceList,targetList,currentProject.SourceLang,currentProject.SourceLang)
+End Sub
+
+private Sub Aligner_Completed(aligned As List)
 	If aligned.Size > 0 Then
 		Dim fa As ForcedAlignment
 		fa.Initialize
