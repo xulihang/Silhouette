@@ -14,11 +14,15 @@ Public Sub Initialize
 End Sub
 
 Public Sub AlignByText(lines As List,alignedSegments As List) As List
+	
+	Log(lines)
+	Log(alignedSegments)
 	Dim newLines As List
 	newLines.Initialize
 	For Each line As Map In lines
 		Dim source As String = line.Get("source")
-		Dim appended As String
+		Dim appendedSource As String
+		Dim appendedTarget As String
 		Dim index As Int
 		Dim indexList As List
 		indexList.Initialize
@@ -26,19 +30,20 @@ Public Sub AlignByText(lines As List,alignedSegments As List) As List
 			indexList.Add(index)
 			Dim segmentSource As String = segment.Get("source")
 			Dim segmentTarget As String = segment.Get("target")
-			appended = appended & segmentTarget
+			appendedSource = appendedSource & segmentSource
+			appendedTarget = appendedTarget & segmentTarget
 			If segmentSource == "" Then
 				Dim newLine As Map
 				newLine.Initialize
-				newLine.Put("source",segmentTarget)
+				newLine.Put("source",appendedTarget)
 				newLine.Put("target","")
 				newLine.Put("startTime",line.Get("endTime"))
 				newLine.Put("endTime",Utils.GetTimeStringFromMilliseconds(Utils.GetMillisecondsFromTimeString(line.Get("endTime"))+1000))
 				newLines.Add(newLine)
 				Exit
 			Else
-				If GetRatio(source,appended) > 0.9 Then
-					line.Put("source",appended)
+				If GetRatio(source,appendedSource) > 0.9 Then
+					line.Put("source",appendedTarget)
 					newLines.Add(line)
 					Exit
 				End If

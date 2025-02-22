@@ -593,11 +593,13 @@ Private Sub ShowAligner
 	Dim a As Aligner
 	a.Initialize
 	Dim aligned As List = a.ShowAndWait(sourceList,targetList,currentProject.SourceLang,currentProject.SourceLang)
+	
 	Log(aligned)
 	If aligned.Size > 0 Then
 		Dim fa As ForcedAlignment
 		fa.Initialize
 		Dim newLines As List = fa.AlignByText(currentProject.lines,aligned)
+		Log(newLines)
 		currentProject.ReplaceLines(newLines)
 		LoadLinesToTable
 	End If
