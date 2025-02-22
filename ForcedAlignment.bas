@@ -52,9 +52,9 @@ Public Sub AlignByText(lines As List,alignedSegments As List) As List
 
 	If alignedSegments.Size>0 And newLines.Size>0 Then
 		Dim lastLine As Map = newLines.Get(newLines.Size - 1)
-		Dim segmentTarget As String = segment.Get("target")
 		Dim startTime As String = lastLine.Get("endTime")
 		For Each segment As Map In alignedSegments
+			Dim segmentTarget As String = segment.Get("target")
 			Dim newLine As Map
 			newLine.Initialize
 			newLine.Put("source",segmentTarget)
