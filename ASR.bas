@@ -15,6 +15,36 @@ Sub Process_Globals
 	Private stdOutStep As Double = 0.5
 End Sub
 
+Public Sub GetParams(engine As String) As ResumableSub
+	Dim note As String
+	If engine = "whisper" Then
+		note = $"
+  -gpu,     --use-gpu       The graphic adapter to use for inference
+  -t N,     --threads N     [4      ] number of threads to use during computation
+  -p N,     --processors N  [1      ] number of processors to use during computation
+  -ot N,    --offset-t N    [0      ] time offset in milliseconds
+  -on N,    --offset-n N    [0      ] segment index offset
+  -d  N,    --duration N    [0      ] duration of audio to process in milliseconds
+  -mc N,    --max-context N [-1     ] maximum number of text context tokens to store
+  -ml N,    --max-len N     [0      ] maximum segment length in characters
+  -wt N,    --word-thold N  [0.01   ] word timestamp probability threshold
+  -su,      --speed-up      [false  ] speed up audio by x2 (reduced accuracy)
+  -tr,      --translate     [false  ] translate from source language to english
+  -l LANG,  --language LANG [en     ] spoken language
+  -m FNAME, --model FNAME   [models/ggml-base.en.bin] model path
+  --prompt                            initial prompt for the model
+		"$
+	Else
+		If getASRPluginList.IndexOf(engine)<>-1 Then
+			Dim params As Map
+			params.Initialize
+			params.Put("preferencesMap",Utils.getPrefMap)
+			wait for (Main.plugin.RunPlugin(engine&"ASR","getParamsNote",params)) complete (note As String)
+		End If
+	End If
+	Return note
+End Sub
+
 Public Sub RecognizeCut(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
 	wait for (FFMpeg.CutWav(dir,filename,"cut.wav",startTime,endTime)) Complete (done As Object)
 	File.Copy(dir,"cut.wav",dir,"cut-o.wav")
@@ -62,11 +92,24 @@ Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As R
 	If engine = "whisper" Then
 		Dim args As List
 		args.Initialize
-		args.AddAll(Array("-m",GetModelPath,"-f",filepath,"-osrt","-l",lang))
 		Dim prompt As String =  Utils.getSetting("prompt","")
+		Dim extraParams As String = Utils.getSetting("extra_params","")
 		If prompt <> "" Then
 			args.Add("--prompt")
 			args.Add(prompt)
+		End If
+		Dim hasLang As Boolean = False
+		If extraParams <> "" Then
+			For Each param As String In Regex.Split(" ",extraParams)
+				args.Add(param)
+				If param == "-l" Then
+					hasLang = True
+				End If
+			Next
+		End If
+		args.AddAll(Array("-m",GetModelPath,"-f",filepath,"-osrt"))
+		If hasLang = False Then
+			args.AddAll(Array("-l",lang))
 		End If
 		Dim sh As Shell
 		sh.Initialize("sh",GetWhisperPath,args)
@@ -86,6 +129,7 @@ Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As R
 			params.Initialize
 			params.Put("path",filepath)
 			params.Put("lang",lang)
+			params.Put("extraParams",Utils.getSetting("extra_params",""))
 			params.Put("preferencesMap",Utils.getPrefMap)
 			wait for (Main.plugin.RunPlugin(engine&"ASR","recognize",params)) complete (lines As List)
 			Dim convertedLines As List
@@ -100,7 +144,7 @@ Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As R
 				convertedLines.Add(converted)
 			Next
 			Exporter.ExportToSRT(convertedLines,filepath&".srt",False,0)
-			return True
+			Return True
 		End If
 	End If
 	Return False

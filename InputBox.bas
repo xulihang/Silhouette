@@ -21,6 +21,10 @@ Public Sub setTitle(title As String)
 	frm.Title = title
 End Sub
 
+Public Sub show(default As String)
+	TextArea1.Text=default
+	frm.Show
+End Sub
 
 Public Sub showAndWait(default As String) As String
 	TextArea1.Text=default

@@ -13,6 +13,7 @@ Sub Class_Globals
 	Private LangPairLabel As Label
 	Private EngineComboBox As ComboBox
 	Private PromptTextField As TextField
+	Private ExtraParamsTextField As TextField
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -43,6 +44,7 @@ Public Sub Initialize(p As Project)
 		EngineComboBox.SelectedIndex = 0
 	End If
 	PromptTextField.Text = settings.GetDefault("prompt","")
+	ExtraParamsTextField.Text = settings.GetDefault("extra_params","")
 	Main.loc.LocalizeForm(frm)
 End Sub
 
@@ -72,6 +74,14 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	settings.Put("targetLang",targetLang)
 	settings.Put("engine",EngineComboBox.Items.Get(EngineComboBox.SelectedIndex))
 	settings.Put("prompt",PromptTextField.Text)
+	settings.Put("extra_params",ExtraParamsTextField.Text)
 	mProject.save
 	frm.Close
+End Sub
+
+Private Sub CheckParamsButton_MouseClicked (EventData As MouseEvent)
+	wait for (ASR.GetParams(EngineComboBox.Items.Get(EngineComboBox.SelectedIndex))) complete (note As String)
+	Dim inp As InputBox
+	inp.Initialize
+	inp.show(note)
 End Sub
