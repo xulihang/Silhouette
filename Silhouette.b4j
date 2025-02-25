@@ -1,49 +1,50 @@
 ﻿AppType=JavaFX
 Build1=Default,org.xulihang.silhouette
 File1=Aligner.bjl
-File10=ErrorReporter.bjl
-File11=ExportOptions.bjl
-File12=generalPreference.bjl
-File13=generalSettings.bjl
-File14=icon.png
-File15=inputbox.bjl
-File16=JumpOptions.bjl
-File17=LangaugePairSelector.bjl
-File18=langcodes.txt
-File19=languagesWithoutSpace.txt
+File10=EmailReset.bjl
+File11=ErrorReporter.bjl
+File12=ExportOptions.bjl
+File13=generalPreference.bjl
+File14=generalSettings.bjl
+File15=icon.png
+File16=inputbox.bjl
+File17=JumpOptions.bjl
+File18=LangaugePairSelector.bjl
+File19=langcodes.txt
 File2=apiparamfiller.bjl
-File20=LeftSplitPane.bjl
-File21=LineEditor.bjl
-File22=ListView.bjl
-File23=main.bjl
-File24=main_mac.bjl
-File25=modelPreference.bjl
-File26=MTSetting.bjl
-File27=PlayControl.bjl
-File28=pretranslate.bjl
-File29=progress.bjl
+File20=languagesWithoutSpace.txt
+File21=LeftSplitPane.bjl
+File22=LineEditor.bjl
+File23=ListView.bjl
+File24=main.bjl
+File25=main_mac.bjl
+File26=modelPreference.bjl
+File27=MTSetting.bjl
+File28=PlayControl.bjl
+File29=pretranslate.bjl
 File3=APISetting.bjl
-File30=projectSetting.bjl
-File31=RangeSelector.bjl
-File32=searchandreplace.bjl
-File33=segment.bjl
-File34=segmentationRules.srx
-File35=sentenceSplitter.bjl
-File36=silhouette.png
-File37=TopRightSplitPane.bjl
-File38=TopSplitPane.bjl
-File39=TranslationAssist.bjl
+File30=progress.bjl
+File31=projectSetting.bjl
+File32=RangeSelector.bjl
+File33=searchandreplace.bjl
+File34=segment.bjl
+File35=segmentationRules.srx
+File36=sentenceSplitter.bjl
+File37=silhouette.png
+File38=TopRightSplitPane.bjl
+File39=TopSplitPane.bjl
 File4=ASROptions.bjl
-File40=TranslationMemory.bjl
-File41=validator.bjl
-File42=VideoPlayer.bjl
-File43=VoiceInput.bjl
-File44=WaveForm.bjl
+File40=TranslationAssist.bjl
+File41=TranslationMemory.bjl
+File42=validator.bjl
+File43=VideoPlayer.bjl
+File44=VoiceInput.bjl
+File45=WaveForm.bjl
 File5=BatchTranslator.bjl
 File6=BottomSplitPane.bjl
-File7=Editor.bjl
-File8=editorLV.bjl
-File9=EmailReset.bjl
+File7=ChineseConverter.bjl
+File8=Editor.bjl
+File9=editorLV.bjl
 FileGroup1=Default Group
 FileGroup10=Default Group
 FileGroup11=Default Group
@@ -83,6 +84,7 @@ FileGroup41=Default Group
 FileGroup42=Default Group
 FileGroup43=Default Group
 FileGroup44=Default Group
+FileGroup45=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
 FileGroup7=Default Group
@@ -115,61 +117,62 @@ Library7=javaobject
 Library8=jb4xencryption
 Library9=jcore
 Module1=Aligner
-Module10=ErrorReporter
-Module11=Exporter
-Module12=ExportOptions
-Module13=FFMpeg
-Module14=ForcedAlignment
-Module15=InputBox
-Module16=JumpOptions
-Module17=jVLC
-Module18=LanguagePairSelector
-Module19=LFAlign
+Module10=|relative|..\Validator\EmailReset
+Module11=ErrorReporter
+Module12=Exporter
+Module13=ExportOptions
+Module14=FFMpeg
+Module15=ForcedAlignment
+Module16=InputBox
+Module17=JumpOptions
+Module18=jVLC
+Module19=LanguagePairSelector
 Module2=AlignerProject
-Module20=LocalizationHelper
-Module21=Localizator
-Module22=Map2Xml
-Module23=MT
-Module24=NativeHook
-Module25=OpenCC
-Module26=PlayControlForm
-Module27=Preferences
-Module28=preTranslateDialog
-Module29=progressDialog
+Module20=LFAlign
+Module21=LocalizationHelper
+Module22=Localizator
+Module23=Map2Xml
+Module24=MT
+Module25=NativeHook
+Module26=OpenCC
+Module27=PlayControlForm
+Module28=Preferences
+Module29=preTranslateDialog
 Module3=APIParamsFiller
-Module30=Project
-Module31=ProjectSettings
-Module32=RangeSelector
-Module33=SearchAndReplaceDialog
-Module34=segmentation
-Module35=SentenceSplitter
-Module36=SileroVad
-Module37=SimpleTag
-Module38=SrtParser
-Module39=SRX
+Module30=progressDialog
+Module31=Project
+Module32=ProjectSettings
+Module33=RangeSelector
+Module34=SearchAndReplaceDialog
+Module35=segmentation
+Module36=SentenceSplitter
+Module37=SileroVad
+Module38=SimpleTag
+Module39=SrtParser
 Module4=ASR
-Module40=TagKind
-Module41=TextFlow
-Module42=UndoManager
-Module43=Utils
-Module44=|relative|..\Validator\Validator
-Module45=VoiceInput
-Module46=WaveFormBitmapCreator
-Module47=WavRandomAccessFile
-Module48=XLIFF
-Module49=Xml2Map
+Module40=SRX
+Module41=TagKind
+Module42=TextFlow
+Module43=UndoManager
+Module44=Utils
+Module45=|relative|..\Validator\Validator
+Module46=VoiceInput
+Module47=WaveFormBitmapCreator
+Module48=WavRandomAccessFile
+Module49=XLIFF
 Module5=ASROptions
-Module50=XMLBuilder2
-Module51=XmlNode
-Module52=XmlParser
-Module53=XMLUtils
+Module50=Xml2Map
+Module51=XMLBuilder2
+Module52=XmlNode
+Module53=XmlParser
+Module54=XMLUtils
 Module6=BatchTranslator
-Module7=DraggableRange
-Module8=editDistance
-Module9=|relative|..\Validator\EmailReset
-NumberOfFiles=44
+Module7=ChineseConverterForm
+Module8=DraggableRange
+Module9=editDistance
+NumberOfFiles=45
 NumberOfLibraries=25
-NumberOfModules=53
+NumberOfModules=54
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -606,6 +609,8 @@ Private Sub MenuBar1_Action
 			vi.Show
 		Case "_Aligner"
 			ShowAligner
+		Case "Chinese Converter"
+			ShowChineseConverter
 		Case "Export UI strings"
 			LocalizationHelper.Export
 		Case "_About"
@@ -621,6 +626,21 @@ private Sub SwitchSourceAndTarget
 		line.Put("target",source)
 	Next
 	LoadLinesToTable
+End Sub
+
+Private Sub ShowChineseConverter
+	Dim cc As ChineseConverterForm
+	cc.Initialize(currentProject.lines)
+	cc.Show
+End Sub
+
+Public Sub GetSelectedLines As List
+	Dim selected As List
+	selected.Initialize
+	If selectedRowID <> -1 Then
+		selected.Add(currentProject.lines.Get(selectedRowID - 1))
+	End If
+	Return selected
 End Sub
 
 Private Sub ShowAligner
