@@ -131,44 +131,45 @@ Module21=Localizator
 Module22=Map2Xml
 Module23=MT
 Module24=NativeHook
-Module25=PlayControlForm
-Module26=Preferences
-Module27=preTranslateDialog
-Module28=progressDialog
-Module29=Project
+Module25=OpenCC
+Module26=PlayControlForm
+Module27=Preferences
+Module28=preTranslateDialog
+Module29=progressDialog
 Module3=APIParamsFiller
-Module30=ProjectSettings
-Module31=RangeSelector
-Module32=SearchAndReplaceDialog
-Module33=segmentation
-Module34=SentenceSplitter
-Module35=SileroVad
-Module36=SimpleTag
-Module37=SrtParser
-Module38=SRX
-Module39=TagKind
+Module30=Project
+Module31=ProjectSettings
+Module32=RangeSelector
+Module33=SearchAndReplaceDialog
+Module34=segmentation
+Module35=SentenceSplitter
+Module36=SileroVad
+Module37=SimpleTag
+Module38=SrtParser
+Module39=SRX
 Module4=ASR
-Module40=TextFlow
-Module41=UndoManager
-Module42=Utils
-Module43=|relative|..\Validator\Validator
-Module44=VoiceInput
-Module45=WaveFormBitmapCreator
-Module46=WavRandomAccessFile
-Module47=XLIFF
-Module48=Xml2Map
-Module49=XMLBuilder2
+Module40=TagKind
+Module41=TextFlow
+Module42=UndoManager
+Module43=Utils
+Module44=|relative|..\Validator\Validator
+Module45=VoiceInput
+Module46=WaveFormBitmapCreator
+Module47=WavRandomAccessFile
+Module48=XLIFF
+Module49=Xml2Map
 Module5=ASROptions
-Module50=XmlNode
-Module51=XmlParser
-Module52=XMLUtils
+Module50=XMLBuilder2
+Module51=XmlNode
+Module52=XmlParser
+Module53=XMLUtils
 Module6=BatchTranslator
 Module7=DraggableRange
 Module8=editDistance
 Module9=|relative|..\Validator\EmailReset
 NumberOfFiles=44
 NumberOfLibraries=25
-NumberOfModules=52
+NumberOfModules=53
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -186,8 +187,12 @@ Version=10
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 #AdditionalJar: bcprov-jdk15on-154
 #AdditionalJar: silero-vad
-#AdditionalJar: onnxruntime-1.20.0-full
+#AdditionalJar: onnxruntime-1.20.0
 #AdditionalJar: jnativehook-2.2.2
+'for opencc
+#AdditionalJar: nlp-common-0.0.5
+#AdditionalJar: heaven-0.2.0
+#AdditionalJar: opencc4j-1.8.1
 
 Sub Process_Globals
 	Public prefPath As String
@@ -337,7 +342,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		v.showAndWait
+		'v.showAndWait
 	End If
 	If Args.Length = 1 Then
 		Dim filePath As String = Args(0)
@@ -910,6 +915,18 @@ Private Sub RecognizeSpeechByFixedSpan As ResumableSub
 End Sub
 
 Private Sub LoadSRTToProject
+	Dim simpleChinese As Boolean = False
+	Dim traditionalChinese As Boolean = False
+	Dim cc As OpenCC
+	If currentProject.SourceLang == "zh" Or currentProject.SourceLang == "zh-CN" Then
+		simpleChinese = True
+		cc.Initialize
+	End If
+	If currentProject.SourceLang == "zh-TW" Then
+		traditionalChinese = True
+		cc.Initialize
+	End If
+	
 	Dim parser As SrtParser
 	parser.Initialize
 	Dim dir As String = currentProject.GetTmpFolder
@@ -926,6 +943,8 @@ Private Sub LoadSRTToProject
 	If srtFiles.Size>0 Then
 		srtFiles = SortedSRTFiles(srtFiles)
 	End If
+	Dim convertedLines As List
+	convertedLines.Initialize
 	For Each filename As String In srtFiles
 		Dim offsetMS As Int = index * segmentLength * 1000
 		Dim content As String = File.ReadString(dir,filename)
@@ -934,10 +953,25 @@ Private Sub LoadSRTToProject
 		For Each line As SpeechLine In lines
 			Dim startTime As String = Utils.ShiftTimeString(line.startTime,offsetMS)
 			Dim endTime As String = Utils.ShiftTimeString(line.endTime,offsetMS)
-			currentProject.AddLine(startTime,endTime,line.text,"")
+			Dim convertedLine As Map
+			Dim source As String = line.text
+			If cc.IsInitialized Then
+				If simpleChinese Then
+					source = cc.ConvertToSimple(source)
+				else if traditionalChinese Then
+					source = cc.ConvertToTraditional(source)
+				End If
+			End If
+			convertedLine.Initialize
+			convertedLine.Put("source",source)
+			convertedLine.Put("target","")
+			convertedLine.Put("startTime",startTime)
+			convertedLine.Put("endTime",endTime)
+			convertedLines.Add(convertedLine)
 		Next
 		index = index + 1
 	Next
+	currentProject.ReplaceLines(convertedLines)
 End Sub
 
 Private Sub SortedSRTFiles(srtFiles As List) As List

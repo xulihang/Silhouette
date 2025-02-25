@@ -76,7 +76,26 @@ Public Sub RecognizeWavAsText(filepath As String,lang As String,engine As String
 	For Each parsedline As SpeechLine In parsedlines
 		sb.Append(parsedline.text)
 	Next
-	Return sb.ToString
+	Dim text As String = sb.ToString
+	Dim simpleChinese As Boolean = False
+	Dim traditionalChinese As Boolean = False
+	Dim cc As OpenCC
+	If lang == "zh" Or lang == "zh-CN" Then
+		simpleChinese = True
+		cc.Initialize
+	End If
+	If lang == "zh-TW" Then
+		traditionalChinese = True
+		cc.Initialize
+	End If
+	If cc.IsInitialized Then
+		If simpleChinese Then
+			text = cc.ConvertToSimple(text)
+		else if traditionalChinese Then
+			text = cc.ConvertToTraditional(text)
+		End If
+	End If
+	Return text
 End Sub
 
 Public Sub RenameWavFile(filepath As String)
