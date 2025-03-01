@@ -163,6 +163,9 @@ End Sub
 
 Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As ResumableSub
 	If engine = "whisper" Then
+		If lang.StartsWith("zh") Then
+			lang = lang
+		End If
 		Dim args As List
 		args.Initialize
 		Dim prompt As String =  Utils.getSetting("prompt","")
