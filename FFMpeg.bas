@@ -9,10 +9,10 @@ Sub Process_Globals
 	
 End Sub
 
-Public Sub ExtractFrames(dir As String,filename As String,fps As Int,outputDir As String) As ResumableSub
+Public Sub ExtractFrames(dir As String,filename As String,fps As Int,outputDir As String,format As String) As ResumableSub
 	'ffmpeg -i big_buck_bunny_720p_2mb.mp4 -r 1 frame%d.png
 	Dim args As List
-	args = Array As String("-i",File.Combine(dir,filename),"-r",fps,"frame%d.png")
+	args = Array As String("-i",File.Combine(dir,filename),"-r",fps,"frame%d."&format)
 	Dim sh As Shell
 	sh.Initialize("sh",GetFFMpegPath,args)
 	sh.WorkingDirectory = outputDir

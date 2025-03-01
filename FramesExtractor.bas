@@ -10,6 +10,7 @@ Sub Class_Globals
 	Private FileTextField As TextField
 	Private FPSSpinner As Spinner
 	Private OutputTextField As TextField
+	Private UseJPEGCheckBox As CheckBox
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -29,9 +30,15 @@ Private Sub ExtractButton_MouseClicked (EventData As MouseEvent)
 	If OutputTextField.Text = "" Or FileTextField.Text = "" Then
 		Return
 	End If
+	Dim format As String
+	If UseJPEGCheckBox.Checked Then
+		format = "jpg"
+	Else
+		format = "png"
+	End If
 	progressDialog.Show("")
 	progressDialog.update2(Main.loc.Localize("Extracting..."))
-	wait for (FFMpeg.ExtractFrames(File.GetFileParent(FileTextField.Text),File.GetName(FileTextField.Text),FPSSpinner.Value,OutputTextField.Text)) complete (done As Object)
+	wait for (FFMpeg.ExtractFrames(File.GetFileParent(FileTextField.Text),File.GetName(FileTextField.Text),FPSSpinner.Value,OutputTextField.Text,format)) complete (done As Object)
 	WriteVideoInfo
 	progressDialog.close
 End Sub
