@@ -1825,6 +1825,10 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 		Dim loopMI As MenuItem
 		loopMI.Initialize(loc.Localize("Loop the selection"),"loopMI")
 		WaveFormContextMenu.MenuItems.Add(loopMI)
+	Else
+		Dim recognizeMI As MenuItem
+		recognizeMI.Initialize(loc.Localize("Recognize the selection"),"recognizeMI")
+		WaveFormContextMenu.MenuItems.Add(recognizeMI)
 	End If
 End Sub
 
@@ -1919,6 +1923,50 @@ Private Sub playSelectionHereMI_Action
 	vlc.Resume
 	vlc.SetTime(startTime)
 	TogglePlayingStatus(True,startTime)
+End Sub
+
+private Sub recognizeMI_Action
+	Dim startTime As String  = Utils.GetTimeStringFromMilliseconds(overviewRange.StartProgress * cutDurationMs + cutStartTimeMs)
+	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(overviewRange.EndProgress * cutDurationMs + cutStartTimeMs)
+	Dim engine As String = currentProject.settings.GetDefault("engine","whisper")
+	If HasValidateModel=False And engine = "whisper" Then
+		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _
+		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
+		If response = fx.DialogResponse.POSITIVE Then
+			ShowPreferences.SwitchTab(2)
+		End If
+		Return
+	End If
+	progressDialog.Show(loc.Localize("Recognizing..."))
+	progressDialog.update2(loc.Localize("Processing..."))
+
+	Dim tmpDir As String = currentProject.GetTmpFolder
+	
+	If File.Exists(tmpDir,"audio.wav") = False Then
+		Dim parent As String = currentProject.GetMediaFolder
+		Dim filename As String = currentProject.GetMediaFilename
+		Dim outpath As String = File.Combine(tmpDir,"audio.wav")
+		Log("convert video to wav...")
+		Wait For (FFMpeg.Video2Wav(parent,filename,outpath)) Complete (done As Object)
+		Log("convert video to wav done")
+	End If
+
+	wait for (ASR.RecognizeCutAsSpeechLines(tmpDir,"audio.wav",startTime,endTime,currentProject.SourceLang,engine)) complete (lines As List)
+	Log(lines)
+	Dim convertedLines As List
+	convertedLines.Initialize
+	For Each line As SpeechLine In lines
+		Dim lineMap As Map
+		lineMap.Initialize
+		lineMap.Put("source",line.text)
+		lineMap.Put("target","")
+		lineMap.put("startTime",line.startTime)
+		lineMap.put("endTime",line.endTime)
+		convertedLines.Add(lineMap)
+	Next
+	currentProject.ReplaceLinesInRange(convertedLines,startTime,endTime)
+	LoadLinesToTable
+	progressDialog.close
 End Sub
 
 

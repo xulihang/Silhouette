@@ -180,6 +180,27 @@ Public Sub ReplaceLines(newLines As List)
 	AddState
 End Sub
 
+Public Sub ReplaceLinesInRange(newLines As List,startTime As String,endTime As String)
+	Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(startTime)
+	Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(endTime)
+	Dim total As List
+	total.Initialize
+	For Each line As Map In lines
+		Dim lineStartTime As String = line.Get("startTime")
+		Dim lineEndTime As String = line.Get("endTime")
+		Dim lineStartTimeMs As Long = Utils.GetMillisecondsFromTimeString(lineStartTime)
+		Dim lineEndTimeMs As Long = Utils.GetMillisecondsFromTimeString(lineEndTime)
+		If lineStartTimeMs>endTimeMs Or lineEndTimeMs<startTimeMs Then
+			total.Add(line)
+		End If
+	Next
+	total.AddAll(newLines)
+	lines.Clear
+	lines.AddAll(total)
+	Sort
+	AddState
+End Sub
+
 Public Sub AddLine(startTime As String,endTime As String,source As String,target As String)
 	Dim line As Map
 	line.Initialize

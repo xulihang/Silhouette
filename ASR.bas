@@ -45,6 +45,17 @@ Public Sub GetParams(engine As String) As ResumableSub
 	Return note
 End Sub
 
+Public Sub RecognizeCutAsSpeechLines(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
+	wait for (FFMpeg.CutWav(dir,filename,"cut.wav",startTime,endTime)) Complete (done As Object)
+	File.Copy(dir,"cut.wav",dir,"cut-o.wav")
+	wait for (FFMpeg.AddPadding(dir,"cut-o.wav","cut.wav",2)) complete (done As Object)
+	File.Delete(dir,"cut-o.wav")
+	Wait For (RecognizeWavAsSpeechLines(File.Combine(dir,"cut.wav"),lang,engine)) Complete (lines As List)
+	File.Delete(dir,"cut.wav.srt")
+	File.Delete(dir,"cut.srt")
+	Return lines
+End Sub
+
 Public Sub RecognizeCut(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
 	wait for (FFMpeg.CutWav(dir,filename,"cut.wav",startTime,endTime)) Complete (done As Object)
 	File.Copy(dir,"cut.wav",dir,"cut-o.wav")
@@ -54,6 +65,44 @@ Public Sub RecognizeCut(dir As String,filename As String,startTime As String,end
 	File.Delete(dir,"cut.wav.srt")
 	File.Delete(dir,"cut.srt")
 	Return str
+End Sub
+
+Public Sub RecognizeWavAsSpeechLines(filepath As String,lang As String,engine As String) As ResumableSub
+	wait for (RecognizeWav(filepath,lang,engine)) complete (done As Object)
+	Dim filename As String = File.GetName(filepath)
+	Dim dir As String = File.GetFileParent(filepath)
+	Dim content As String
+	If File.Exists(dir,filename&".srt") Then
+		content = File.ReadString(dir,filename&".srt")
+	End If
+	If File.Exists(dir,Utils.GetFilenameWithoutExtension(filename)&".srt") Then
+		content = File.ReadString(dir,Utils.GetFilenameWithoutExtension(filename)&".srt")
+	End If
+	content = Utils.RemoveBOM(content)
+	Dim parser As SrtParser
+	parser.Initialize
+	Dim parsedlines As List = parser.Parse(content)
+	Dim simpleChinese As Boolean = False
+	Dim traditionalChinese As Boolean = False
+	Dim cc As OpenCC
+	If lang == "zh" Or lang == "zh-CN" Then
+		simpleChinese = True
+		cc.Initialize
+	End If
+	If lang == "zh-TW" Then
+		traditionalChinese = True
+		cc.Initialize
+	End If
+	If cc.IsInitialized Then
+		For Each line As SpeechLine In parsedlines
+			If simpleChinese Then
+				line.text = cc.ConvertToSimple(line.text)
+			else if traditionalChinese Then
+				line.text = cc.ConvertToTraditional(line.text)
+			End If
+		Next
+	End If
+	Return parsedlines
 End Sub
 
 Public Sub RecognizeWavAsText(filepath As String,lang As String,engine As String) As ResumableSub
