@@ -85,14 +85,17 @@ Public Sub RecognizeWavAsSpeechLines(filepath As String,lang As String,engine As
 	Dim simpleChinese As Boolean = False
 	Dim traditionalChinese As Boolean = False
 	Dim cc As OpenCC
-	If lang == "zh" Or lang == "zh-CN" Then
-		simpleChinese = True
-		cc.Initialize
+	If Utils.getPref("convert_chinese_base_on_source_lang",True) Then
+		If lang == "zh" Or lang == "zh-CN" Then
+			simpleChinese = True
+			cc.Initialize
+		End If
+		If lang == "zh-TW" Then
+			traditionalChinese = True
+			cc.Initialize
+		End If
 	End If
-	If lang == "zh-TW" Then
-		traditionalChinese = True
-		cc.Initialize
-	End If
+
 	If cc.IsInitialized Then
 		For Each line As SpeechLine In parsedlines
 			If simpleChinese Then
@@ -129,13 +132,15 @@ Public Sub RecognizeWavAsText(filepath As String,lang As String,engine As String
 	Dim simpleChinese As Boolean = False
 	Dim traditionalChinese As Boolean = False
 	Dim cc As OpenCC
-	If lang == "zh" Or lang == "zh-CN" Then
-		simpleChinese = True
-		cc.Initialize
-	End If
-	If lang == "zh-TW" Then
-		traditionalChinese = True
-		cc.Initialize
+	If Utils.getPref("convert_chinese_base_on_source_lang",True) Then
+		If lang == "zh" Or lang == "zh-CN" Then
+			simpleChinese = True
+			cc.Initialize
+		End If
+		If lang == "zh-TW" Then
+			traditionalChinese = True
+			cc.Initialize
+		End If
 	End If
 	If cc.IsInitialized Then
 		If simpleChinese Then

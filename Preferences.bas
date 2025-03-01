@@ -21,6 +21,7 @@ Sub Class_Globals
 	Private UseGPUCheckBox As CheckBox
 	Private SubtitleFontSizeSpinner As Spinner
 	Private PrecisePlayOfSelectionCheckBox As CheckBox
+	Private ConvertChineseBasedOnSourceLangCheckBox As CheckBox
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -53,6 +54,7 @@ Public Sub Initialize(mb As MenuBar)
 	SkipRecognizedCheckBox.Checked = preferencesMap.GetDefault("skip_recognized",True)
 	UseGPUCheckBox.Checked = preferencesMap.GetDefault("use_gpu",True)
 	SubtitleFontSizeSpinner.Value = preferencesMap.GetDefault("subtitle_font_size",16)
+	ConvertChineseBasedOnSourceLangCheckBox.Checked = preferencesMap.GetDefault("convert_chinese_base_on_source_lang",True)
 	PrecisePlayOfSelectionCheckBox.Checked = preferencesMap.GetDefault("precise_play_of_selection",False)
 	loadAPI
 	loadMT
@@ -169,6 +171,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("use_gpu",UseGPUCheckBox.Checked)
 	preferencesMap.Put("subtitle_font_size",SubtitleFontSizeSpinner.Value)
 	preferencesMap.Put("precise_play_of_selection",PrecisePlayOfSelectionCheckBox.Checked)
+	preferencesMap.Put("convert_chinese_base_on_source_lang",ConvertChineseBasedOnSourceLangCheckBox.Checked)
 	Dim lang As String
 	If LanguageComboBox.SelectedIndex<>-1 Then
 		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)

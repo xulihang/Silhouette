@@ -953,15 +953,16 @@ Private Sub LoadSRTToProject
 	Dim simpleChinese As Boolean = False
 	Dim traditionalChinese As Boolean = False
 	Dim cc As OpenCC
-	If currentProject.SourceLang == "zh" Or currentProject.SourceLang == "zh-CN" Then
-		simpleChinese = True
-		cc.Initialize
+	If Utils.getPref("convert_chinese_base_on_source_lang",True) Then
+		If currentProject.SourceLang == "zh" Or currentProject.SourceLang == "zh-CN" Then
+			simpleChinese = True
+			cc.Initialize
+		End If
+		If currentProject.SourceLang == "zh-TW" Then
+			traditionalChinese = True
+			cc.Initialize
+		End If
 	End If
-	If currentProject.SourceLang == "zh-TW" Then
-		traditionalChinese = True
-		cc.Initialize
-	End If
-	
 	Dim parser As SrtParser
 	parser.Initialize
 	Dim dir As String = currentProject.GetTmpFolder
