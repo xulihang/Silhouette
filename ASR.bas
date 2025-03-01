@@ -164,7 +164,7 @@ End Sub
 Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As ResumableSub
 	If engine = "whisper" Then
 		If lang.StartsWith("zh") Then
-			lang = lang
+			lang = "zh"
 		End If
 		Dim args As List
 		args.Initialize
@@ -232,6 +232,9 @@ Public Sub RecognizeWavWithProgressInfo(callback As Object, eventname As String,
 	mCurrentIndex = 0
 	mSize = size
 	If engine = "whisper" Then
+		If lang.StartsWith("zh") Then
+			lang = "zh"
+		End If
 		Dim args As List
 		args.Initialize
 		args.AddAll(Array("-m",GetModelPath,"-f",filepath,"-osrt","-l",lang))
