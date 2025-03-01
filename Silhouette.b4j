@@ -515,6 +515,10 @@ Private Sub MenuBar1_Action
 			If selectedRowID <> -1 Then
 				JumpToRow(selectedRowID - 1,0)
 			End If
+		Case "Jump to the Previous Line and Play"
+			playPreviousLineMI_Action
+		Case "Jump to the Next Line and Play"
+			playNextLineMI_Action
 		Case "Jump _Forward"
 			Forward(500)
 		Case "Jump _Backward"
