@@ -1560,8 +1560,10 @@ public Sub TranslateOneFile(settings As Map,filepath As String,mtOptions As Map,
 	currentProject.settings = settings
 	If ASRMethod = 0 Then
 		wait for (RecognizeSpeechByFixedSpan) complete (done As Object)
-	Else
+	Else if ASRMethod = 1 Then
 		wait for (RecognizeExistingLines) complete (done As Object)
+	Else
+		wait for (RecognizeWholeSpeech) complete (done As Object)
 	End If
 	wait for (pretranslate(mtOptions)) complete (done As Object)
 	currentProject.save
