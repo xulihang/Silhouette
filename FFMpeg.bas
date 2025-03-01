@@ -9,6 +9,20 @@ Sub Process_Globals
 	
 End Sub
 
+Public Sub ExtractFrames(dir As String,filename As String,fps As Int,outputDir As String) As ResumableSub
+	'ffmpeg -i big_buck_bunny_720p_2mb.mp4 -r 1 frame%d.png
+	Dim args As List
+	args = Array As String("-i",File.Combine(dir,filename),"-r",fps,"frame%d.png")
+	Dim sh As Shell
+	sh.Initialize("sh",GetFFMpegPath,args)
+	sh.WorkingDirectory = outputDir
+	sh.Run(-1)
+	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	Log(StdOut)
+	Log(StdErr)
+	Return Success
+End Sub
+
 Public Sub PlayCut(dir As String,filename As String,startTime As String,endTime As String,lang As String,engine As String) As ResumableSub
 	wait for (CutWav(dir,filename,"cut.wav",startTime,endTime)) Complete (done As Object)
 	wait for (PlayAudio(dir,"cut.wav")) Complete (done As Object)
