@@ -1810,6 +1810,12 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 	playHereMi.Initialize(loc.Localize("Play from here"),"playHereMI")
 	WaveFormContextMenu.MenuItems.Add(playHereMi)
 	If isTimestampRange Then
+		Dim playNextLineMI As MenuItem
+		playNextLineMI.Initialize(loc.Localize("Play the next line"),"playNextLineMI")
+		WaveFormContextMenu.MenuItems.Add(playNextLineMI)
+		Dim playPreviousLineMI As MenuItem
+		playPreviousLineMI.Initialize(loc.Localize("Play the previous line"),"playPreviousLineMI")
+		WaveFormContextMenu.MenuItems.Add(playPreviousLineMI)
 		Dim splitHereMI As MenuItem
 		splitHereMI.Initialize(loc.Localize("Split here"),"splitHereMI")
 		WaveFormContextMenu.MenuItems.Add(splitHereMI)
@@ -1830,6 +1836,16 @@ Private Sub SetWaveFormContextMenuItems(isTimestampRange As Boolean)
 		recognizeMI.Initialize(loc.Localize("Recognize the selection"),"recognizeMI")
 		WaveFormContextMenu.MenuItems.Add(recognizeMI)
 	End If
+End Sub
+
+Private Sub playNextLineMI_Action
+	SelectRow(selectedRowID + 1,True)
+	PlayLineByID(selectedRowID)
+End Sub
+
+Private Sub playPreviousLineMI_Action
+	SelectRow(selectedRowID - 1,True)
+	PlayLineByID(selectedRowID)
 End Sub
 
 private Sub splitHereMI_Action
@@ -1952,7 +1968,6 @@ private Sub recognizeMI_Action
 	End If
 
 	wait for (ASR.RecognizeCutAsSpeechLines(tmpDir,"audio.wav",startTime,endTime,currentProject.SourceLang,engine)) complete (lines As List)
-	Log(lines)
 	Dim convertedLines As List
 	convertedLines.Initialize
 	For Each line As SpeechLine In lines
