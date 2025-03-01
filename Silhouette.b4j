@@ -193,7 +193,7 @@ Version=10
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 #AdditionalJar: bcprov-jdk15on-154
 #AdditionalJar: silero-vad
-#AdditionalJar: onnxruntime-1.20.0
+#AdditionalJar: onnxruntime-1.20.0-full
 #AdditionalJar: jnativehook-2.2.2
 'for opencc
 #AdditionalJar: nlp-common-0.0.5
@@ -348,7 +348,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		'v.showAndWait
+		v.showAndWait
 	End If
 	If Args.Length = 1 Then
 		Dim filePath As String = Args(0)
