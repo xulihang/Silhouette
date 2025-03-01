@@ -1461,11 +1461,37 @@ Sub pretranslate(options As Map) As ResumableSub
 			
 			progressDialog.close
 		Else
-			fx.Msgbox(MainForm,loc.Localize("Not supported now"),"")
+			progressDialog.Show(loc.Localize("matching……"))
+			Sleep(0)
+			fillWithExactMatch
+			progressDialog.close
 		End If
 	End If
 	LoadLinesToTable
 	Return ""
+End Sub
+
+
+private Sub fillWithExactMatch
+	Dim sourceTextMap As Map
+	sourceTextMap.Initialize
+	For Each line As Map In currentProject.lines
+		Dim source As String = line.Get("source")
+		Dim target As String = line.Get("target")
+		If source <> "" And target <> "" Then
+			sourceTextMap.Put(source,target)
+		End If
+	Next
+	For Each line As Map In currentProject.lines
+		Dim source As String = line.Get("source")
+		Dim target As String = line.Get("target")
+		If source <> "" And target = "" Then
+			If sourceTextMap.ContainsKey(source) Then
+				line.Put("target",sourceTextMap.Get(source))
+			End If
+		End If
+	Next
+	currentProject.AddState
 End Sub
 
 Private Sub Save
