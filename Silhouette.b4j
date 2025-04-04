@@ -555,6 +555,24 @@ Private Sub MenuBar1_Action
 				LoadLinesToTable
 				fx.Msgbox(MainForm,loc.Localize("Done"),"")
 			End If
+		Case "import from txt"
+			If limitedMode Then
+				fx.Msgbox(MainForm,loc.Localize("Limited mode cannot import files"),"")
+				Return
+			End If
+			Dim fc As FileChooser
+			fc.Initialize
+			Dim path As String = fc.ShowOpen(MainForm)
+			If File.Exists(path,"") Then
+				Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("Import to source or target?"),"",loc.Localize("source"),"",loc.Localize("target"),fx.MSGBOX_CONFIRMATION)
+				If response = fx.DialogResponse.POSITIVE Then
+					ImportFromPlainTXT(path,True)
+				Else
+					ImportFromPlainTXT(path,False)
+				End If
+				LoadLinesToTable
+				fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			End If
 		Case "import from tab-delimited _txt"
 			If limitedMode Then
 				fx.Msgbox(MainForm,loc.Localize("Limited mode cannot import files"),"")
@@ -1058,6 +1076,21 @@ Private Sub ImportFromXLIFF(path As String)
 	Next
 End Sub
 
+Private Sub ImportFromPlainTXT(path As String,isSource As Boolean)
+	Dim content As String = File.ReadString(path,"")
+	content = Utils.RemoveBOM(content)
+	Dim i As Int
+	For Each line As String In Regex.Split(CRLF,content)
+		line = Exporter.Unescape(line)
+		Dim lineMap As Map = currentProject.GetLine(i)
+		If isSource Then
+			lineMap.Put("source",line)
+		Else
+			lineMap.Put("target",line)
+		End If
+		i = i + 1
+	Next
+End Sub
 
 Private Sub ImportFromTXT(path As String)
 	Dim content As String = File.ReadString(path,"")
