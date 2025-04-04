@@ -50,9 +50,23 @@ Public Sub ExportToSRT(lines As List,path As String,askOption As Boolean,option 
 End Sub
 
 Public Sub ExportToXLIFF(lines As List,path As String,sourceLang As String,targetLang As String)
-    XLIFF.Export(lines,path,sourceLang,targetLang)
+	XLIFF.Export(lines,path,sourceLang,targetLang)
 End Sub
 
+
+Public Sub ExportToPlainTXT(lines As List,isSource As Boolean,path As String)
+	Dim sb As StringBuilder
+	sb.Initialize
+	For Each line As Map In lines
+		If isSource Then
+			sb.Append(Escape(line.Get("source")))
+		Else
+			sb.Append(Escape(line.Get("target")))
+		End If
+		sb.Append(CRLF)
+	Next
+	File.WriteString(path,"",sb.ToString)
+End Sub
 
 Public Sub ExportToTXT(lines As List,path As String)
 	Dim sb As StringBuilder

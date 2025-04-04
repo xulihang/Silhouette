@@ -264,7 +264,7 @@ Sub Process_Globals
 	Type SortCriteria (o As Object,value As Long)
 	Private SubtitleLabel As Label
 	Private DisplaySubtitleCheckBox As CheckBox
-	Public version As String = "1.4.0"
+	Public version As String = "1.4.1"
 	Public limitedMode As Boolean = False
 	Private loopMode As Boolean = False
 	Private player As MediaPlayer
@@ -606,6 +606,20 @@ Private Sub MenuBar1_Action
 			Dim path As String = fc.ShowSave(MainForm)
 			If path <> "" Then
 				Exporter.ExportToSRT(currentProject.lines,path,True,0)
+				fx.Msgbox(MainForm,loc.Localize("Done"),"")
+			End If
+		Case "export to txt"
+			Dim fc As FileChooser
+			fc.Initialize
+			fc.SetExtensionFilter("TXT",Array As String("*.txt"))
+			Dim path As String = fc.ShowSave(MainForm)
+			If path <> "" Then
+				Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("Export source or target?"),"",loc.Localize("source"),"",loc.Localize("target"),fx.MSGBOX_CONFIRMATION)
+				If response = fx.DialogResponse.POSITIVE Then
+					Exporter.ExportToPlainTXT(currentProject.lines,True,path)
+				Else
+					Exporter.ExportToPlainTXT(currentProject.lines,False,path)
+				End If
 				fx.Msgbox(MainForm,loc.Localize("Done"),"")
 			End If
 		Case "export to tab-delimited _txt"
