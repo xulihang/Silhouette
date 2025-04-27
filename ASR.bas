@@ -237,11 +237,24 @@ Public Sub RecognizeWavWithProgressInfo(callback As Object, eventname As String,
 		End If
 		Dim args As List
 		args.Initialize
-		args.AddAll(Array("-m",GetModelPath,"-f",filepath,"-osrt","-l",lang))
 		Dim prompt As String =  Utils.getSetting("prompt","")
+		Dim extraParams As String = Utils.getSetting("extra_params","")
 		If prompt <> "" Then
 			args.Add("--prompt")
 			args.Add(prompt)
+		End If
+		Dim hasLang As Boolean = False
+		If extraParams <> "" Then
+			For Each param As String In Regex.Split(" ",extraParams)
+				args.Add(param)
+				If param == "-l" Then
+					hasLang = True
+				End If
+			Next
+		End If
+		args.AddAll(Array("-m",GetModelPath,"-f",filepath,"-osrt"))
+		If hasLang = False Then
+			args.AddAll(Array("-l",lang))
 		End If
 		Dim sh As Shell
 		sh.Initialize("sh",GetWhisperPath,args)
@@ -260,6 +273,7 @@ Public Sub RecognizeWavWithProgressInfo(callback As Object, eventname As String,
 			params.Initialize
 			params.Put("path",filepath)
 			params.Put("lang",lang)
+			params.Put("extraParams",Utils.getSetting("extra_params",""))
 			params.Put("preferencesMap",Utils.getPrefMap)
 			wait for (Main.plugin.RunPlugin(engine&"ASR","recognizeLongFile",params)) complete (done As Object)
 			Do While True
