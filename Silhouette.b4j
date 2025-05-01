@@ -491,6 +491,8 @@ Private Sub MenuBar1_Action
 			SortLines
 		Case "Break Lines"
 			BreakLines
+		Case "Merge Lines"
+			MergeLines
 		Case "Sh_ift Time"
 			ShiftTime
 		Case "Split"
@@ -2264,11 +2266,68 @@ Private Sub MoveDownCurrentLine
 	End Try
 End Sub
 
+Private Sub MergeLines
+	Dim inpBox As InputBox
+	inpBox.Initialize
+	inpBox.Title = loc.Localize("Please input how many words a line should have.")
+	Dim wordNumber As Int = inpBox.showAndWait(5)
+	Dim newLines As List
+	newLines.Initialize
+	Dim sourcePattern As String = " "
+	If Utils.LanguageHasSpace(currentProject.SourceLang) = False Then
+		sourcePattern = ""
+	End If
+	Dim targetPattern As String = " "
+	If Utils.LanguageHasSpace(currentProject.TargetLang) = False Then
+		targetPattern = ""
+	End If
+	Dim mergedLine As Map
+	For Each line As Map In currentProject.lines
+		Dim source As String = line.Get("source")
+		Dim target As String = line.Get("target")
+		Dim startTime As String = line.Get("startTime")
+		Dim endTime As String = line.Get("endTime")
+		If mergedLine.IsInitialized Then
+			If mergedLine.Get("endTime") = startTime Then
+				Dim mergedSource As String = mergedLine.Get("source")&sourcePattern&source
+				Dim mergedTarget As String = mergedLine.Get("target")&targetPattern&target
+				mergedLine.Put("source",mergedSource)
+				mergedLine.Put("target",mergedTarget)
+				mergedLine.Put("endTime",endTime)
+				If Regex.Split(sourcePattern,mergedSource).Length>=wordNumber Then
+					newLines.Add(mergedLine)
+					mergedLine = Null
+				End If
+			Else
+				newLines.Add(mergedLine)
+				If Regex.Split(sourcePattern,source).Length<wordNumber Then
+					mergedLine = line
+				Else
+					mergedLine = Null
+					newLines.Add(line)
+				End If
+			End If
+		Else
+			If Regex.Split(sourcePattern,source).Length<wordNumber Then
+				mergedLine = line
+			Else
+				newLines.Add(line)
+			End If
+		End If
+	Next
+	If mergedLine.IsInitialized Then
+		newLines.Add(mergedLine)
+	End If
+	currentProject.lines.Clear
+	currentProject.lines.AddAll(newLines)
+	LoadLinesToTable
+End Sub
+
 Private Sub BreakLines 
 	Dim inpBox As InputBox
 	inpBox.Initialize
 	inpBox.Title = loc.Localize("Please input how many words a line should have.")
-	Dim wordNumber As Int = inpBox.showAndWait(3)
+	Dim wordNumber As Int = inpBox.showAndWait(5)
 	Dim newLines As List
 	newLines.Initialize
 	For Each line As Map In currentProject.lines
