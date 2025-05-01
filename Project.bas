@@ -241,7 +241,7 @@ Private Sub DefaultLine As Map
 End Sub
 
 Public Sub MergeWithTheNextLine(index As Int)
-	If index < lines.Size -2 Then
+	If index < lines.Size - 1 Then
 		Dim line As Map = GetLine(index)
 		Dim nextLine As Map = GetLine(index+1)
 		line.Put("endTime",nextLine.Get("endTime"))
