@@ -196,7 +196,7 @@ Public Sub RecognizeWav(filepath As String,lang As String,engine As String) As R
 		Log(StdErr)
 		RenameWavFile(filepath)
 		If ExitCode <> 0 Then
-			Utils.ReportError(StdOut)
+			Utils.ReportError(StdOut&StdErr)
 		End If
 		Return Success
 	Else
@@ -264,7 +264,7 @@ Public Sub RecognizeWavWithProgressInfo(callback As Object, eventname As String,
 		Log(StdOut)
 		Log(StdErr)
 		If ExitCode <> 0 Then
-			Utils.ReportError(StdOut)
+			Utils.ReportError(StdOut&StdErr)
 		End If
 		Return Success
 	Else
