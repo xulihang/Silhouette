@@ -241,12 +241,21 @@ Private Sub DefaultLine As Map
 End Sub
 
 Public Sub MergeWithTheNextLine(index As Int)
+	Dim sourcePattern As String = " "
+	Dim targetPattern As String = " "
+	If Utils.LanguageHasSpace(getSourceLang) = False Then
+		sourcePattern = ""
+	End If
+	If Utils.LanguageHasSpace(getTargetLang) = False Then
+		targetPattern = ""
+	End If
+	
 	If index < lines.Size - 1 Then
 		Dim line As Map = GetLine(index)
 		Dim nextLine As Map = GetLine(index+1)
 		line.Put("endTime",nextLine.Get("endTime"))
-		line.Put("source",line.Get("source")&nextLine.Get("source"))
-		line.Put("target",line.Get("target")&nextLine.Get("target"))
+		line.Put("source",line.Get("source")&sourcePattern&nextLine.Get("source"))
+		line.Put("target",line.Get("target")&targetPattern&nextLine.Get("target"))
 		lines.RemoveAt(index+1)
 		AddState
 	End If
