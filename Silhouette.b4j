@@ -2306,7 +2306,7 @@ Private Sub BreakLineBasedOnWordNumber(str As String,sourceLang As String,wordNu
 			sb.Initialize
 			For Each w As String In segment
 				sb.Append(w)
-				sb.Append(" ")
+				sb.Append(pattern)
 			Next
 			segments.Add(sb.ToString.Trim)
 			segment.Initialize
