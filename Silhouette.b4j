@@ -489,6 +489,8 @@ Private Sub MenuBar1_Action
 			ClearEmptyLines
 		Case "Sor_t Lines"
 			SortLines
+		Case "Break Lines"
+			BreakLines
 		Case "Sh_ift Time"
 			ShiftTime
 		Case "Split"
@@ -2260,6 +2262,67 @@ Private Sub MoveDownCurrentLine
 	Catch
 		Log(LastException)
 	End Try
+End Sub
+
+Private Sub BreakLines 
+	Dim inpBox As InputBox
+	inpBox.Initialize
+	inpBox.Title = loc.Localize("Please input how many words a line should have.")
+	Dim wordNumber As Int = inpBox.showAndWait(3)
+	Dim newLines As List
+	newLines.Initialize
+	For Each line As Map In currentProject.lines
+		Dim splitter As SentenceSplitter
+		splitter.Initialize
+		Dim source As String = line.Get("source")
+		Dim segments As List = BreakLineBasedOnWordNumber(source,currentProject.SourceLang,wordNumber)
+		Dim sb As StringBuilder
+		sb.Initialize
+		For Each segment As String In segments
+			sb.Append(segment).Append(CRLF)
+		Next
+		Dim target As String = line.Get("target")
+		Dim lines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,sb.ToString.Trim,target,True)
+		newLines.AddAll(lines)
+	Next
+	currentProject.lines.Clear
+	currentProject.lines.AddAll(newLines)
+	LoadLinesToTable
+End Sub
+
+Private Sub BreakLineBasedOnWordNumber(str As String,sourceLang As String,wordNumber As Int) As List
+	Dim segments As List
+	segments.Initialize
+	Dim segment As List
+	segment.Initialize
+	Dim pattern As String = " "
+	If Utils.LanguageHasSpace(sourceLang) = False Then
+		pattern = ""
+	End If
+	For Each word As String In Regex.Split(pattern,str)
+		segment.Add(word)
+		If segment.Size >= wordNumber Then
+			Dim sb As StringBuilder
+			sb.Initialize
+			For Each w As String In segment
+				sb.Append(w)
+				sb.Append(" ")
+			Next
+			segments.Add(sb.ToString.Trim)
+			segment.Initialize
+		End If
+	Next
+	If segment.Size>0 Then
+		Dim sb As StringBuilder
+		sb.Initialize
+		For Each w As String In segment
+			sb.Append(w)
+			sb.Append(" ")
+		Next
+		segments.Add(sb.ToString.Trim)
+	End If
+	Log(segments)
+	Return segments
 End Sub
 
 Private Sub SortLines
