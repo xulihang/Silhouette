@@ -2302,8 +2302,8 @@ Private Sub MergeLines
 						Exit
 					End If
 				Next
-				Dim mergedSource As String = mergedLine.Get("source")&sourceWhiteSpace&source
-				Dim mergedTarget As String = mergedLine.Get("target")&targetPattern&target
+				Dim mergedSource As String = (mergedLine.Get("source")&sourceWhiteSpace&source).Trim
+				Dim mergedTarget As String = (mergedLine.Get("target")&targetPattern&target).Trim
 				mergedLine.Put("source",mergedSource)
 				mergedLine.Put("target",mergedTarget)
 				mergedLine.Put("endTime",endTime)
