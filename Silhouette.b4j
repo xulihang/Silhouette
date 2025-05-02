@@ -32,15 +32,16 @@ File35=segment.bjl
 File36=segmentationRules.srx
 File37=sentenceSplitter.bjl
 File38=silhouette.png
-File39=TopRightSplitPane.bjl
+File39=SplittingOptions.bjl
 File4=ASROptions.bjl
-File40=TopSplitPane.bjl
-File41=TranslationAssist.bjl
-File42=TranslationMemory.bjl
-File43=validator.bjl
-File44=VideoPlayer.bjl
-File45=VoiceInput.bjl
-File46=WaveForm.bjl
+File40=TopRightSplitPane.bjl
+File41=TopSplitPane.bjl
+File42=TranslationAssist.bjl
+File43=TranslationMemory.bjl
+File44=validator.bjl
+File45=VideoPlayer.bjl
+File46=VoiceInput.bjl
+File47=WaveForm.bjl
 File5=BatchTranslator.bjl
 File6=BottomSplitPane.bjl
 File7=ChineseConverter.bjl
@@ -87,6 +88,7 @@ FileGroup43=Default Group
 FileGroup44=Default Group
 FileGroup45=Default Group
 FileGroup46=Default Group
+FileGroup47=Default Group
 FileGroup5=Default Group
 FileGroup6=Default Group
 FileGroup7=Default Group
@@ -152,31 +154,32 @@ Module37=SentenceSplitter
 Module38=SileroVad
 Module39=SimpleTag
 Module4=ASR
-Module40=SRTImportOptions
-Module41=SrtParser
-Module42=SRX
-Module43=TagKind
-Module44=TextFlow
-Module45=UndoManager
-Module46=Utils
-Module47=|relative|..\Validator\Validator
-Module48=VoiceInput
-Module49=WaveFormBitmapCreator
+Module40=SplittingOptionsForm
+Module41=SRTImportOptions
+Module42=SrtParser
+Module43=SRX
+Module44=TagKind
+Module45=TextFlow
+Module46=UndoManager
+Module47=Utils
+Module48=|relative|..\Validator\Validator
+Module49=VoiceInput
 Module5=ASROptions
-Module50=WavRandomAccessFile
-Module51=XLIFF
-Module52=Xml2Map
-Module53=XMLBuilder2
-Module54=XmlNode
-Module55=XmlParser
-Module56=XMLUtils
+Module50=WaveFormBitmapCreator
+Module51=WavRandomAccessFile
+Module52=XLIFF
+Module53=Xml2Map
+Module54=XMLBuilder2
+Module55=XmlNode
+Module56=XmlParser
+Module57=XMLUtils
 Module6=BatchTranslator
 Module7=ChineseConverterForm
 Module8=DraggableRange
 Module9=editDistance
-NumberOfFiles=46
+NumberOfFiles=47
 NumberOfLibraries=25
-NumberOfModules=56
+NumberOfModules=57
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -2333,28 +2336,58 @@ Private Sub MergeLines
 End Sub
 
 Private Sub BreakLines 
-	Dim inpBox As InputBox
-	inpBox.Initialize
-	inpBox.Title = loc.Localize("Please input how many words a line should have.")
-	Dim wordNumber As Int = inpBox.showAndWait(5)
-	Dim newLines As List
-	newLines.Initialize
-	For Each line As Map In currentProject.lines
+	Dim options As SplittingOptionsForm
+	options.Initialize
+	Dim result As Map = options.ShowAndWait
+	If result.Size>0 Then
+		Dim wordNumber As Int = result.GetDefault("word_number",5)
+		Dim splitSentences As Boolean = result.GetDefault("split_sentences",False)
+		Dim splitByWordNumber As Boolean = result.GetDefault("split_by_word_number",True)
+		Dim srxPath As String
+		If File.Exists(File.DirApp,"segmentationRules.srx") Then
+			srxPath = File.Combine(File.DirApp,"segmentationRules.srx")
+		End If
+		Dim newLines As List
+		newLines.Initialize
 		Dim splitter As SentenceSplitter
 		splitter.Initialize(currentProject.SourceLang)
-		Dim source As String = line.Get("source")
-		Dim segments As List = BreakLineBasedOnWordNumber(source,currentProject.SourceLang,wordNumber)
-		Dim sb As StringBuilder
-		sb.Initialize
-		For Each segment As String In segments
-			sb.Append(segment).Append(CRLF)
+		For Each line As Map In currentProject.lines
+			Dim source As String = line.Get("source")
+			Dim target As String = line.Get("target")
+			Dim sentences As List
+			If splitSentences Then
+				wait for (segmentation.segmentedTxt(source,True,currentProject.SourceLang,srxPath,True)) complete (sentences As List)
+			Else
+				sentences.Initialize
+				sentences.Add(source)
+			End If
+			Dim sb As StringBuilder
+			sb.Initialize
+			For Each sentence As String In sentences
+                sb.Append(sentence)
+				sb.Append(CRLF)
+			Next
+			
+			Dim linesInSentenceLevel As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,sb.ToString.Trim,target,True)
+			
+			If splitByWordNumber Then
+				For Each lineInSentenceLevel As Map In linesInSentenceLevel
+					Dim segments As List = BreakLineBasedOnWordNumber(lineInSentenceLevel.Get("source"),currentProject.SourceLang,wordNumber)
+					Dim sb As StringBuilder
+					sb.Initialize
+					For Each segment As String In segments
+						sb.Append(segment).Append(CRLF)
+					Next
+					Dim lines As List = splitter.GetNewLines(lineInSentenceLevel.Get("startTime"),lineInSentenceLevel.Get("endTime"),currentProject.SourceLang,sb.ToString.Trim,target,True)
+					newLines.AddAll(lines)
+				Next
+			Else
+				newLines.AddAll(linesInSentenceLevel)
+			End If
 		Next
-		Dim target As String = line.Get("target")
-		Dim lines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,sb.ToString.Trim,target,True)
-		newLines.AddAll(lines)
-	Next
-	currentProject.ReplaceLines(newLines)
-	LoadLinesToTable
+		currentProject.ReplaceLines(newLines)
+		LoadLinesToTable
+	End If
 End Sub
 
 Private Sub BreakLineBasedOnWordNumber(str As String,sourceLang As String,wordNumber As Int) As List
