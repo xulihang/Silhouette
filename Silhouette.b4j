@@ -2633,7 +2633,6 @@ private Sub splitSegment
 	Dim newLines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,source,line.Get("target"),True)
 	currentProject.DeleteLine(selectedRowID - 1)
 	InsertLines(selectedRowID - 1,newLines)
-	LoadLinesToTable
 	SelectRow(newRowIDToSelect,True)
 End Sub
 
