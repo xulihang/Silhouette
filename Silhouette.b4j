@@ -2318,8 +2318,7 @@ Private Sub MergeLines
 	If mergedLine.IsInitialized Then
 		newLines.Add(mergedLine)
 	End If
-	currentProject.lines.Clear
-	currentProject.lines.AddAll(newLines)
+	currentProject.ReplaceLines(newLines)
 	LoadLinesToTable
 End Sub
 
@@ -2344,8 +2343,7 @@ Private Sub BreakLines
 		Dim lines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,sb.ToString.Trim,target,True)
 		newLines.AddAll(lines)
 	Next
-	currentProject.lines.Clear
-	currentProject.lines.AddAll(newLines)
+	currentProject.ReplaceLines(newLines)
 	LoadLinesToTable
 End Sub
 
