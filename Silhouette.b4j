@@ -2378,7 +2378,7 @@ Private Sub BreakLines
 					For Each segment As String In segments
 						sb.Append(segment).Append(CRLF)
 					Next
-					Dim lines As List = splitter.GetNewLines(lineInSentenceLevel.Get("startTime"),lineInSentenceLevel.Get("endTime"),currentProject.SourceLang,sb.ToString.Trim,target,True)
+					Dim lines As List = splitter.GetNewLines(lineInSentenceLevel.Get("startTime"),lineInSentenceLevel.Get("endTime"),currentProject.SourceLang,sb.ToString.Trim,lineInSentenceLevel.Get("target"),True)
 					newLines.AddAll(lines)
 				Next
 			Else
