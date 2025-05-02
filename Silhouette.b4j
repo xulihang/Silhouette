@@ -2364,7 +2364,7 @@ Private Sub BreakLines
 			Dim sb As StringBuilder
 			sb.Initialize
 			For Each sentence As String In sentences
-                sb.Append(sentence)
+                sb.Append(sentence.Trim)
 				sb.Append(CRLF)
 			Next
 			
