@@ -1972,7 +1972,7 @@ private Sub splitHereMI_Action
 		line.Put("endTime",AudioProgressLabel.Text)
 		If source <> "" Or target <> "" Then
 			Dim splitter As SentenceSplitter
-			splitter.Initialize
+			splitter.Initialize(currentProject.SourceLang)
 			splitter.SetCheckboxVisibility(False)
 			splitter.SetText(source,target)
 			Dim result As Map
@@ -2219,7 +2219,7 @@ Private Sub SplitCurrentLine
 	If selectedRowID <> -1 Then
 		Dim line As Map = currentProject.GetLine(selectedRowID-1)
 		Dim splitter As SentenceSplitter
-		splitter.Initialize
+		splitter.Initialize(currentProject.SourceLang)
 		splitter.SetText(line.Get("source"),line.Get("target"))
 		Dim result As Map = splitter.ShowAndWait
 		Dim lines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,result.Get("source"),result.Get("target"),result.Get("calculateByWords"))
@@ -2340,7 +2340,7 @@ Private Sub BreakLines
 	newLines.Initialize
 	For Each line As Map In currentProject.lines
 		Dim splitter As SentenceSplitter
-		splitter.Initialize
+		splitter.Initialize(currentProject.SourceLang)
 		Dim source As String = line.Get("source")
 		Dim segments As List = BreakLineBasedOnWordNumber(source,currentProject.SourceLang,wordNumber)
 		Dim sb As StringBuilder
@@ -2629,7 +2629,7 @@ private Sub splitSegment
     Dim ta As TextArea = SourceTextArea
 	Dim source As String = ta.Text
 	Dim splitter As SentenceSplitter
-	splitter.Initialize
+	splitter.Initialize(currentProject.SourceLang)
 	Dim newLines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,source,line.Get("target"),True)
 	currentProject.DeleteLine(selectedRowID - 1)
 	InsertLines(selectedRowID - 1,newLines)

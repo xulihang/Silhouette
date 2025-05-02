@@ -10,13 +10,15 @@ Sub Class_Globals
 	Private CalculateTimeByWordsCheckBox As CheckBox
 	Private SourceTextArea As TextArea
 	Private TargetTextArea As TextArea
+	Private mSourceLang As String
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
-Public Sub Initialize
+Public Sub Initialize(sourceLang As String)
 	frm.Initialize("frm",600,500)
 	frm.RootPane.LoadLayout("sentenceSplitter")
 	Main.loc.LocalizeForm(frm)
+	mSourceLang = sourceLang
 End Sub
 
 Public Sub SetText(source As String,target As String)
@@ -174,4 +176,19 @@ Sub getPhonemeCount(s As String) As Int
 	Loop
 	totalSyllables = totalSyllables + syllables
 	Return totalSyllables
+End Sub
+
+Private Sub SplitButton_MouseClicked (EventData As MouseEvent)
+	Dim srxPath As String
+	If File.Exists(File.DirApp,"segmentationRules.srx") Then
+		srxPath = File.Combine(File.DirApp,"segmentationRules.srx")
+	End If
+	wait for (segmentation.segmentedTxt(SourceTextArea.Text,True,mSourceLang,srxPath,True)) complete (segments As List)
+	Dim sb As StringBuilder
+	sb.Initialize
+	For Each segment As String In segments
+		sb.Append(segment.Trim)
+		sb.Append(CRLF)
+	Next
+	SourceTextArea.Text = sb.ToString.Trim
 End Sub
