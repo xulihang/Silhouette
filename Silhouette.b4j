@@ -269,6 +269,7 @@ Sub Process_Globals
 	Public limitedMode As Boolean = False
 	Private loopMode As Boolean = False
 	Private player As MediaPlayer
+	Private SplitModeToggleButton As ToggleButton
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -338,7 +339,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	ProgressSlider.tag = False
 	ProgressContextMenu.Initialize("ProgressContextMenu")
 	WaveFormContextMenu.Initialize("WaveFormContextMenu")
-	
+	addKeyEvent(SourceTextArea,"sourceTextArea")
 	SetTable
 	loadPlugins
 	AddWaveFormControls
@@ -2411,6 +2412,7 @@ End Sub
 Private Sub MergeWithTheNextLine
 	If selectedRowID <> -1 Then
 		currentProject.MergeWithTheNextLine(selectedRowID - 1)
+		SelectRow(selectedRowID,True)
 		LoadLinesToTable
 	End If
 End Sub
@@ -2592,6 +2594,53 @@ End Sub
 Private Sub SourceTextArea_TextChanged (Old As String, New As String)
 	UpdateText(True,New)
 End Sub
+
+Sub addKeyEvent(textarea1 As TextArea,eventName As String)
+	Dim CJO As JavaObject = textarea1
+	Dim O As Object = CJO.CreateEventFromUI("javafx.event.EventHandler",eventName&"_KeyPressed",Null)
+	CJO.RunMethod("setOnKeyPressed",Array(O))
+	CJO.RunMethod("setFocusTraversable",Array(True))
+End Sub
+
+private Sub sourceTextArea_KeyPressed_Event (MethodName As String, Args() As Object)
+	If currentProject <> Null And currentProject.IsInitialized = False Then
+		Return
+	End If
+	If selectedRowID = -1 Then
+		Return
+	End If
+	If SplitModeToggleButton.Selected Then
+		Dim KEvt As JavaObject = Args(0)
+		Dim result As String
+		result=KEvt.RunMethod("getCode",Null)
+		Log(result)
+		If result="ENTER" Then
+			splitSegment
+		Else if result="DELETE" Then
+			mergeSegment
+		End If
+	End If
+End Sub
+
+
+private Sub splitSegment
+	Dim newRowIDToSelect As Int = selectedRowID + 1
+	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
+    Dim ta As TextArea = SourceTextArea
+	Dim source As String = ta.Text
+	Dim splitter As SentenceSplitter
+	splitter.Initialize
+	Dim newLines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,source,line.Get("target"),True)
+	currentProject.DeleteLine(selectedRowID - 1)
+	InsertLines(selectedRowID - 1,newLines)
+	LoadLinesToTable
+	SelectRow(newRowIDToSelect,True)
+End Sub
+
+Private Sub mergeSegment
+	MergeWithTheNextLine
+End Sub
+
 
 Private Sub TargetTextArea_TextChanged (Old As String, New As String)
 	UpdateText(False,New)
@@ -2808,7 +2857,6 @@ Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
 		SubtitleLabel.Font = fx.DefaultFont(Utils.getPref("subtitle_font_size",16))
 	End If
 End Sub
-
 
 private Sub AddKeyEventListener(n As Node)
 	Dim r As Reflector
