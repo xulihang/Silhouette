@@ -2838,3 +2838,27 @@ public Sub FillText(text As String,isTarget As Boolean)
 		SourceTextArea.Text = text
 	End If
 End Sub
+
+Private Sub QuickTranslateButton_MouseClicked (EventData As MouseEvent)
+	Dim preferencesMap As Map=Utils.getPrefMap
+	If preferencesMap.ContainsKey("mt") Then
+		Dim mtPreferences As Map=preferencesMap.Get("mt")
+		For Each engine As String In MT.getMTList
+			If mtPreferences.GetDefault(engine&"_enabled",False)=True Then
+				translateCurrentText(engine)
+				Return
+			End If
+		Next
+	End If
+End Sub
+
+Sub translateCurrentText(engine As String) As ResumableSub
+	If selectedRowID <> -1 Then
+		wait for (MT.getMT(SourceTextArea.Text,currentProject.sourceLang,currentProject.targetLang,engine)) Complete (translation As String)
+		If translation<>"" Then
+			Log(translation)
+			TargetTextArea.Text=translation
+		End If
+	End If
+	Return ""
+End Sub
