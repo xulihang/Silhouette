@@ -270,6 +270,7 @@ Sub Process_Globals
 	Private loopMode As Boolean = False
 	Private player As MediaPlayer
 	Private SplitModeToggleButton As ToggleButton
+	Private SplitAtPlaybackPositionToggleButton As ToggleButton
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -2628,9 +2629,31 @@ private Sub splitSegment
 	Dim line As Map = currentProject.GetLine(selectedRowID - 1)
     Dim ta As TextArea = SourceTextArea
 	Dim source As String = ta.Text
-	Dim splitter As SentenceSplitter
-	splitter.Initialize(currentProject.SourceLang)
-	Dim newLines As List = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,source,line.Get("target"),True)
+	Dim newLines As List
+	Dim startTimeMs As Long = Utils.GetMillisecondsFromTimeString(line.Get("startTime"))
+	Dim endTimeMs As Long = Utils.GetMillisecondsFromTimeString(line.Get("endTime"))
+	Dim currentTimeMs As Long = GetCurrentVideoTime
+	If SplitAtPlaybackPositionToggleButton.Selected And startTimeMs<currentTimeMs And currentTimeMs<endTimeMs Then
+		newLines.Initialize
+		Dim firstLine As Map
+		firstLine.Initialize
+		firstLine.Put("startTime",line.Get("startTime"))
+		firstLine.Put("endTime",Utils.GetTimeStringFromMilliseconds(currentTimeMs))
+		firstLine.Put("source",Regex.Split(CRLF,source)(0))
+		firstLine.Put("target",line.Get("target"))
+		Dim secondLine As Map
+		secondLine.Initialize
+		secondLine.Put("startTime",firstLine.Get("endTime"))
+		secondLine.Put("endTime",line.Get("endTime"))
+		secondLine.Put("source",Regex.Split(CRLF,source)(1))
+		secondLine.Put("target","")
+		newLines.Add(firstLine)
+		newLines.Add(secondLine)
+	Else
+		Dim splitter As SentenceSplitter
+		splitter.Initialize(currentProject.SourceLang)
+		newLines = splitter.GetNewLines(line.Get("startTime"),line.Get("endTime"),currentProject.SourceLang,source,line.Get("target"),True)
+	End If
 	currentProject.DeleteLine(selectedRowID - 1)
 	InsertLines(selectedRowID - 1,newLines)
 	SelectRow(newRowIDToSelect,True)
@@ -2908,4 +2931,8 @@ Sub translateCurrentText(engine As String) As ResumableSub
 		End If
 	End If
 	Return ""
+End Sub
+
+Private Sub SplitModeToggleButton_SelectedChange(Selected As Boolean)
+	SplitAtPlaybackPositionToggleButton.Visible = Selected
 End Sub
