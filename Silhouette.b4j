@@ -2289,7 +2289,14 @@ Private Sub MergeLines
 		Dim endTime As String = line.Get("endTime")
 		If mergedLine.IsInitialized Then
 			If mergedLine.Get("endTime") = startTime Then
-				Dim mergedSource As String = mergedLine.Get("source")&sourcePattern&source
+				Dim sourceWhiteSpace As String = sourcePattern
+				For Each c As String In Array("'",",",".","!","?",$"""$)
+					If source.StartsWith(c) Then
+						sourceWhiteSpace = ""
+						Exit
+					End If
+				Next
+				Dim mergedSource As String = mergedLine.Get("source")&sourceWhiteSpace&source
 				Dim mergedTarget As String = mergedLine.Get("target")&targetPattern&target
 				mergedLine.Put("source",mergedSource)
 				mergedLine.Put("target",mergedTarget)
