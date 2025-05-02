@@ -1261,9 +1261,9 @@ End Sub
 
 private Sub UpdateSubtitleLabel
 	If DisplaySubtitleCheckBox.Checked Then
-		SubtitleLabel.Style = Utils.getPref("subtitle_css",$"-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,1.0) , 1, 1 , 0 , 0 );"$)
 		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
 		SubtitleLabel.Text = line.Get("source")&CRLF&line.Get("target")
+		ApplySubtitleLabelStyle
 	End If
 End Sub
 
@@ -2907,9 +2907,14 @@ Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
 	Dim jo As JavaObject = SubtitleLabel
 	jo.RunMethod("setTextAlignment", Array("CENTER"))
 	SubtitleLabel.Visible = Checked
+	ApplySubtitleLabelStyle
+End Sub
+
+private Sub ApplySubtitleLabelStyle
 	If Utils.getPrefMap.ContainsKey("subtitle_font_size") Then
 		SubtitleLabel.Font = fx.DefaultFont(Utils.getPref("subtitle_font_size",16))
 	End If
+	SubtitleLabel.Style = Utils.getPref("subtitle_css",$"-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,1.0) , 1, 1 , 0 , 0 );"$)
 End Sub
 
 private Sub AddKeyEventListener(n As Node)
