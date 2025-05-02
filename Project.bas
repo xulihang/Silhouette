@@ -253,8 +253,16 @@ Public Sub MergeWithTheNextLine(index As Int)
 	If index < lines.Size - 1 Then
 		Dim line As Map = GetLine(index)
 		Dim nextLine As Map = GetLine(index+1)
+		Dim nextSource As String = nextLine.Get("source")
 		line.Put("endTime",nextLine.Get("endTime"))
-		line.Put("source",line.Get("source")&sourcePattern&nextLine.Get("source"))
+		Dim sourceWhiteSpace As String = sourcePattern
+		For Each c As String In Array("'",",",".","!","?",$"""$)
+			If nextSource.StartsWith(c) Then
+				sourceWhiteSpace = ""
+				Exit
+			End If
+		Next
+		line.Put("source",line.Get("source")&sourceWhiteSpace&nextLine.Get("source"))
 		line.Put("target",line.Get("target")&targetPattern&nextLine.Get("target"))
 		lines.RemoveAt(index+1)
 		AddState
