@@ -1756,7 +1756,7 @@ Private Sub ResizeVLCImageView(Width As Double, Height As Double)
 			VLCImageView.Left = (Width - desiredWidth) / 2
 			If Utils.getPref("match_sutitle_with_video",False) Then
 				Dim padding As Int = 10
-				SubtitleLabel.PrefWidth = desiredWidth - padding
+				SubtitleLabel.PrefWidth = desiredWidth - padding * 2
 				SubtitleLabel.Left = VLCImageView.Left + padding
 			End If
 		Else
