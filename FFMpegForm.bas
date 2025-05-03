@@ -10,9 +10,9 @@ Sub Class_Globals
 	Private ArgumentsTextArea As TextArea
 	Private OutputTextArea As TextArea
 	Private sh As Shell
-	Private workDir As String
 	Private StatusLabel As Label
 	Private th As Thread
+	Private WorkDirTextField As TextField
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -20,7 +20,7 @@ Public Sub Initialize
 	frm.Initialize("frm",500,250)
 	frm.RootPane.LoadLayout("FFmpeg")
 	Main.loc.LocalizeForm(frm)
-	workDir = File.DirApp
+	WorkDirTextField.Text = File.DirApp
 	th.Initialise("th")
 End Sub
 
@@ -29,7 +29,7 @@ Public Sub SetArguments(arguments As String)
 End Sub
 
 Public Sub SetWorkdir(dir As String)
-	workDir = dir
+	WorkDirTextField.Text = dir
 End Sub
 
 Public Sub Show
@@ -45,7 +45,7 @@ Private Sub Run As ResumableSub
 	Dim args As List = Regex.Split(" ",ArgumentsTextArea.Text)
 	Dim sh As Shell
 	sh.Initialize("sh",FFMpeg.GetFFMpegPath,args)
-	sh.WorkingDirectory = workDir
+	sh.WorkingDirectory = WorkDirTextField.Text
 	sh.RunWithOutputEvents(-1)
 	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
 	Log(StdOut)
