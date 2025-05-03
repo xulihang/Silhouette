@@ -262,8 +262,8 @@ Public Sub MergeWithTheNextLine(index As Int)
 				Exit
 			End If
 		Next
-		line.Put("source",line.Get("source")&sourceWhiteSpace&nextLine.Get("source"))
-		line.Put("target",line.Get("target")&targetPattern&nextLine.Get("target"))
+		line.Put("source",(line.Get("source")&sourceWhiteSpace&nextLine.Get("source")).As(String).Trim)
+		line.Put("target",(line.Get("target")&targetPattern&nextLine.Get("target")).As(String).Trim)
 		lines.RemoveAt(index+1)
 		AddState
 	End If
