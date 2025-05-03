@@ -1745,12 +1745,26 @@ Private Sub ResizeVLCImageView(Width As Double, Height As Double)
 		Dim radio As Double = img.Width/img.Height
 		VLCImageView.Height = Height
 		VLCImageView.Width = Width
+		
+		If Utils.getPref("match_sutitle_with_video",False)=False Then
+			SubtitleLabel.Left = 0
+			SubtitleLabel.PrefWidth = VLCImageView.Width
+		End If
+		
 		If img.Width/img.Height < Width/Height Then '16:9 4:3
 			Dim desiredWidth As Double = VLCImageView.Height * radio
 			VLCImageView.Left = (Width - desiredWidth) / 2
+			If Utils.getPref("match_sutitle_with_video",False) Then
+				SubtitleLabel.PrefWidth = desiredWidth
+				SubtitleLabel.Left = VLCImageView.Left
+			End If
 		Else
 			Dim desiredHeight As Double = VLCImageView.Width / radio
 			VLCImageView.Top = (Height - desiredHeight) / 2
+			If Utils.getPref("match_sutitle_with_video",False) Then
+				SubtitleLabel.Left = 0
+				SubtitleLabel.PrefWidth = VLCImageView.Width
+			End If
 		End If
 	End If
 End Sub

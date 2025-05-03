@@ -23,6 +23,7 @@ Sub Class_Globals
 	Private PrecisePlayOfSelectionCheckBox As CheckBox
 	Private ConvertChineseBasedOnSourceLangCheckBox As CheckBox
 	Private SubtitleCSSTextArea As TextArea
+	Private MatchSubtitleWithVideoCheckBox As CheckBox
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -57,6 +58,7 @@ Public Sub Initialize(mb As MenuBar)
 	SubtitleFontSizeSpinner.Value = preferencesMap.GetDefault("subtitle_font_size",16)
 	ConvertChineseBasedOnSourceLangCheckBox.Checked = preferencesMap.GetDefault("convert_chinese_base_on_source_lang",True)
 	PrecisePlayOfSelectionCheckBox.Checked = preferencesMap.GetDefault("precise_play_of_selection",False)
+	MatchSubtitleWithVideoCheckBox.Checked = preferencesMap.GetDefault("match_sutitle_with_video",False)
 	SubtitleCSSTextArea.Text = preferencesMap.GetDefault("subtitle_css",$"-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,1.0) , 1, 1 , 0 , 0 );"$)
 	loadAPI
 	loadMT
@@ -175,6 +177,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("precise_play_of_selection",PrecisePlayOfSelectionCheckBox.Checked)
 	preferencesMap.Put("convert_chinese_base_on_source_lang",ConvertChineseBasedOnSourceLangCheckBox.Checked)
 	preferencesMap.Put("subtitle_css",SubtitleCSSTextArea.Text)
+	preferencesMap.Put("match_sutitle_with_video",MatchSubtitleWithVideoCheckBox.Checked)
 	Dim lang As String
 	If LanguageComboBox.SelectedIndex<>-1 Then
 		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)
