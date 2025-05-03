@@ -123,6 +123,15 @@ Public Sub DetectOS As String
 	End If
 End Sub
 
+Sub GetExtension(filename As String) As String
+	Try
+		filename=filename.SubString2(filename.LastIndexOf("."),filename.Length)
+	Catch
+		Log(LastException)
+	End Try
+	Return filename
+End Sub
+
 Sub GetFilenameWithoutExtension(filename As String) As String
 	Try
 		filename=filename.SubString2(0,filename.LastIndexOf("."))
