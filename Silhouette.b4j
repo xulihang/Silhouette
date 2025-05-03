@@ -1745,7 +1745,7 @@ Private Sub ResizeVLCImageView(Width As Double, Height As Double)
 		Dim radio As Double = img.Width/img.Height
 		VLCImageView.Height = Height
 		VLCImageView.Width = Width
-		
+
 		If Utils.getPref("match_sutitle_with_video",False)=False Then
 			SubtitleLabel.Left = 0
 			SubtitleLabel.PrefWidth = VLCImageView.Width
