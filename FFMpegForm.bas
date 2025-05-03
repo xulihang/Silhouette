@@ -17,7 +17,7 @@ End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
 Public Sub Initialize
-	frm.Initialize("frm",500,250)
+	frm.Initialize("frm",600,400)
 	frm.RootPane.LoadLayout("FFmpeg")
 	Main.loc.LocalizeForm(frm)
 	WorkDirTextField.Text = File.DirApp
