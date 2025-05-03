@@ -705,8 +705,7 @@ Private Sub ShowFFmpegFormToBurnSubtitle
 			ffForm.Initialize
 			ffForm.Show
 			Dim args As List
-			
-			args = Array As String("-i",$""${currentProject.GetMediaPath}""$,"-vf","subtitles="&File.GetName(path),outputPath,"-y")
+			args = Array As String("-i",$""${currentProject.GetMediaPath}""$,"-vf","subtitles="&File.GetName(path),$""${outputPath}""$,"-y")
 			Dim sb As StringBuilder
 			sb.Initialize
 			For Each arg As String In args
