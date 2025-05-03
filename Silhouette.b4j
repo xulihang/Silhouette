@@ -1767,6 +1767,7 @@ Private Sub ResizeVLCImageView(Width As Double, Height As Double)
 				SubtitleLabel.PrefWidth = VLCImageView.Width
 			End If
 		End If
+		SetSubtitleLabelFontSize
 	End If
 End Sub
 
@@ -2926,10 +2927,17 @@ Private Sub DisplaySubtitleCheckBox_CheckedChange(Checked As Boolean)
 End Sub
 
 private Sub ApplySubtitleLabelStyle
-	If Utils.getPrefMap.ContainsKey("subtitle_font_size") Then
-		SubtitleLabel.Font = fx.DefaultFont(Utils.getPref("subtitle_font_size",16))
-	End If
+	SetSubtitleLabelFontSize
 	SubtitleLabel.Style = Utils.getPref("subtitle_css",$"-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,1.0) , 1, 1 , 0 , 0 );"$)
+End Sub
+
+private Sub SetSubtitleLabelFontSize
+	Dim videoHeight As Int = VLCImageView.GetImage.Height
+	Dim fontSize As Double = Utils.getPref("subtitle_font_size",16)
+	fontSize = videoHeight / 720 * (40 / 16) * fontSize 'scale fontsize based on video height
+	Dim labelWidth As Double = SubtitleLabel.PrefWidth + 20
+	Dim scaledSize As Double = labelWidth / VLCImageView.GetImage.Width * fontSize
+	SubtitleLabel.Font = fx.DefaultFont(scaledSize)
 End Sub
 
 private Sub AddKeyEventListener(n As Node)
