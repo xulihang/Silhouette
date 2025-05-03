@@ -697,15 +697,15 @@ Private Sub ShowFFmpegFormToBurnSubtitle
 		Dim fc As FileChooser
 		fc.Initialize
 		fc.Title = loc.Localize("Select the output path.")
+		Dim filename As String = currentProject.GetMediaFilename
+		fc.InitialFileName = "out-"&filename
 		Dim outputPath As String = fc.ShowSave(MainForm)
 		If outputPath <> "" Then
 			Dim ffForm As FFMpegForm
 			ffForm.Initialize
 			ffForm.Show
 			Dim args As List
-			'Dim filename As String = currentProject.GetMediaFilename
-			'Dim pureFilename As String = Utils.GetFilenameWithoutExtension(filename)
-			'Dim outputPath As String = File.Combine(currentProject.GetMediaFolder, "out-"&pureFilename&Utils.GetExtension(filename))
+			
 			args = Array As String("-i",$""${currentProject.GetMediaPath}""$,"-vf","subtitles="&File.GetName(path),outputPath,"-y")
 			Dim sb As StringBuilder
 			sb.Initialize
