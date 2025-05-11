@@ -2130,6 +2130,8 @@ private Sub loopMI_Action
 End Sub
 
 Private Sub playSelectionHereMI_Action
+	FollowProgressCheckBox.Tag = FollowProgressCheckBox.Checked
+	FollowProgressCheckBox.Checked = False
 	Dim startTime As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
 	expectedEndTime = Utils.GetMillisecondsFromTimeString(EndTimeTextField.Text)
 	vlc.Resume
