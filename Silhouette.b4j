@@ -1303,8 +1303,20 @@ End Sub
 
 private Sub UpdateSubtitleLabel
 	If DisplaySubtitleCheckBox.Checked Then
+		Dim format As Int = Utils.getPref("subtitle_format",0)
 		Dim line As Map = currentProject.GetLine(selectedRowID - 1)
-		SubtitleLabel.Text = line.Get("source")&CRLF&line.Get("target")
+		Dim text As String
+		Select format
+			Case 0
+				text = line.Get("source")&CRLF&line.Get("target")
+			Case 1
+				text = line.Get("target")&CRLF&line.Get("source")
+			Case 2	
+				text = line.Get("source")
+			Case 3
+				text = line.Get("target")
+		End Select
+		SubtitleLabel.Text = text
 		ApplySubtitleLabelStyle
 	End If
 End Sub

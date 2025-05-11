@@ -24,6 +24,7 @@ Sub Class_Globals
 	Private ConvertChineseBasedOnSourceLangCheckBox As CheckBox
 	Private SubtitleCSSTextArea As TextArea
 	Private MatchSubtitleWithVideoCheckBox As CheckBox
+	Private SubtitleFormatComboBox As ComboBox
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -36,6 +37,10 @@ Public Sub Initialize(mb As MenuBar)
 	TabPane1.LoadLayout("APISetting", "API")
 	TabPane1.LoadLayout("MTSetting", Main.loc.Localize("Machine Translation"))
 	TabPane1.LoadLayout("modelPreference", Main.loc.Localize("Speech Recognition"))
+	SubtitleFormatComboBox.Items.Add(Main.loc.Localize("Source+Target"))
+	SubtitleFormatComboBox.Items.Add(Main.loc.Localize("Target+Source"))
+	SubtitleFormatComboBox.Items.Add(Main.loc.Localize("Source"))
+	SubtitleFormatComboBox.Items.Add(Main.loc.Localize("Target"))
 	APITableView.SetColumns(Array(Main.loc.Localize("API Name"),Main.loc.Localize("value")))
 	preferencesMap.Initialize
 	apiPreferences.Initialize
@@ -61,6 +66,7 @@ Public Sub Initialize(mb As MenuBar)
 	PrecisePlayOfSelectionCheckBox.Checked = preferencesMap.GetDefault("precise_play_of_selection",False)
 	MatchSubtitleWithVideoCheckBox.Checked = preferencesMap.GetDefault("match_sutitle_with_video",False)
 	SubtitleCSSTextArea.Text = preferencesMap.GetDefault("subtitle_css",$"-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,1.0) , 1, 1 , 0 , 0 );"$)
+	SubtitleFormatComboBox.SelectedIndex= preferencesMap.GetDefault("subtitle_format",0)
 	loadAPI
 	loadMT
 	LoadLanaugesList
@@ -179,6 +185,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("convert_chinese_base_on_source_lang",ConvertChineseBasedOnSourceLangCheckBox.Checked)
 	preferencesMap.Put("subtitle_css",SubtitleCSSTextArea.Text)
 	preferencesMap.Put("match_sutitle_with_video",MatchSubtitleWithVideoCheckBox.Checked)
+	preferencesMap.Put("subtitle_format",SubtitleFormatComboBox.SelectedIndex)
 	Dim lang As String
 	If LanguageComboBox.SelectedIndex<>-1 Then
 		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)
