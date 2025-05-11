@@ -1910,18 +1910,7 @@ Private Sub ProgressTimer_Tick
 	If vlc.IsPlaying Then
 		Dim currentVideoTime As Long = GetCurrentVideoTime
 		'currentVideoTime = currentVideoTime + 100
-		If currentVideoTime > expectedEndTime And expectedEndTime <> -1 And playbackStartDate <> -1 Then
-			If loopMode Then
-				loopMI_Action
-			Else
-				expectedEndTime = -1
-				playbackStartTime = -1
-				playbackStartDate = -1
-				vlc.Pause
-				player.Pause
-				TogglePlayingStatus(False,-1)
-			End If
-		End If
+		
 		If FollowProgressCheckBox.Checked Then
 			Dim rowID As Int = FindTheRowIDOfTime(currentVideoTime)
 			If rowID <> selectedRowID And rowID <> -1 Then
@@ -1934,6 +1923,24 @@ Private Sub ProgressTimer_Tick
 				End If
 			End If
 		End If
+		
+		If currentVideoTime > expectedEndTime And expectedEndTime <> -1 And playbackStartDate <> -1 Then
+			If loopMode Then
+				loopMI_Action
+			Else
+				If FollowProgressCheckBox.Tag Is Boolean Then
+					FollowProgressCheckBox.Checked = FollowProgressCheckBox.Tag
+					FollowProgressCheckBox.Tag = Null
+				End If
+				expectedEndTime = -1
+				playbackStartTime = -1
+				playbackStartDate = -1
+				vlc.Pause
+				player.Pause
+				TogglePlayingStatus(False,-1)
+			End If
+		End If
+		
 		ProgressSlider.Tag = False
 		DrawPositionLineInWaveForm(currentVideoTime)
 		ProgressLabel.Text = Utils.GetCompactTimeStringFromMilliseconds(vlc.GetTime)
@@ -2551,7 +2558,9 @@ Private Sub PlayFromLineByID(rowID As Int)
 End Sub
 
 Private Sub PlayLineByID(rowID As Int)
+	FollowProgressCheckBox.Tag = FollowProgressCheckBox.Checked
 	Try
+		FollowProgressCheckBox.Checked = False
 		Dim precise As Boolean = Utils.getPref("precise_play_of_selection",False)
 		If precise Then
 			vlc.SetMute(True)
