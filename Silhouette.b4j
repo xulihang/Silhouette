@@ -279,6 +279,8 @@ Sub Process_Globals
 	Private player As MediaPlayer
 	Private SplitModeToggleButton As ToggleButton
 	Private SplitAtPlaybackPositionToggleButton As ToggleButton
+	Type LineRange (startIndex As Int,endIndex As Int)
+	Private alignedRange As LineRange
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -750,6 +752,11 @@ Private Sub ShowAligner
 	inp.Initialize
 	inp.Title = loc.Localize("Please input the text to align.")
 	Dim target As String = inp.showAndWait("")
+	Dim selector As RangeSelector
+	selector.Initialize
+	selector.SetRange(1,currentProject.lines.Size)
+	alignedRange = selector.ShowAndWait
+	Log(alignedRange)
 	Dim targetList As List
 	targetList.Initialize
 	For Each line As String In Regex.Split(CRLF,target)
@@ -757,7 +764,8 @@ Private Sub ShowAligner
 	Next
 	Dim sourceList As List
 	sourceList.Initialize
-	For Each lineMap As Map In currentProject.lines
+	For i = alignedRange.startIndex To alignedRange.endIndex 
+		Dim lineMap As Map = currentProject.lines.Get(i)
 		sourceList.Add(lineMap.Get("source"))
 	Next
 	Dim a As Aligner
@@ -766,13 +774,20 @@ Private Sub ShowAligner
 End Sub
 
 private Sub Aligner_Completed(aligned As List)
-	If aligned.Size > 0 Then
+	If aligned.Size > 0 And alignedRange<>Null Then
+		Dim lines As List
+		lines.Initialize
+		For i = alignedRange.startIndex To alignedRange.endIndex
+			Dim lineMap As Map = currentProject.lines.Get(i)
+			lines.Add(lineMap)
+		Next
 		Dim fa As ForcedAlignment
 		fa.Initialize
-		Dim newLines As List = fa.AlignByText(currentProject.lines,aligned)
+		Dim newLines As List = fa.AlignByText(lines,aligned)
 		Log(newLines)
-		currentProject.ReplaceLines(newLines)
+		currentProject.ReplaceLinesInRangeByIndex(newLines,alignedRange)
 		LoadLinesToTable
+		alignedRange = Null
 	End If
 End Sub
 
@@ -2320,9 +2335,9 @@ Private Sub ShiftTime
 	Dim selector As RangeSelector
 	selector.Initialize
 	selector.SetRange(1,currentProject.lines.Size)
-	Dim rangeResult As Map = selector.ShowAndWait
-	Dim startIndex As Int = rangeResult.Get("startIndex")
-	Dim endIndex As Int = rangeResult.Get("endIndex")
+	Dim range As LineRange = selector.ShowAndWait
+	Dim startIndex As Int = range.startIndex
+	Dim endIndex As Int = range.endIndex
 	Dim inp As InputBox
 	inp.Initialize
 	inp.Title = loc.Localize("Please input the time offset in ms:")

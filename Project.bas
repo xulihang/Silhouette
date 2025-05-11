@@ -201,6 +201,32 @@ Public Sub ReplaceLinesInRange(newLines As List,startTime As String,endTime As S
 	AddState
 End Sub
 
+Public Sub ReplaceLinesInRangeByIndex(newLines As List,range As LineRange)
+	Dim before As List
+	before.Initialize
+	Dim after As List
+	after.Initialize
+	Dim index As Int
+	For Each line As Map In lines
+		If index < range.startIndex Then
+			before.Add(line)
+		End If
+		If index > range.endIndex Then
+			after.Add(line)
+		End If
+        index = index + 1
+	Next
+    Dim total As List
+	total.Initialize
+	total.AddAll(before)
+	total.AddAll(newLines)
+	total.AddAll(after)
+	lines.Clear
+	lines.AddAll(total)
+	Sort
+	AddState
+End Sub
+
 Public Sub AddLine(startTime As String,endTime As String,source As String,target As String)
 	Dim line As Map
 	line.Initialize

@@ -23,14 +23,14 @@ Public Sub SetRange(startNumber As Int,endNumber As Int)
 	EndTextField.Text = endNumber
 End Sub
 
-Public Sub ShowAndWait As Map
+Public Sub ShowAndWait As LineRange
 	frm.ShowAndWait
 	Dim startIndex As Int = StartTextField.Text - 1
 	Dim endIndex As Int = EndTextField.Text - 1
-	Dim result As Map
+	Dim result As LineRange
 	result.Initialize
-	result.Put("startIndex",startIndex)
-	result.Put("endIndex",endIndex)
+	result.startIndex=startIndex
+	result.endIndex=endIndex
 	Return result
 End Sub
 
