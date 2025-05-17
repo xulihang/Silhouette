@@ -10,7 +10,8 @@ Sub Class_Globals
 	Private FileTextField As TextField
 	Private FPSSpinner As Spinner
 	Private OutputTextField As TextField
-	Private UseJPEGCheckBox As CheckBox
+	Private JPEGRadioButton As RadioButton
+	Private PNGRadioButton As RadioButton
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -31,7 +32,7 @@ Private Sub ExtractButton_MouseClicked (EventData As MouseEvent)
 		Return
 	End If
 	Dim format As String
-	If UseJPEGCheckBox.Checked Then
+	If JPEGRadioButton.Selected Then
 		format = "jpg"
 	Else
 		format = "png"
