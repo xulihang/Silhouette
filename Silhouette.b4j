@@ -36,15 +36,16 @@ File39=silhouette.png
 File4=ASROptions.bjl
 File40=SplittingOptions.bjl
 File41=subtitlePreference.bjl
-File42=TopRightSplitPane.bjl
-File43=TopSplitPane.bjl
-File44=TranslationAssist.bjl
-File45=TranslationMemory.bjl
-File46=validator.bjl
-File47=VideoPlayer.bjl
-File48=VoiceInput.bjl
-File49=WaveForm.bjl
+File42=SubtitleRemovedVideoCreator.bjl
+File43=TopRightSplitPane.bjl
+File44=TopSplitPane.bjl
+File45=TranslationAssist.bjl
+File46=TranslationMemory.bjl
+File47=validator.bjl
+File48=VideoPlayer.bjl
+File49=VoiceInput.bjl
 File5=BatchTranslator.bjl
+File50=WaveForm.bjl
 File6=BottomSplitPane.bjl
 File7=ChineseConverter.bjl
 File8=Editor.bjl
@@ -94,6 +95,7 @@ FileGroup47=Default Group
 FileGroup48=Default Group
 FileGroup49=Default Group
 FileGroup5=Default Group
+FileGroup50=Default Group
 FileGroup6=Default Group
 FileGroup7=Default Group
 FileGroup8=Default Group
@@ -163,28 +165,29 @@ Module41=SplittingOptionsForm
 Module42=SRTImportOptions
 Module43=SrtParser
 Module44=SRX
-Module45=TagKind
-Module46=TextFlow
-Module47=UndoManager
-Module48=Utils
-Module49=|relative|..\Validator\Validator
+Module45=SubtitleRemovedVideoCreator
+Module46=TagKind
+Module47=TextFlow
+Module48=UndoManager
+Module49=Utils
 Module5=ASROptions
-Module50=VoiceInput
-Module51=WaveFormBitmapCreator
-Module52=WavRandomAccessFile
-Module53=XLIFF
-Module54=Xml2Map
-Module55=XMLBuilder2
-Module56=XmlNode
-Module57=XmlParser
-Module58=XMLUtils
+Module50=|relative|..\Validator\Validator
+Module51=VoiceInput
+Module52=WaveFormBitmapCreator
+Module53=WavRandomAccessFile
+Module54=XLIFF
+Module55=Xml2Map
+Module56=XMLBuilder2
+Module57=XmlNode
+Module58=XmlParser
+Module59=XMLUtils
 Module6=BatchTranslator
 Module7=ChineseConverterForm
 Module8=DraggableRange
 Module9=editDistance
-NumberOfFiles=49
+NumberOfFiles=50
 NumberOfLibraries=25
-NumberOfModules=58
+NumberOfModules=59
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -680,6 +683,15 @@ Private Sub MenuBar1_Action
 			Else
 				fe.Show("")
 			End If
+		Case "Subtitle-Removed Video Creator"
+			If currentProject.IsInitialized Then
+				Dim creator As SubtitleRemovedVideoCreator
+				creator.Initialize(currentProject.GetMediaPath)
+				creator.Show
+			Else
+				fx.Msgbox(MainForm,loc.Localize("Please open a file first."),"")
+			End If
+			
 		Case "FFmpeg"
 			Dim ffForm As FFMpegForm
 			ffForm.Initialize

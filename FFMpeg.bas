@@ -141,6 +141,33 @@ Public Sub Video2Wav(dir As String,filename As String,outpath As String) As Resu
 	Return Success
 End Sub
 
+Public Sub Video2RawWav(dir As String,filename As String,outpath As String) As ResumableSub
+	Dim args As List
+	args = Array("-i",$"${filename}""$,$"${outpath}""$)
+	Dim sh As Shell
+	sh.Initialize("sh",GetFFMpegPath,args)
+	sh.WorkingDirectory = dir
+	sh.Run(-1)
+	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	Log(StdOut)
+	Log(StdErr)
+	Return Success
+End Sub
+
+Public Sub GenerateVideoFromImagesAndAudio(dir As String,audioName As String,frameRate As String,outpath As String) As ResumableSub
+	'ffmpeg -r 25 -i out.wav -i frame%d.png -vcodec libx264 output.mp4
+	Dim args As List
+	args = Array("-r",frameRate,"-i",$"${audioName}""$,"-i","frame%d.png","-vcodec","libx264",$"${outpath}""$)
+	Dim sh As Shell
+	sh.Initialize("sh",GetFFMpegPath,args)
+	sh.WorkingDirectory = dir
+	sh.Run(-1)
+	wait for sh_ProcessCompleted (Success As Boolean, ExitCode As Int, StdOut As String, StdErr As String)
+	Log(StdOut)
+	Log(StdErr)
+	Return Success
+End Sub
+
 Public Sub SplitWav(duration As Int,dir As String,filename As String) As ResumableSub
 	Dim args As List
 	args = Array As String("-i",filename,"-f","segment","-segment_time",duration,"-c","copy","segment-%05d.wav")
