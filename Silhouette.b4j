@@ -239,6 +239,7 @@ Sub Process_Globals
 	Private LinesTable As B4XTable
 	Public currentProject As Project
 	Private tableCM As ContextMenu
+	Private playerContextMenu As ContextMenu
 	Private robot As JavaObject
 	Private selectedRowID As Int = -1
 	Private expectedEndTime As Int = -1
@@ -2859,28 +2860,6 @@ Private Sub EnableWaveFormCheckBox_CheckedChange(Checked As Boolean)
 	End If
 End Sub
 
-Private Sub VLCImageView_MouseClicked (EventData As MouseEvent)
-	If EventData.SecondaryButtonPressed Then
-		Dim view As B4XView = Sender
-		Dim cm As ContextMenu
-		cm.Initialize("")
-		Dim playControlMi As MenuItem
-		playControlMi.Initialize(loc.Localize("Play control"),"playControlMi")
-		cm.MenuItems.Add(playControlMi)
-		Dim map1 As Map
-		map1=Utils.GetScreenPosition(view)
-		Dim jo As JavaObject = cm
-		jo.RunMethod("show", Array(view, map1.Get("x")+EventData.X, map1.Get("y")+EventData.Y))
-	End If
-End Sub
-
-Private Sub playControlMi_Action
-	If PlayControl.IsInitialized = False Then
-		PlayControl.Initialize(vlc)
-	End If
-	PlayControl.Show
-End Sub
-
 private Sub DetectVoiceActivity
 	If currentProject.IsInitialized=False Then
 		Return
@@ -3090,4 +3069,30 @@ End Sub
 
 Private Sub SplitModeToggleButton_SelectedChange(Selected As Boolean)
 	SplitAtPlaybackPositionToggleButton.Visible = Selected
+End Sub
+
+Private Sub VLCPane_MouseClicked (EventData As MouseEvent)
+	If EventData.SecondaryButtonPressed Then
+		Dim view As B4XView = Sender
+        If playerContextMenu.IsInitialized = False Then
+			playerContextMenu.Initialize("")
+			Dim playControlMi As MenuItem
+			playControlMi.Initialize(loc.Localize("Play control"),"playControlMi")
+			playerContextMenu.MenuItems.Add(playControlMi)
+        End If
+		Dim map1 As Map
+		map1=Utils.GetScreenPosition(view)
+		Dim jo As JavaObject = playerContextMenu
+		jo.RunMethod("show", Array(view, map1.Get("x")+EventData.X, map1.Get("y")+EventData.Y))
+	Else
+		Dim jo As JavaObject = playerContextMenu
+		jo.RunMethod("hide",Null)
+	End If
+End Sub
+
+Private Sub playControlMi_Action
+	If PlayControl.IsInitialized = False Then
+		PlayControl.Initialize(vlc)
+	End If
+	PlayControl.Show
 End Sub
