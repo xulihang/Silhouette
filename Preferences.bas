@@ -112,6 +112,14 @@ Public Sub SwitchTab(index As Int)
 	TabPane1.SelectedIndex = index
 End Sub
 
+Public Sub SwitchToTheLastTab
+	TabPane1.SelectedIndex = TabPane1.Tabs.Size - 1
+End Sub
+
+Public Sub GetTabNumber As Int
+	Return TabPane1.Tabs.Size
+End Sub
+
 Sub loadAPI
 	APITableView.Items.Clear
 	
