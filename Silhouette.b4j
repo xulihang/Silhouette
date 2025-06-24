@@ -925,7 +925,7 @@ Private Sub RecognizeExistingLines As ResumableSub
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
 		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
-			ShowPreferences.SwitchTab(2)
+			ShowPreferences.SwitchTab(3)
 		End If
 		Return ""
 	End If
@@ -961,7 +961,7 @@ Private Sub RecognizeWholeSpeech As ResumableSub
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _
 		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
-			ShowPreferences.SwitchTab(2)
+			ShowPreferences.SwitchTab(3)
 		End If
 		Return ""
 	End If
@@ -1023,7 +1023,7 @@ Private Sub RecognizeSpeechByFixedSpan As ResumableSub
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
 		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
-			ShowPreferences.SwitchTab(2)
+			ShowPreferences.SwitchTab(3)
 		End If
 		Return ""
 	End If
@@ -2178,7 +2178,7 @@ private Sub recognizeMI_Action
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _
 		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
-			ShowPreferences.SwitchTab(2)
+			ShowPreferences.SwitchTab(3)
 		End If
 		Return
 	End If
@@ -2284,7 +2284,7 @@ Private Sub RecognizeTheSelectedLine
 		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("No models found"),"", _ 
 		                                          loc.Localize("Go to perferences"),"",loc.Localize("Close"),fx.MSGBOX_CONFIRMATION)
 		If response = fx.DialogResponse.POSITIVE Then
-			ShowPreferences.SwitchTab(2)
+			ShowPreferences.SwitchTab(3)
 		End If
 		Return
 	End If
