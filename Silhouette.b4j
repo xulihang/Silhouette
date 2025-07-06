@@ -544,9 +544,9 @@ Private Sub MenuBar1_Action
 		Case "Jump to the Next Line and Play"
 			playNextLineMI_Action
 		Case "Jump _Forward"
-			Forward(500)
+			Forward
 		Case "Jump _Backward"
-			Backward(500)
+			Backward
 		Case "Pause/Resume"
 			TogglePlaying
 		Case "Play the _Previous Line"
@@ -2924,22 +2924,24 @@ Private Sub SetEndPointButton_MouseClicked (EventData As MouseEvent)
 	End If
 End Sub
 
-Private Sub Backward500Button_MouseClicked (EventData As MouseEvent)
-	Backward(500)
+Private Sub BackwardButton_MouseClicked (EventData As MouseEvent)
+	Backward
 End Sub
 
-Private Sub Forward500Button_MouseClicked (EventData As MouseEvent)
-	Forward(500)
+Private Sub ForwardButton_MouseClicked (EventData As MouseEvent)
+	Forward
 End Sub
 
-Private Sub Backward(span As Int)
+Private Sub Backward
+	Dim span As Int = Utils.getPref("jump_time_span",500)
 	playbackStartTime = playbackStartTime - span
 	Dim time As Double = Max(0, GetCurrentVideoTime - span)
 	vlc.SetTime(time)
 	player.Position = time
 End Sub
 
-Private Sub Forward(span As Int)
+Private Sub Forward
+	Dim span As Int = Utils.getPref("jump_time_span",500)
 	playbackStartTime = playbackStartTime + span
 	Dim time As Double = Min(GetCurrentVideoTime + span,vlc.GetLength)
 	vlc.SetTime(time)

@@ -25,6 +25,7 @@ Sub Class_Globals
 	Private SubtitleCSSTextArea As TextArea
 	Private MatchSubtitleWithVideoCheckBox As CheckBox
 	Private SubtitleFormatComboBox As ComboBox
+	Private JumpTimeSpanSpinner As Spinner
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -62,6 +63,7 @@ Public Sub Initialize(mb As MenuBar)
 	SkipRecognizedCheckBox.Checked = preferencesMap.GetDefault("skip_recognized",True)
 	UseGPUCheckBox.Checked = preferencesMap.GetDefault("use_gpu",True)
 	SubtitleFontSizeSpinner.Value = preferencesMap.GetDefault("subtitle_font_size",16)
+	JumpTimeSpanSpinner.Value = preferencesMap.GetDefault("jump_time_span",500)
 	ConvertChineseBasedOnSourceLangCheckBox.Checked = preferencesMap.GetDefault("convert_chinese_base_on_source_lang",True)
 	PrecisePlayOfSelectionCheckBox.Checked = preferencesMap.GetDefault("precise_play_of_selection",False)
 	MatchSubtitleWithVideoCheckBox.Checked = preferencesMap.GetDefault("match_sutitle_with_video",False)
@@ -194,6 +196,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("subtitle_css",SubtitleCSSTextArea.Text)
 	preferencesMap.Put("match_sutitle_with_video",MatchSubtitleWithVideoCheckBox.Checked)
 	preferencesMap.Put("subtitle_format",SubtitleFormatComboBox.SelectedIndex)
+	preferencesMap.Put("jump_time_span",JumpTimeSpanSpinner.Value)
 	Dim lang As String
 	If LanguageComboBox.SelectedIndex<>-1 Then
 		lang=LanguageComboBox.Items.Get(LanguageComboBox.SelectedIndex)
