@@ -277,7 +277,7 @@ Sub Process_Globals
 	Type SortCriteria (o As Object,value As Long)
 	Private SubtitleLabel As Label
 	Private DisplaySubtitleCheckBox As CheckBox
-	Public version As String = "1.5.2"
+	Public version As String = "1.5.3"
 	Public limitedMode As Boolean = False
 	Private loopMode As Boolean = False
 	Private player As MediaPlayer
@@ -285,7 +285,7 @@ Sub Process_Globals
 	Private SplitAtPlaybackPositionToggleButton As ToggleButton
 	Type LineRange (startIndex As Int,endIndex As Int)
 	Private alignedRange As LineRange
-	Private continuousMode as Boolean = False
+	Private continuousMode As Boolean = False
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -366,7 +366,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		'v.showAndWait
+		v.showAndWait
 	End If
 	If Args.Length = 1 Then
 		Dim filePath As String = Args(0)
