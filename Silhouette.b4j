@@ -285,6 +285,7 @@ Sub Process_Globals
 	Private SplitAtPlaybackPositionToggleButton As ToggleButton
 	Type LineRange (startIndex As Int,endIndex As Int)
 	Private alignedRange As LineRange
+	Private continuousMode as Boolean = False
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
@@ -557,6 +558,8 @@ Private Sub MenuBar1_Action
 			If selectedRowID <> -1 Then
 				PlayLineByID(selectedRowID + 1)
 			End If
+		Case "Play Every Line"
+			PlayEveryLine
 		Case "_Settings"
 			Dim ps As ProjectSettings
 			ps.Initialize(currentProject)
@@ -1900,6 +1903,7 @@ Private Sub TogglePlaying
 		vlc.SetMute(False)
 		TogglePlayingStatus(True,vlc.GetTime)
 	End If
+	continuousMode = False
 End Sub
 
 Private Sub TogglePlayingStatus(isPlaying As Boolean,startTime As Long)
@@ -1969,6 +1973,14 @@ Private Sub ProgressTimer_Tick
 				vlc.Pause
 				player.Pause
 				TogglePlayingStatus(False,-1)
+				If continuousMode Then
+					If selectedRowID < currentProject.lines.Size Then
+						SelectRow(selectedRowID + 1,True)
+						PlayLineByID(selectedRowID)
+					Else
+						continuousMode = False
+					End If
+				End If
 			End If
 		End If
 		
@@ -2590,7 +2602,13 @@ Private Sub PlayFromLineByID(rowID As Int)
 	End Try
 End Sub
 
-Private Sub PlayLineByID(rowID As Int)
+Private Sub PlayEveryLine
+	continuousMode = True
+	SelectRow(1,True)
+	PlayLineByID(1)
+End Sub
+
+Private Sub PlayLineByID(rowID As Int) As ResumableSub
 	FollowProgressCheckBox.Tag = FollowProgressCheckBox.Checked
 	Try
 		FollowProgressCheckBox.Checked = False
@@ -2620,6 +2638,7 @@ Private Sub PlayLineByID(rowID As Int)
 	Catch
 		Log(LastException)
 	End Try
+	Return ""
 End Sub
 
 Private Sub LoadLineToEditor(fromLongClick As Boolean)
