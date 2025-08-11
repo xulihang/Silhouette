@@ -366,7 +366,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		v.showAndWait
+		'v.showAndWait
 	End If
 	If Args.Length = 1 Then
 		Dim filePath As String = Args(0)
@@ -3108,8 +3108,10 @@ Private Sub VLCPane_MouseClicked (EventData As MouseEvent)
 		Dim jo As JavaObject = playerContextMenu
 		jo.RunMethod("show", Array(view, map1.Get("x")+EventData.X, map1.Get("y")+EventData.Y))
 	Else
-		Dim jo As JavaObject = playerContextMenu
-		jo.RunMethod("hide",Null)
+		If playerContextMenu.IsInitialized = True Then
+			Dim jo As JavaObject = playerContextMenu
+			jo.RunMethod("hide",Null)
+		End If
 	End If
 End Sub
 
