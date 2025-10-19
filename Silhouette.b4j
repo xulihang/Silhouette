@@ -300,12 +300,20 @@ Sub AppStart (Form1 As Form, Args() As String)
 			Log(LastException)
 		End Try
 	End If
+	
 	MainForm = Form1
 	If Utils.DetectOS = "mac" Then
 		MainForm.RootPane.LoadLayout("main_mac")
 	Else
 		MainForm.RootPane.LoadLayout("main")
 	End If
+	
+	progressDialog.Show("")
+	progressDialog.update2(loc.Localize("Loading VLC..."))
+	vlc.Initialize(VLCImageView)
+	wait for (vlc.LoadAsync) complete (done As Object)
+	progressDialog.close
+	
 	MainForm.WindowWidth = 800
 	MainForm.Show
 	MainPane.LoadLayout("Editor")
@@ -371,11 +379,6 @@ Sub AppStart (Form1 As Form, Args() As String)
 	End If
 	
 	AskAboutGPU
-	progressDialog.Show("")
-	progressDialog.update2(loc.Localize("Loading VLC..."))
-	vlc.Initialize(VLCImageView)
-	wait for (vlc.LoadAsync) complete (done As Object)
-	progressDialog.close
 	
 	If Args.Length = 1 Then
 		Dim filePath As String = Args(0)
