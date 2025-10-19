@@ -205,7 +205,7 @@ Version=10
 #AdditionalJar: sqlite-jdbc-3.43.0.0
 #AdditionalJar: bcprov-jdk15on-154
 #AdditionalJar: silero-vad
-#AdditionalJar: onnxruntime-1.20.0-full
+#AdditionalJar: onnxruntime-1.20.0-nodll
 #AdditionalJar: jnativehook-2.2.2
 'for opencc
 #AdditionalJar: nlp-common-0.0.5
@@ -292,6 +292,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
 	initLoc
 	AddVLCSearchPath
+	loadONNXRuntime
 	If Utils.DetectOS = "windows" Then
 		Try
 			hook.Initialize(Me,"Hook")
@@ -382,6 +383,44 @@ Sub AppStart (Form1 As Form, Args() As String)
 		End If
 	End If
 	AskAboutGPU
+End Sub
+
+Private Sub loadONNXRuntime
+	Dim System As JavaObject
+	System.InitializeStatic("java.lang.System")
+	Dim os As String = Utils.DetectOS
+	If os = "windows" Then
+		Dim validToLoad As Boolean = True
+		If IsSystemVersionLowerThanWin10 Then
+			Log("System version lower than win 10")
+			If File.Exists(File.DirApp,"onnxrt64.dll") = False Then
+				Log("compability dlls do not exist")
+				validToLoad = False
+				fx.Msgbox2(MainForm,loc.Localize("Detected using system lower than Win10. Please download compatible zip file and unzip to the app's folder."),"",loc.Localize("Download"),"","",fx.MSGBOX_CONFIRMATION)
+				fx.ShowExternalDocument("https://github.com/xulihang/onnxruntime-for-win7/releases/download/builds/x64.zip")
+			End If
+		End If
+		If validToLoad Then
+			System.RunMethod("load",Array(File.Combine(File.DirApp,"onnxruntime.dll")))
+			System.RunMethod("load",Array(File.Combine(File.DirApp,"onnxruntime4j_jni.dll")))
+		End If
+	else if os = "mac" Then
+		System.RunMethod("load",Array(File.Combine(File.DirApp,"libonnxruntime.dylib")))
+		System.RunMethod("load",Array(File.Combine(File.DirApp,"libonnxruntime4j_jni.dylib")))
+	Else
+		System.RunMethod("load",Array(File.Combine(File.DirApp,"libonnxruntime.so")))
+		System.RunMethod("load",Array(File.Combine(File.DirApp,"libonnxruntime4j_jni.so")))
+	End If
+End Sub
+
+Private Sub IsSystemVersionLowerThanWin10 As Boolean
+	Dim osName As String = GetSystemProperty("os.name","")
+	Log(osName)
+	If osName.StartsWith("Windows 8") Or osName.StartsWith("Windows 7") Then
+		Return True
+	Else
+		Return False
+	End If
 End Sub
 
 private Sub AddVLCSearchPath
