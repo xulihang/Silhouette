@@ -428,7 +428,12 @@ private Sub AddVLCSearchPath
 	RuntimeUtil.InitializeStatic("uk.co.caprica.vlcj.binding.support.runtime.RuntimeUtil")
 	Dim NativeLibrary As JavaObject
 	NativeLibrary.InitializeStatic("com.sun.jna.NativeLibrary")
-	NativeLibrary.RunMethod("addSearchPath",Array(RuntimeUtil.RunMethod("getLibVlcLibraryName",Null),File.Combine(File.DirApp,"VLC")))
+	If Utils.DetectOS = "mac" Then
+		NativeLibrary.RunMethod("addSearchPath",Array(RuntimeUtil.RunMethod("getLibVlcLibraryName",Null),File.Combine(File.DirApp,"VLC.app/Contents/MacOS/lib/")))
+	Else
+		NativeLibrary.RunMethod("addSearchPath",Array(RuntimeUtil.RunMethod("getLibVlcLibraryName",Null),File.Combine(File.DirApp,"VLC")))
+	End If
+	
 End Sub
 
 Public Sub AskAboutGPU
