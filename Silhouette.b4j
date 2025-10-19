@@ -325,7 +325,6 @@ Sub AppStart (Form1 As Form, Args() As String)
 	TMTableView.SetColumnWidth(1,50)
 	TMTableView.SetColumnWidth(2,200)
 	TMTableView.SetColumnWidth(3,100)
-	vlc.Initialize(VLCImageView)
 	VLCImageView.PreserveRatio = True
 	
 	ProgressTimer.Initialize("ProgressTimer",100)
@@ -368,8 +367,16 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		'v.showAndWait
+		v.showAndWait
 	End If
+	
+	AskAboutGPU
+	progressDialog.Show("")
+	progressDialog.update2(loc.Localize("Loading VLC..."))
+	vlc.Initialize(VLCImageView)
+	wait for (vlc.LoadAsync) complete (done As Object)
+	progressDialog.close
+	
 	If Args.Length = 1 Then
 		Dim filePath As String = Args(0)
 		If filePath.Contains("sip") Then
@@ -382,7 +389,6 @@ Sub AppStart (Form1 As Form, Args() As String)
 			End If
 		End If
 	End If
-	AskAboutGPU
 End Sub
 
 Private Sub loadONNXRuntime
@@ -1464,12 +1470,16 @@ Private Sub ReadyToDrawWaveForm As Boolean
 End Sub
 
 Private Sub WaveFormPane_Resize (Width As Double, Height As Double)
-	timestampRange.Pane.SetSize(Width,Height/4*3)
-	overviewRange.Pane.Top = Height/4*3
-	overviewRange.Pane.SetSize(Width,Height/4)
-	If ReadyToDrawWaveForm Then
-		DrawWaveForm
-	End If
+	Try
+		timestampRange.Pane.SetSize(Width,Height/4*3)
+		overviewRange.Pane.Top = Height/4*3
+		overviewRange.Pane.SetSize(Width,Height/4)
+		If ReadyToDrawWaveForm Then
+			DrawWaveForm
+		End If
+	Catch
+		Log(LastException)
+	End Try
 End Sub
 
 Private Sub GetWaveFilesToDraw As List
