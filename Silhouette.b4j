@@ -291,6 +291,7 @@ End Sub
 Sub AppStart (Form1 As Form, Args() As String)
 	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
 	initLoc
+	AddVLCSearchPath
 	If Utils.DetectOS = "windows" Then
 		Try
 			hook.Initialize(Me,"Hook")
@@ -381,6 +382,14 @@ Sub AppStart (Form1 As Form, Args() As String)
 		End If
 	End If
 	AskAboutGPU
+End Sub
+
+private Sub AddVLCSearchPath
+	Dim RuntimeUtil As JavaObject
+	RuntimeUtil.InitializeStatic("uk.co.caprica.vlcj.binding.support.runtime.RuntimeUtil")
+	Dim NativeLibrary As JavaObject
+	NativeLibrary.InitializeStatic("com.sun.jna.NativeLibrary")
+	NativeLibrary.RunMethod("addSearchPath",Array(RuntimeUtil.RunMethod("getLibVlcLibraryName",Null),File.Combine(File.DirApp,"VLC")))
 End Sub
 
 Public Sub AskAboutGPU
