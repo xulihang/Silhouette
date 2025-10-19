@@ -10,6 +10,7 @@ Sub Process_Globals
 	Private frm As Form
 	Private Label1 As Label
 	Private ProgressBar1 As ProgressBar
+	Private Button1 As Button
 End Sub
 
 'input a random type name
@@ -36,6 +37,9 @@ Sub isShowing As Boolean
 	Return frm.Showing
 End Sub
 
+Sub hideButton
+	Button1.Visible = False
+End Sub
 
 Sub hideProgressBar
 	ProgressBar1.Visible=False

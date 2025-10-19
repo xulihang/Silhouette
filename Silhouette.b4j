@@ -309,6 +309,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	End If
 	
 	progressDialog.Show("")
+	progressDialog.hideButton
 	progressDialog.update2(loc.Localize("Loading VLC..."))
 	vlc.Initialize(VLCImageView)
 	wait for (vlc.LoadAsync) complete (done As Object)
