@@ -311,7 +311,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	progressDialog.Show2("",400,150)
 	progressDialog.hideButton
 	progressDialog.update2(loc.Localize("Loading VLC..."))
-	vlc.Initialize(VLCImageView)
+	vlc.Initialize
 	wait for (vlc.LoadAsync) complete (done As Object)
 	progressDialog.close
 	
@@ -380,6 +380,8 @@ Sub AppStart (Form1 As Form, Args() As String)
 	End If
 	
 	AskAboutGPU
+	
+	vlc.ImageView = VLCImageView
 	
 	If Args.Length = 1 Then
 		Dim filePath As String = Args(0)

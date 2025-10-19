@@ -12,13 +12,11 @@ Sub Class_Globals
 	Private surface As JavaObject
 	Private mStopped As Boolean = True
 	Private mRate As Float = 1.0
-	Private mIv As ImageView
 	Private th As Thread
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
-Public Sub Initialize(iv As ImageView)
-	mIv = iv
+Public Sub Initialize
 	th.Initialise("th")
 End Sub
 
@@ -31,7 +29,10 @@ End Sub
 Public Sub Load
 	mediaPlayerFactory = jo.RunMethodJO("getMediaPlayerFactory",Null)
 	embeddedMediaPlayer = jo.RunMethodJO("getMediaPlayer",Array(mediaPlayerFactory))
-	surface = jo.RunMethod("setVideoSurface",Array(embeddedMediaPlayer,mIv))
+End Sub
+
+Public Sub setImageView(iv As ImageView)
+	surface = jo.RunMethod("setVideoSurface",Array(embeddedMediaPlayer,iv))
 	embeddedMediaPlayer.RunMethodJO("videoSurface",Null).RunMethod("set",Array(surface))
 End Sub
 
