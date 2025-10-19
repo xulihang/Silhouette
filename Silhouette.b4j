@@ -308,7 +308,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 		MainForm.RootPane.LoadLayout("main")
 	End If
 	
-	progressDialog.Show("")
+	progressDialog.Show2("",400,150)
 	progressDialog.hideButton
 	progressDialog.update2(loc.Localize("Loading VLC..."))
 	vlc.Initialize(VLCImageView)
