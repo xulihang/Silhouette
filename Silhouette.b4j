@@ -438,6 +438,16 @@ Private Sub IsSystemVersionLowerThanWin10 As Boolean
 	End If
 End Sub
 
+Private Sub IsSystemWin7 As Boolean
+	Dim osName As String = GetSystemProperty("os.name","")
+	Log(osName)
+	If osName.StartsWith("Windows 7") Then
+		Return True
+	Else
+		Return False
+	End If
+End Sub
+
 private Sub AddVLCSearchPath
 	Dim RuntimeUtil As JavaObject
 	RuntimeUtil.InitializeStatic("uk.co.caprica.vlcj.binding.support.runtime.RuntimeUtil")
@@ -453,13 +463,22 @@ End Sub
 
 Public Sub AskAboutGPU
 	If Utils.DetectOS = "windows" And File.Exists(File.DirData("Silhouette"),"gpuAsked") = False Then
-		Dim response As Int = fx.Msgbox2(MainForm,loc.Localize("Enable GPU for speech recognition? If your GPU power is weak, you'd better use CPU."),"",loc.Localize("Yes"),"",loc.Localize("No"),fx.MSGBOX_CONFIRMATION)
+		Dim response As Int
+		
+		If IsSystemWin7 Then
+			response = fx.DialogResponse.NEGATIVE
+		Else
+			response = fx.Msgbox2(MainForm,loc.Localize("Enable GPU for speech recognition? If your GPU power is weak, you'd better use CPU."),"",loc.Localize("Yes"),"",loc.Localize("No"),fx.MSGBOX_CONFIRMATION)
+		End If
+		
 		Dim preferencesMap As Map = Utils.getPrefMap
+		
 		If response = fx.DialogResponse.POSITIVE Then
 			preferencesMap.Put("use_gpu",True)
 		Else
 			preferencesMap.Put("use_gpu",False)
 		End If
+		
 		Dim json As JSONGenerator
 		json.Initialize(preferencesMap)
 		File.WriteString(prefPath,"",json.ToPrettyString(4))
