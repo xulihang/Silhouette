@@ -292,7 +292,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	prefPath = File.Combine(File.DirData("Silhouette"),"preferences.conf")
 	initLoc
 	AddVLCSearchPath
-	loadONNXRuntime
+	
 	If Utils.DetectOS = "windows" Then
 		Try
 			hook.Initialize(Me,"Hook")
@@ -302,6 +302,9 @@ Sub AppStart (Form1 As Form, Args() As String)
 	End If
 	
 	MainForm = Form1
+	
+	loadONNXRuntime
+	
 	If Utils.DetectOS = "mac" Then
 		MainForm.RootPane.LoadLayout("main_mac")
 	Else
