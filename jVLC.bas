@@ -13,11 +13,18 @@ Sub Class_Globals
 	Private mStopped As Boolean = True
 	Private mRate As Float = 1.0
 	Private th As Thread
+	Private mCallback As Object
+	Private mEventName As String
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
-Public Sub Initialize
+Public Sub Initialize(Callback As Object,EventName As String)
+	mCallback = Callback
+	mEventName = EventName
 	th.Initialise("th")
+	Dim meJo As JavaObject = Me
+	meJo.RunMethod("setBAStatic",Array(meJo.GetField("ba")))
+	meJo.RunMethod("setTarget",Array(meJo))
 End Sub
 
 Public Sub LoadAsync As ResumableSub
@@ -69,6 +76,12 @@ End Sub
 Public Sub Resume
 	mStopped = False
 	embeddedMediaPlayer.RunMethodJO("controls",Null).RunMethod("play",Null)
+End Sub
+
+Public Sub vlc_paused
+	If SubExists(mCallback,mEventName&"_Paused") Then
+		CallSubDelayed(mCallback,mEventName&"_Paused")
+	End If
 End Sub
 
 Public Sub SetTime(time As Long)
@@ -130,6 +143,7 @@ Public Sub GetTime As Float
 End Sub
 
 #if java
+import anywheresoftware.b4a.keywords.Common;
 import javafx.scene.image.ImageView;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
@@ -141,6 +155,18 @@ import uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurface;
 public static ImageViewVideoSurface surface;
 public static MediaPlayerFactory factory;
 public static EmbeddedMediaPlayer embeddedMediaPlayer;
+
+public static BA baStatic;
+public static jvlc target;
+
+public static void setBAStatic(BA ba) {
+    baStatic = ba;
+}
+
+public static void setTarget(jvlc t) {
+    target = t;
+}
+
 public static ImageViewVideoSurface setVideoSurface(EmbeddedMediaPlayer embeddedMediaPlayer,ImageView videoImageView) {
     surface = new ImageViewVideoSurface(videoImageView);
     embeddedMediaPlayer.videoSurface().set(surface);
@@ -171,10 +197,14 @@ public static EmbeddedMediaPlayer getMediaPlayer(MediaPlayerFactory factory){
 
         @Override
         public void paused(MediaPlayer mediaPlayer) {
+		    if (baStatic != null) {
+			    baStatic.raiseEvent(target, "vlc_paused", new Object[] {});
+			}
         }
 
         @Override
         public void stopped(MediaPlayer mediaPlayer) {
+
         }
 
         @Override

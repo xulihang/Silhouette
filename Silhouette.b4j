@@ -314,7 +314,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	progressDialog.Show2("",400,150)
 	progressDialog.hideButton
 	progressDialog.update2(loc.Localize("Loading VLC..."))
-	vlc.Initialize
+	vlc.Initialize(Me,"vlc")
 	wait for (vlc.LoadAsync) complete (done As Object)
 	progressDialog.close
 	
@@ -397,6 +397,14 @@ Sub AppStart (Form1 As Form, Args() As String)
 				OpenFile(filePath,True)
 			End If
 		End If
+	End If
+End Sub
+
+Private Sub vlc_Paused
+	Log("paused")
+	If FollowProgressCheckBox.Tag Is Boolean Then
+		FollowProgressCheckBox.Checked = FollowProgressCheckBox.Tag
+		FollowProgressCheckBox.Tag = Null
 	End If
 End Sub
 
