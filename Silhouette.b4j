@@ -315,8 +315,10 @@ Sub AppStart (Form1 As Form, Args() As String)
 	progressDialog.hideButton
 	progressDialog.update2(loc.Localize("Loading VLC..."))
 	vlc.Initialize(Me,"vlc")
-	wait for (vlc.LoadAsync) complete (done As Object)
+	wait for (vlc.LoadAsync) complete (success As Boolean)
 	progressDialog.close
+	
+	fx.Msgbox(MainForm,loc.Localize("Failed to start VLC"),"")		
 	
 	MainForm.WindowWidth = 800
 	MainForm.Show

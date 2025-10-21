@@ -30,10 +30,7 @@ End Sub
 Public Sub LoadAsync As ResumableSub
 	th.Start(Me,"Load",Array())
 	wait for th_Ended(endedOK As Boolean, error As String)
-	If endedOK = False Then
-		ThrowError
-	End If
-	Return ""
+	return endedOK
 End Sub
 
 Sub ThrowError
