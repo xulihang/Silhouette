@@ -30,7 +30,15 @@ End Sub
 Public Sub LoadAsync As ResumableSub
 	th.Start(Me,"Load",Array())
 	wait for th_Ended(endedOK As Boolean, error As String)
+	If endedOK = False Then
+		ThrowError
+	End If
 	Return ""
+End Sub
+
+Sub ThrowError
+	Dim i As Int
+	i = "VLC initialization failed"
 End Sub
 
 Public Sub Load
