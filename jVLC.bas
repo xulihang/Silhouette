@@ -30,13 +30,9 @@ End Sub
 Public Sub LoadAsync As ResumableSub
 	th.Start(Me,"Load",Array())
 	wait for th_Ended(endedOK As Boolean, error As String)
-	return endedOK
+	Return endedOK
 End Sub
 
-Sub ThrowError
-	Dim i As Int
-	i = "VLC initialization failed"
-End Sub
 
 Public Sub Load
 	mediaPlayerFactory = jo.RunMethodJO("getMediaPlayerFactory",Null)

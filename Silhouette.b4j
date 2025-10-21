@@ -318,7 +318,9 @@ Sub AppStart (Form1 As Form, Args() As String)
 	wait for (vlc.LoadAsync) complete (success As Boolean)
 	progressDialog.close
 	
-	fx.Msgbox(MainForm,loc.Localize("Failed to start VLC"),"")		
+	If success = False Then
+		fx.Msgbox(MainForm,loc.Localize("Failed to start VLC"),"")
+	End If
 	
 	MainForm.WindowWidth = 800
 	MainForm.Show
