@@ -1649,8 +1649,12 @@ Private Sub timestampRange_MouseClicked (EventData As MouseEvent)
 	If EventData.ClickCount = 2 Then
 		newLineHereMI_Action
 	else if EventData.PrimaryButtonPressed Then
-		Dim time As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
-		vlc.SetTime(time)
+		Try
+			Dim time As Long = Utils.GetMillisecondsFromTimeString(AudioProgressLabel.Text)
+			vlc.SetTime(time)
+		Catch
+			Log(LastException)
+		End Try
 	End If
 End Sub
 
