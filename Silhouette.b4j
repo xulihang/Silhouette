@@ -277,7 +277,7 @@ Sub Process_Globals
 	Type SortCriteria (o As Object,value As Long)
 	Private SubtitleLabel As Label
 	Private DisplaySubtitleCheckBox As CheckBox
-	Public version As String = "1.5.4"
+	Public version As String = "1.5.5"
 	Public limitedMode As Boolean = False
 	Private loopMode As Boolean = False
 	Private player As MediaPlayer
