@@ -20,32 +20,33 @@ File24=LineEditor.bjl
 File25=ListView.bjl
 File26=main.bjl
 File27=main_mac.bjl
-File28=modelPreference.bjl
-File29=MTSetting.bjl
+File28=MergeLineOptions.bjl
+File29=modelPreference.bjl
 File3=APISetting.bjl
-File30=PlayControl.bjl
-File31=pretranslate.bjl
-File32=progress.bjl
-File33=projectSetting.bjl
-File34=RangeSelector.bjl
-File35=searchandreplace.bjl
-File36=segment.bjl
-File37=segmentationRules.srx
-File38=sentenceSplitter.bjl
-File39=silhouette.png
+File30=MTSetting.bjl
+File31=PlayControl.bjl
+File32=pretranslate.bjl
+File33=progress.bjl
+File34=projectSetting.bjl
+File35=RangeSelector.bjl
+File36=searchandreplace.bjl
+File37=segment.bjl
+File38=segmentationRules.srx
+File39=sentenceSplitter.bjl
 File4=ASROptions.bjl
-File40=SplittingOptions.bjl
-File41=subtitlePreference.bjl
-File42=SubtitleRemovedVideoCreator.bjl
-File43=TopRightSplitPane.bjl
-File44=TopSplitPane.bjl
-File45=TranslationAssist.bjl
-File46=TranslationMemory.bjl
-File47=validator.bjl
-File48=VideoPlayer.bjl
-File49=VoiceInput.bjl
+File40=silhouette.png
+File41=SplittingOptions.bjl
+File42=subtitlePreference.bjl
+File43=SubtitleRemovedVideoCreator.bjl
+File44=TopRightSplitPane.bjl
+File45=TopSplitPane.bjl
+File46=TranslationAssist.bjl
+File47=TranslationMemory.bjl
+File48=validator.bjl
+File49=VideoPlayer.bjl
 File5=BatchTranslator.bjl
-File50=WaveForm.bjl
+File50=VoiceInput.bjl
+File51=WaveForm.bjl
 File6=BottomSplitPane.bjl
 File7=ChineseConverter.bjl
 File8=Editor.bjl
@@ -96,6 +97,7 @@ FileGroup48=Default Group
 FileGroup49=Default Group
 FileGroup5=Default Group
 FileGroup50=Default Group
+FileGroup51=Default Group
 FileGroup6=Default Group
 FileGroup7=Default Group
 FileGroup8=Default Group
@@ -144,50 +146,51 @@ Module22=LFAlign
 Module23=LocalizationHelper
 Module24=Localizator
 Module25=Map2Xml
-Module26=MT
-Module27=NativeHook
-Module28=OpenCC
-Module29=PlayControlForm
+Module26=MergeLineOptions
+Module27=MT
+Module28=NativeHook
+Module29=OpenCC
 Module3=APIParamsFiller
-Module30=Preferences
-Module31=preTranslateDialog
-Module32=progressDialog
-Module33=Project
-Module34=ProjectSettings
-Module35=RangeSelector
-Module36=SearchAndReplaceDialog
-Module37=segmentation
-Module38=SentenceSplitter
-Module39=SileroVad
+Module30=PlayControlForm
+Module31=Preferences
+Module32=preTranslateDialog
+Module33=progressDialog
+Module34=Project
+Module35=ProjectSettings
+Module36=RangeSelector
+Module37=SearchAndReplaceDialog
+Module38=segmentation
+Module39=SentenceSplitter
 Module4=ASR
-Module40=SimpleTag
-Module41=SplittingOptionsForm
-Module42=SRTImportOptions
-Module43=SrtParser
-Module44=SRX
-Module45=SubtitleRemovedVideoCreator
-Module46=TagKind
-Module47=TextFlow
-Module48=UndoManager
-Module49=Utils
+Module40=SileroVad
+Module41=SimpleTag
+Module42=SplittingOptionsForm
+Module43=SRTImportOptions
+Module44=SrtParser
+Module45=SRX
+Module46=SubtitleRemovedVideoCreator
+Module47=TagKind
+Module48=TextFlow
+Module49=UndoManager
 Module5=ASROptions
-Module50=|relative|..\Validator\Validator
-Module51=VoiceInput
-Module52=WaveFormBitmapCreator
-Module53=WavRandomAccessFile
-Module54=XLIFF
-Module55=Xml2Map
-Module56=XMLBuilder2
-Module57=XmlNode
-Module58=XmlParser
-Module59=XMLUtils
+Module50=Utils
+Module51=|relative|..\Validator\Validator
+Module52=VoiceInput
+Module53=WaveFormBitmapCreator
+Module54=WavRandomAccessFile
+Module55=XLIFF
+Module56=Xml2Map
+Module57=XMLBuilder2
+Module58=XmlNode
+Module59=XmlParser
 Module6=BatchTranslator
+Module60=XMLUtils
 Module7=ChineseConverterForm
 Module8=DraggableRange
 Module9=editDistance
-NumberOfFiles=50
+NumberOfFiles=51
 NumberOfLibraries=25
-NumberOfModules=59
+NumberOfModules=60
 Version=10
 @EndOfDesignText@
 #Region Project Attributes 
@@ -2513,12 +2516,23 @@ Private Sub MoveDownCurrentLine
 End Sub
 
 Private Sub MergeLines
-	Dim inpBox As InputBox
-	inpBox.Initialize
-	inpBox.Title = loc.Localize("Please input how many words a line should have.")
-	Dim wordNumber As Int = inpBox.showAndWait(5)
+	Dim optionsForm As MergeLineOptions
+	optionsForm.Initialize
+	Dim options As Map = optionsForm.ShowAndWait
+	Dim wordNumber As Int = options.Get("maxWordNumber")
+	Dim mergeByPunctuation As Boolean = options.Get("mergeByPunctuation")
+	Dim mergeByMaxWordNumber As Boolean = options.Get("mergeByMaxWordNumber")
+	Dim checkTimestamp As Boolean = options.Get("checkTimestamp")
 	Dim newLines As List
 	newLines.Initialize
+    
+	' 定义标点符号集合（中英文常见标点）
+	Dim punctuationSet As B4XSet
+	punctuationSet.Initialize
+	For Each p In Array("。", "？", "！", "；", "：", "，", "、", ".", "?", "!", ";", ":", ",")
+		punctuationSet.Add(p)
+	Next
+    
 	Dim sourcePattern As String = " "
 	If Utils.LanguageHasSpace(currentProject.SourceLang) = False Then
 		sourcePattern = ""
@@ -2527,33 +2541,87 @@ Private Sub MergeLines
 	If Utils.LanguageHasSpace(currentProject.TargetLang) = False Then
 		targetPattern = ""
 	End If
+    
 	Dim mergedLine As Map
 	For Each line As Map In currentProject.lines
 		Dim source As String = line.Get("source")
 		Dim target As String = line.Get("target")
 		Dim startTime As String = line.Get("startTime")
 		Dim endTime As String = line.Get("endTime")
+        
 		If mergedLine.IsInitialized Then
-			If mergedLine.Get("endTime") = startTime Then
+			' 检查是否可以合并
+			Dim canMerge As Boolean = True
+            
+			' 如果需要检查时间戳，则验证时间是否连续
+			If checkTimestamp Then
+				If mergedLine.Get("endTime") <> startTime Then
+					canMerge = False
+				End If
+			End If
+            
+			If canMerge Then
+				' 处理源语言合并时的空白字符
 				Dim sourceWhiteSpace As String = sourcePattern
-				For Each c As String In Array("'",",",".","!","?",$"""$)
+				For Each c As String In Array("'", ",", ".", "!", "?", $"""$)
 					If source.StartsWith(c) Then
 						sourceWhiteSpace = ""
 						Exit
 					End If
 				Next
-				Dim mergedSource As String = (mergedLine.Get("source")&sourceWhiteSpace&source).Trim
-				Dim mergedTarget As String = (mergedLine.Get("target")&targetPattern&target).Trim
-				mergedLine.Put("source",mergedSource)
-				mergedLine.Put("target",mergedTarget)
-				mergedLine.Put("endTime",endTime)
-				If Regex.Split(sourcePattern,mergedSource).Length>=wordNumber Then
+                
+				' 执行合并
+				Dim mergedSource As String = (mergedLine.Get("source") & sourceWhiteSpace & source).Trim
+				Dim mergedTarget As String = (mergedLine.Get("target") & targetPattern & target).Trim
+				mergedLine.Put("source", mergedSource)
+				mergedLine.Put("target", mergedTarget)
+				mergedLine.Put("endTime", endTime)
+                
+				' 判断合并后是否需要切分（按标点或词数）
+				Dim needSplit As Boolean = False
+				If mergeByMaxWordNumber Then
+					' 计算词数/字符数
+					Dim wordCount As Int
+					If sourcePattern = "" Then
+						' 中文等无空格语言，按字符数计算
+						wordCount = mergedSource.Length
+					Else
+						' 有空格语言，按分割后的数组长度计算
+						wordCount = Regex.Split(sourcePattern, mergedSource).Length
+					End If
+					If wordCount >= wordNumber Then
+						needSplit = True
+					End If
+				End If
+                
+				If mergeByPunctuation And Not(needSplit) Then
+					' 检查合并后的文本是否以标点符号结尾
+					If mergedSource.Length > 0 Then
+						Dim lastChar As String = mergedSource.SubString(mergedSource.Length - 1)
+						If punctuationSet.Contains(lastChar) Then
+							needSplit = True
+						End If
+					End If
+				End If
+                
+				If needSplit Then
+					' 需要切分：将当前合并行加入列表，并清空mergedLine
+					' 注意：当前line已经被合并进mergedLine，所以保存后不再单独添加
 					newLines.Add(mergedLine)
 					mergedLine = Null
 				End If
 			Else
+				' 不能合并（时间不连续），将已合并行加入列表
 				newLines.Add(mergedLine)
-				If Regex.Split(sourcePattern,source).Length<wordNumber Then
+				' 检查当前行是否可以作为新的合并起点
+				Dim currentWordCount As Int
+				If sourcePattern = "" Then
+					currentWordCount = source.Length
+				Else
+					currentWordCount = Regex.Split(sourcePattern, source).Length
+				End If
+                
+				If currentWordCount < wordNumber Then
 					mergedLine = line
 				Else
 					mergedLine = Null
@@ -2561,16 +2629,27 @@ Private Sub MergeLines
 				End If
 			End If
 		Else
-			If Regex.Split(sourcePattern,source).Length<wordNumber Then
+			' 没有正在合并的行，判断当前行是否开启新合并
+			Dim currentWordCount As Int
+			If sourcePattern = "" Then
+				currentWordCount = source.Length
+			Else
+				currentWordCount = Regex.Split(sourcePattern, source).Length
+			End If
+            
+			If currentWordCount < wordNumber Then
 				mergedLine = line
 			Else
 				newLines.Add(line)
 			End If
 		End If
 	Next
+    
+	' 处理最后剩余未添加的合并行
 	If mergedLine.IsInitialized Then
 		newLines.Add(mergedLine)
 	End If
+    
 	currentProject.ReplaceLines(newLines)
 	LoadLinesToTable
 End Sub
