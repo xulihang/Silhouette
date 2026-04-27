@@ -383,7 +383,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		v.showAndWait
+		'v.showAndWait
 	End If
 	
 	AskAboutGPU
@@ -3139,12 +3139,14 @@ private Sub ApplySubtitleLabelStyle
 End Sub
 
 private Sub SetSubtitleLabelFontSize
-	Dim videoHeight As Int = VLCImageView.GetImage.Height
-	Dim fontSize As Double = Utils.getPref("subtitle_font_size",16)
-	fontSize = videoHeight / 720 * (40 / 16) * fontSize 'scale fontsize based on video height
-	Dim labelWidth As Double = SubtitleLabel.PrefWidth + 20
-	Dim scaledSize As Double = labelWidth / VLCImageView.GetImage.Width * fontSize
-	SubtitleLabel.Font = fx.DefaultFont(scaledSize)
+	If VLCImageView.GetImage.IsInitialized Then
+		Dim videoHeight As Int = VLCImageView.GetImage.Height
+		Dim fontSize As Double = Utils.getPref("subtitle_font_size",16)
+		fontSize = videoHeight / 720 * (40 / 16) * fontSize 'scale fontsize based on video height
+		Dim labelWidth As Double = SubtitleLabel.PrefWidth + 20
+		Dim scaledSize As Double = labelWidth / VLCImageView.GetImage.Width * fontSize
+		SubtitleLabel.Font = fx.DefaultFont(scaledSize)
+	End If
 End Sub
 
 private Sub AddKeyEventListener(n As Node)
