@@ -1078,6 +1078,13 @@ Private Sub RecognizeWholeSpeech As ResumableSub
 		End If
 		Return ""
 	End If
+	If engine <> "whiser" Then
+		wait for (plugin.RunPlugin(engine&"ASR","longFileSupported",Null)) complete (longFileSupported As Object)
+		If longFileSupported = False Then
+			fx.Msgbox(MainForm,loc.Localize("Unsupported"),"")
+			Return ""
+		End If
+	End If
 	Dim parent As String = currentProject.GetMediaFolder
 	Dim filename As String = currentProject.GetMediaFilename
 	Dim tmpDir As String = currentProject.GetTmpFolder
