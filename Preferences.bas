@@ -26,6 +26,7 @@ Sub Class_Globals
 	Private MatchSubtitleWithVideoCheckBox As CheckBox
 	Private SubtitleFormatComboBox As ComboBox
 	Private JumpTimeSpanSpinner As Spinner
+	Private SubtitleBottomOffsetSpinner As Spinner
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -63,6 +64,7 @@ Public Sub Initialize(mb As MenuBar)
 	SkipRecognizedCheckBox.Checked = preferencesMap.GetDefault("skip_recognized",True)
 	UseGPUCheckBox.Checked = preferencesMap.GetDefault("use_gpu",True)
 	SubtitleFontSizeSpinner.Value = preferencesMap.GetDefault("subtitle_font_size",16)
+	SubtitleBottomOffsetSpinner.Value = preferencesMap.GetDefault("subtitle_bottom_offset",10)
 	JumpTimeSpanSpinner.Value = preferencesMap.GetDefault("jump_time_span",500)
 	ConvertChineseBasedOnSourceLangCheckBox.Checked = preferencesMap.GetDefault("convert_chinese_base_on_source_lang",True)
 	PrecisePlayOfSelectionCheckBox.Checked = preferencesMap.GetDefault("precise_play_of_selection",False)
@@ -191,6 +193,7 @@ Sub ApplyButton_MouseClicked (EventData As MouseEvent)
 	preferencesMap.Put("skip_recognized",SkipRecognizedCheckBox.Checked)
 	preferencesMap.Put("use_gpu",UseGPUCheckBox.Checked)
 	preferencesMap.Put("subtitle_font_size",SubtitleFontSizeSpinner.Value)
+	preferencesMap.put("subtitle_bottom_offset",SubtitleBottomOffsetSpinner.Value)
 	preferencesMap.Put("precise_play_of_selection",PrecisePlayOfSelectionCheckBox.Checked)
 	preferencesMap.Put("convert_chinese_base_on_source_lang",ConvertChineseBasedOnSourceLangCheckBox.Checked)
 	preferencesMap.Put("subtitle_css",SubtitleCSSTextArea.Text)

@@ -1991,6 +1991,9 @@ Private Sub ResizeVLCImageView(Width As Double, Height As Double)
 		SubtitleLabel.Left = 0
 		SubtitleLabel.PrefWidth = Width
 	End If
+	If 10 <> Utils.getPref("subtitle_bottom_offset",10) Then
+		SubtitleLabel.PrefHeight = Height - Utils.getPref("subtitle_bottom_offset",10)
+	End If
 End Sub
 
 Private Sub ExitApp
