@@ -192,7 +192,7 @@ Module9=editDistance
 NumberOfFiles=51
 NumberOfLibraries=25
 NumberOfModules=61
-Version=10.5
+Version=10
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
@@ -2025,7 +2025,7 @@ Private Sub VolSlider_ValueChange (Value As Double)
 	player.Volume = Value / 100
 End Sub
 
-Private Sub StopButton_MouseClicked (EventData As MouseEvent)
+Private Sub StopButton_Click
 	StopPlaying
 End Sub
 
@@ -2035,7 +2035,7 @@ Private Sub StopPlaying
 	TogglePlayingStatus(False,-1)
 End Sub
 
-Private Sub PlayButton_MouseClicked (EventData As MouseEvent)
+Private Sub PlayButton_Click
 	TogglePlaying
 End Sub
 
@@ -3064,7 +3064,7 @@ Private Sub EndTimeTextField_TextChanged (Old As String, New As String)
 	UpdateTime(False,New)
 End Sub
 
-Private Sub UseCurrentTimeButton_MouseClicked (EventData As MouseEvent)
+Private Sub UseCurrentTimeButton__Click
 	If focusedTimeTextField.IsInitialized Then
 		focusedTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
 		Sleep(0)
@@ -3148,7 +3148,7 @@ private Sub DetectVoiceActivity
 	fx.Msgbox(MainForm,loc.Localize("Done"),"")
 End Sub
 
-Private Sub SetStartPointButton_MouseClicked (EventData As MouseEvent)
+Private Sub SetStartPointButton_Click
 	If selectedRowID <> -1 Then
 		StartTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
 		Sleep(0)
@@ -3158,7 +3158,7 @@ Private Sub SetStartPointButton_MouseClicked (EventData As MouseEvent)
 	End If
 End Sub
 
-Private Sub SetEndPointButton_MouseClicked (EventData As MouseEvent)
+Private Sub SetEndPointButton_Click
 	If selectedRowID <> -1 Then
 		EndTimeTextField.Text = Utils.GetTimeStringFromMilliseconds(GetCurrentVideoTime)
 		Sleep(0)
@@ -3168,11 +3168,11 @@ Private Sub SetEndPointButton_MouseClicked (EventData As MouseEvent)
 	End If
 End Sub
 
-Private Sub BackwardButton_MouseClicked (EventData As MouseEvent)
+Private Sub BackwardButton_Click
 	Backward
 End Sub
 
-Private Sub ForwardButton_MouseClicked (EventData As MouseEvent)
+Private Sub ForwardButton_Click
 	Forward
 End Sub
 
@@ -3224,7 +3224,7 @@ Private Sub WaveFormPane_MouseExited (EventData As MouseEvent)
 	VLCPane.Tag = False
 End Sub
 
-Private Sub NewLineHereButton_MouseClicked (EventData As MouseEvent)
+Private Sub NewLineHereButton_Click
 	Dim currentStartTime As Long = GetCurrentVideoTime
 	Dim startTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime)
 	Dim endTime As String = Utils.GetTimeStringFromMilliseconds(currentStartTime + 1000)
@@ -3291,7 +3291,7 @@ public Sub FillText(text As String,isTarget As Boolean)
 	End If
 End Sub
 
-Private Sub QuickTranslateButton_MouseClicked (EventData As MouseEvent)
+Private Sub QuickTranslateButton_Click
 	Dim preferencesMap As Map=Utils.getPrefMap
 	If preferencesMap.ContainsKey("mt") Then
 		Dim mtPreferences As Map=preferencesMap.Get("mt")
