@@ -88,14 +88,17 @@ End Sub
 
 Private Sub EngineComboBox_SelectedIndexChanged(Index As Int, Value As Object)
 	If Value <> "whisper" Then
-		wait for (Main.plugin.RunPlugin(Value&"ASR","getIsInstalledOrRunning",Null)) complete (installedOrRunning As Object)
+		Dim params As Map
+		params.Initialize
+		params.Put("preferencesMap",Utils.getPrefMap)
+		wait for (Main.plugin.RunPlugin(Value&"ASR","getIsInstalledOrRunning",params)) complete (installedOrRunning As Object)
 		If installedOrRunning = False Then
 			Dim response As Int = fx.Msgbox2(frm,Main.loc.Localize("Not installed or running"),"",Main.loc.Localize("Check readme"),Main.loc.Localize("Cancel"),"",fx.MSGBOX_CONFIRMATION)
 			If response = fx.DialogResponse.POSITIVE Then
-				wait for (Main.plugin.RunPlugin(Value&"ASR","getSetupParams",Null)) Complete (params As Object)
-			     If params Is Map Then
-				 	fx.ShowExternalDocument(params.As(Map).Get("readme"))
-				 End If
+				wait for (Main.plugin.RunPlugin(Value&"ASR","getSetupParams",params)) Complete (setupParams As Object)
+				If setupParams Is Map Then
+					fx.ShowExternalDocument(setupParams.As(Map).Get("readme"))
+				End If
 			End If
 		End If
 	End If
