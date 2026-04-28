@@ -258,6 +258,7 @@ Sub Process_Globals
 	Private AssistTabPane As TabPane
 	Private TMTableView As TableView
 	Private TMTextArea As TextArea
+	private StopButton as Button
 	Public plugin As ABPlugin
 	Private isLongClick As Boolean = False
 	Private VLCImageView As ImageView
@@ -3200,6 +3201,7 @@ End Sub
 
 Private Sub Hook_NativeKeyPressed(code As String)
 	If code = 57 Then 'space pressed
+		VLCPane.RequestFocus
 		If VLCPane.Tag = True Then
 			TogglePlaying
 		End If
