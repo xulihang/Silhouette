@@ -191,7 +191,7 @@ Module9=editDistance
 NumberOfFiles=51
 NumberOfLibraries=25
 NumberOfModules=60
-Version=10
+Version=10.5
 @EndOfDesignText@
 #Region Project Attributes 
 	#MainFormWidth: 600
@@ -1986,6 +1986,18 @@ End Sub
 Private Sub ExitApp
 	'vlc.stop
 	cleanupHook
+	
+	Dim params As Map
+	params.Initialize
+	params.Put("preferencesMap",Utils.getPrefMap)
+	For Each engineName As String In ASR.getASRPluginList
+		wait for (plugin.RunPlugin(engineName&"ASR","needManualStop",params)) complete (result As Object)
+		If result = True Then
+			Log("Stopping "&engineName)
+			wait for (plugin.RunPlugin(engineName&"ASR","stop",params)) complete (result As Object)
+		End If
+	Next
+	
 	Try
 		vlc.release
 	Catch
