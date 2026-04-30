@@ -31,9 +31,17 @@ Public Sub ExportToSRT(lines As List,path As String,askOption As Boolean,option 
 		sb.Append(Chr(13))
 		sb.Append(Chr(10))
 		If option = 0 Then
-			sb.Append(line.Get("source"))
+			If Regex.IsMatch("\d+",line.Get("source")) Then
+				sb.Append(" "&line.Get("source")&" ")
+			Else
+				sb.Append(line.Get("source"))
+			End If
 		else if option = 1 Then
-			sb.Append(line.Get("target"))
+			If Regex.IsMatch("\d+",line.Get("target")) Then
+				sb.Append(" "&line.Get("target")&" ")
+			Else
+				sb.Append(line.Get("target"))
+			End If
 		Else
 			sb.Append(line.Get("source"))
 			sb.Append(Chr(13))

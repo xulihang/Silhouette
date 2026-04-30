@@ -258,7 +258,7 @@ Sub Process_Globals
 	Private AssistTabPane As TabPane
 	Private TMTableView As TableView
 	Private TMTextArea As TextArea
-	private StopButton as Button
+	Private StopButton As Button
 	Public plugin As ABPlugin
 	Private isLongClick As Boolean = False
 	Private VLCImageView As ImageView
@@ -388,7 +388,7 @@ Sub AppStart (Form1 As Form, Args() As String)
 	Dim v As Validator
 	v.Initialize
 	If v.VerifyInSilence = False Then
-		'v.showAndWait
+		v.showAndWait
 	End If
 	
 	AskAboutGPU
