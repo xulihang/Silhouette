@@ -3201,8 +3201,8 @@ End Sub
 
 Private Sub Hook_NativeKeyPressed(code As String)
 	If code = 57 Then 'space pressed
-		VLCPane.RequestFocus
 		If VLCPane.Tag = True Then
+			VLCPane.RequestFocus
 			TogglePlaying
 		End If
 	End If
