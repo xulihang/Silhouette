@@ -3202,7 +3202,9 @@ End Sub
 Private Sub Hook_NativeKeyPressed(code As String)
 	If code = 57 Then 'space pressed
 		If VLCPane.Tag = True Then
-			VLCPane.RequestFocus
+			If TextAreaFocused = False Then
+				VLCPane.RequestFocus
+			End If
 			TogglePlaying
 		End If
 	End If
@@ -3210,7 +3212,9 @@ End Sub
 
 Private Sub VideoPlayerPane_MouseEntered (EventData As MouseEvent)
 	VLCPane.Tag = True
-	PlayButton.RequestFocus
+	If TextAreaFocused = False Then
+		PlayButton.RequestFocus
+	End If
 End Sub
 
 Private Sub VideoPlayerPane_MouseExited (EventData As MouseEvent)
@@ -3218,8 +3222,23 @@ Private Sub VideoPlayerPane_MouseExited (EventData As MouseEvent)
 End Sub
 
 Private Sub WaveFormPane_MouseEntered (EventData As MouseEvent)
-	PlayButton.RequestFocus
+	If TextAreaFocused = False Then
+		PlayButton.RequestFocus
+	End If
 	VLCPane.Tag = True
+End Sub
+
+Private Sub TextAreaFocused As Boolean
+	Dim focuesed As Boolean = False
+	Dim jo As JavaObject = SourceTextArea
+	If jo.RunMethod("isFocused",Null) Then
+		focuesed = True
+	End If
+	Dim jo As JavaObject = TargetTextArea
+	If jo.RunMethod("isFocused",Null) Then
+		focuesed = True
+	End If
+	Return focuesed
 End Sub
 
 Private Sub WaveFormPane_MouseExited (EventData As MouseEvent)
