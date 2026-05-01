@@ -1987,11 +1987,11 @@ Private Sub ResizeVLCImageView(Width As Double, Height As Double)
 				SubtitleLabel.PrefWidth = VLCImageView.Width
 			End If
 		End If
-		SetSubtitleLabelFontSize
 	Else
 		SubtitleLabel.Left = 0
 		SubtitleLabel.PrefWidth = Width
 	End If
+	SetSubtitleLabelFontSize
 	If 10 <> Utils.getPref("subtitle_bottom_offset",10) Then
 		SubtitleLabel.PrefHeight = Height - Utils.getPref("subtitle_bottom_offset",10)
 	End If
@@ -3254,13 +3254,15 @@ private Sub ApplySubtitleLabelStyle
 End Sub
 
 private Sub SetSubtitleLabelFontSize
+	Dim fontSize As Double = Utils.getPref("subtitle_font_size",16)
 	If VLCImageView.GetImage.IsInitialized Then
 		Dim videoHeight As Int = VLCImageView.GetImage.Height
-		Dim fontSize As Double = Utils.getPref("subtitle_font_size",16)
 		fontSize = videoHeight / 720 * (40 / 16) * fontSize 'scale fontsize based on video height
 		Dim labelWidth As Double = SubtitleLabel.PrefWidth + 20
 		Dim scaledSize As Double = labelWidth / VLCImageView.GetImage.Width * fontSize
 		SubtitleLabel.Font = fx.DefaultFont(scaledSize)
+	Else
+		SubtitleLabel.Font = fx.DefaultFont(fontSize)
 	End If
 End Sub
 
