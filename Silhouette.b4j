@@ -2253,15 +2253,15 @@ private Sub splitHereMI_Action
 			result = splitter.ShowAndWait
 			Dim adjustedSource As String = result.Get("source")
 			Dim adjustedTarget As String = result.Get("target")
-			Dim splittedSource() As String = Regex.Split(CRLF,adjustedSource)
-			Dim splittedTarget() As String = Regex.Split(CRLF,adjustedTarget)
-			If splittedSource.Length = 2 Then
-				line.Put("source",splittedSource(0))
-				appendedLine.Put("source",splittedSource(1))
+			Dim splitSource() As String = Regex.Split(CRLF,adjustedSource)
+			Dim splitTarget() As String = Regex.Split(CRLF,adjustedTarget)
+			If splitSource.Length = 2 Then
+				line.Put("source",splitSource(0))
+				appendedLine.Put("source",splitSource(1))
 			End If
-			If splittedTarget.Length = 2 Then
-				line.Put("target",splittedSource(0))
-				appendedLine.Put("target",splittedSource(1))
+			If splitTarget.Length = 2 Then
+				line.Put("target",splitTarget(0))
+				appendedLine.Put("target",splitTarget(1))
 			End If
 		End If
 		LoadLinesToTable
